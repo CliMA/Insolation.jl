@@ -16,7 +16,7 @@ Julia code to calculate solar zenith angle and solar insolation. Defaults to Ear
 [codecov-url]: https://codecov.io/gh/claresinger/Insolation.jl
 
 [bors-img]: https://bors.tech/images/badge_small.svg
-[bors-url]: https://app.bors.tech/repositories/20449
+[bors-url]: https://app.bors.tech/repositories/24246
 
 [travis-img]: https://travis-ci.org/claresinger/Insolation.jl.svg?branch=master
 [travis-url]: https://travis-ci.org/claresinger/Insolation.jl
