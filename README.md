@@ -10,7 +10,7 @@ Julia code to calculate solar zenith angle and solar insolation. Defaults to Ear
 | **Travis Build**     | [![travis][travis-img]][travis-url]           |
 
 [docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
-[docs-latest-url]: https://climate-machine.github.io/Insolation.jl/latest/
+[docs-latest-url]: https://claresinger.github.io/Insolation.jl/latest/
 
 [codecov-img]: https://codecov.io/gh/claresinger/Insolation.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/claresinger/Insolation.jl
