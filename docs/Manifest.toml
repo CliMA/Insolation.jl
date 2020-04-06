@@ -40,7 +40,7 @@ uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[Insolation]]
 deps = ["Dates", "Documenter", "DocumenterTools", "Test"]
-path = "/Users/claresinger/Research/Insolation.jl"
+path = ".."
 uuid = "e98cc03f-d57e-4e3c-b70c-8d51efe9e0d8"
 version = "0.1.0"
 
