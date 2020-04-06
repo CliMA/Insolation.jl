@@ -1,5 +1,7 @@
 module Insolation
 
+include("SolarZenithAngle.jl")
+
 export func1, func2
 
 """

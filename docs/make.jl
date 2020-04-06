@@ -9,6 +9,7 @@ makedocs(
     clean = false,
     pages = Any[
         "Home" => "index.md"
+        "Solar Zenith Angle" => "SolarZenithAngle.md"
     ]
 )
 
