@@ -4,13 +4,13 @@ Julia code to calculate solar zenith angle and solar insolation. Defaults to Ear
 
 |||
 |---------------------:|:----------------------------------------------|
-| **Documentation**    | [![latest][docs-latest-img]][docs-latest-url] |
+| **Documentation**    | [![latest][docs-dev-img]][docs-dev-url] |
 | **Code Coverage**    | [![codecov][codecov-img]][codecov-url]        |
 | **Bors**             | [![Bors enabled][bors-img]][bors-url]         |
 | **Travis Build**     | [![travis][travis-img]][travis-url]           |
 
-[docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
-[docs-latest-url]: https://claresinger.github.io/Insolation.jl/latest/
+[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-dev-url]: https://claresinger.github.io/Insolation.jl/dev/
 
 [codecov-img]: https://codecov.io/gh/claresinger/Insolation.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/claresinger/Insolation.jl
