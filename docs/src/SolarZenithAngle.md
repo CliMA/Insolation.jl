@@ -7,7 +7,7 @@ CurrentModule = RRTMGP.SolarZenithAngle
 # Examples
 
 ```@example ZenithAngle
-include("plot_zenith_angle.jl")
+include("../../src/plot_zenith_angle.jl")
 
 #####
 ##### Example 2
