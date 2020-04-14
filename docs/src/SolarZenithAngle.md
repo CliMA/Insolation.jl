@@ -13,17 +13,17 @@ include("../../src/plot_zenith_angle.jl")
 ##### Example 2
 #####
 
+# ndays, nlats
+ndays = 365
+nlats = 180
+
 # 2018 constants
 γ_0 = 23.44
 ϖ_0 = 282.95
 e_0 = 0.017
 
-# ndays, nlats
-ndays = 365
-nlats = 180
-
-F0 = calc_day_lat_insolation(ndays, nlats, γ_0, ϖ_0, e_0)
-plot_day_lat_insolation(ndays, nlats, F0, "YlOrRd", "gamma_0 = $(γ_0), pi_0 = $(ϖ_0), e = $(e_0)", "example2.png")
+day, lats, F0 = calc_day_lat_insolation(ndays, nlats, γ_0, ϖ_0, e_0)
+plot_day_lat_insolation(days, lats, F0, "YlOrRd", "gamma_0 = $(γ_0), pi_0 = $(ϖ_0), e = $(e_0)", "example2.png")
 
 #####
 ##### Example 3
@@ -34,12 +34,9 @@ plot_day_lat_insolation(ndays, nlats, F0, "YlOrRd", "gamma_0 = $(γ_0), pi_0 = $
 ϖ_1 = 282.95 + 180.0
 e_0 = 0.017
 
-ndays = 365
-nlats = 180
-
-F1 = calc_day_lat_insolation(ndays,nlats,γ_0,ϖ_1,e_0)
-plot_day_lat_insolation(ndays,nlats,F1,"YlOrRd",  "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example3a.png")
-plot_day_lat_insolation(ndays,nlats,F1-F0,"PRGn", "ToA Insolation Difference: ϖ_0_1 = 102.95^∘ - ϖ_0_0 = 282.95^∘", "example3b.png")
+days, lats, F1 = calc_day_lat_insolation(ndays,nlats,γ_0,ϖ_1,e_0)
+plot_day_lat_insolation(days,lats,F1,"YlOrRd",  "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example3a.png")
+plot_day_lat_insolation(days,lats,F1-F0,"PRGn", "ToA Insolation Difference: ϖ_0_1 = 102.95^∘ - ϖ_0_0 = 282.95^∘", "example3b.png")
 
 #####
 ##### Example 4
@@ -50,26 +47,18 @@ plot_day_lat_insolation(ndays,nlats,F1-F0,"PRGn", "ToA Insolation Difference: ϖ
 ϖ_0 = 282.95
 e_0 = 0.017
 
-# ndays, nlats
-ndays = 365
-nlats = 180
-
-F2 = calc_day_lat_insolation(ndays,nlats,γ_1,ϖ_0,e_0)
-plot_day_lat_insolation(ndays,nlats,F2,"YlOrRd",  "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example4a.png")
-plot_day_lat_insolation(ndays,nlats,F2-F0,"PRGn", "ToA Insolation Difference: γ_1 = $(γ_1)^∘ - γ_0 = $(γ_0)^∘", "example4b.png")
+days, lats, F2 = calc_day_lat_insolation(ndays,nlats,γ_1,ϖ_0,e_0)
+plot_day_lat_insolation(days,lats,F2,"YlOrRd",  "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example4a.png")
+plot_day_lat_insolation(days,lats,F2-F0,"PRGn", "ToA Insolation Difference: γ_1 = $(γ_1)^∘ - γ_0 = $(γ_0)^∘", "example4b.png")
 
 # decrease γ to 18.0°
 γ_2 = 18.0
 ϖ_0 = 282.95
 e_0 = 0.017
 
-# ndays, nlats
-ndays = 365
-nlats = 180
-
-F3 = calc_day_lat_insolation(ndays,nlats,γ_2,ϖ_0,e_0)
-plot_day_lat_insolation(ndays,nlats,F3,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example4c.png")
-plot_day_lat_insolation(ndays,nlats,F3-F0,"PRGn", "ToA Insolation Difference: γ_1 = $(γ_1)^∘ - γ_0 = $(γ_0)^∘", "example4d.png")
+days, lats, F3 = calc_day_lat_insolation(ndays,nlats,γ_2,ϖ_0,e_0)
+plot_day_lat_insolation(days,lats,F3,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example4c.png")
+plot_day_lat_insolation(days,lats,F3-F0,"PRGn", "ToA Insolation Difference: γ_1 = $(γ_1)^∘ - γ_0 = $(γ_0)^∘", "example4d.png")
 
 #####
 ##### Example 6
@@ -80,26 +69,18 @@ plot_day_lat_insolation(ndays,nlats,F3-F0,"PRGn", "ToA Insolation Difference: γ
 ϖ_0 = 282.95
 e_0 = 0.017
 
-# ndays, nlats
-ndays = 365
-nlats = 180
-
-F4 = calc_day_lat_insolation(ndays,nlats,γ_3,ϖ_0,e_0)
-plot_day_lat_insolation(ndays,nlats,F4,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example6a.png")
-plot_day_lat_insolation(ndays,nlats,F4-F0,"PRGn", "ToA Insolation Difference: γ_1 = 60.0^∘ - γ_0 = 23.44^∘", "example6b.png")
+days, lats, F4 = calc_day_lat_insolation(ndays,nlats,γ_3,ϖ_0,e_0)
+plot_day_lat_insolation(days,lats,F4,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example6a.png")
+plot_day_lat_insolation(days,lats,F4-F0,"PRGn", "ToA Insolation Difference: γ_1 = 60.0^∘ - γ_0 = 23.44^∘", "example6b.png")
 
 # now change obliquity to 97.86°
 γ = 97.86
 ϖ_0 = 282.95
 e_0 = 0.017
 
-# ndays, nlats
-ndays = 365
-nlats = 180
-
-F5 = calc_day_lat_insolation(ndays,nlats,γ,ϖ_0,e_0)
-plot_day_lat_insolation(ndays,nlats,F5,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example6c.png")
-plot_day_lat_insolation(ndays,nlats,F5-F0,"PRGn", "ToA Insolation Difference: γ_1 = 97.86^∘ - γ_0 = 23.44^∘", "example6d.png")
+days, lats, F5 = calc_day_lat_insolation(ndays,nlats,γ,ϖ_0,e_0)
+plot_day_lat_insolation(days,lats,F5,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example6c.png")
+plot_day_lat_insolation(days,lats,F5-F0,"PRGn", "ToA Insolation Difference: γ_1 = 97.86^∘ - γ_0 = 23.44^∘", "example6d.png")
 
 ```
 ## Example 2
