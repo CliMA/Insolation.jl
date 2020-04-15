@@ -1,100 +1,131 @@
 # Solar Zenith Angle
 
 ```@meta
-CurrentModule = RRTMGP.SolarZenithAngle
+CurrentModule = Insolation.SolarZenithAngle
 ```
 
-# Examples
+## Example 1
+```@example
+include("../../examples/plot_insolation.jl")
 
-```@example ZenithAngle
-include("../../src/plot_zenith_angle.jl")
+# 2018 orbital constants
+γ0 = 23.44
+ϖ0 = 282.95
+e0 = 0.017
 
-#####
-##### Example 2
-#####
+days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
+title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "example1.png")
+```
+![](example1.png)
 
-# ndays, nlats
-ndays = 365
-nlats = 180
-
-# 2018 constants
-γ_0 = 23.44
-ϖ_0 = 282.95
-e_0 = 0.017
-
-day, lats, F0 = calc_day_lat_insolation(ndays, nlats, γ_0, ϖ_0, e_0)
-plot_day_lat_insolation(days, lats, F0, "YlOrRd", "gamma_0 = $(γ_0), pi_0 = $(ϖ_0), e = $(e_0)", "example2.png")
-
-#####
-##### Example 3
-#####
+## Example 2
+```@example
+include("../../examples/plot_insolation.jl") # hide
 
 # turn longitude of perihelion by 180°
-γ_0 = 23.44
-ϖ_1 = 282.95 + 180.0
-e_0 = 0.017
+γ0 = 23.44
+ϖ0 = 282.95 # hide
+ϖ1 = ϖ0 + 180.0
+e0 = 0.017
 
-days, lats, F1 = calc_day_lat_insolation(ndays,nlats,γ_0,ϖ_1,e_0)
-plot_day_lat_insolation(days,lats,F1,"YlOrRd",  "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example3a.png")
-plot_day_lat_insolation(days,lats,F1-F0,"PRGn", "ToA Insolation Difference: ϖ_0_1 = 102.95^∘ - ϖ_0_0 = 282.95^∘", "example3b.png")
+days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
+days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
 
-#####
-##### Example 4
-#####
+title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ1)" * ", ecc=" * "$(e0)"
+plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "example2a.png")
+
+title = "insolation diff: perihelion0=" * "$(ϖ0)" * ", perihelion1=" * "$(ϖ1)"
+plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "example2b.png")
+```
+![](example2a.png)
+![](example2b.png)
+
+## Example 3
+```@example
+include("../../examples/plot_insolation.jl") # hide
 
 # perihelion back to normal. decrease γ to 22.0°
-γ_1 = 22.0
-ϖ_0 = 282.95
-e_0 = 0.017
+γ0 = 23.44 # hide
+γ1 = 22.0
+ϖ0 = 282.95
+e0 = 0.017
 
-days, lats, F2 = calc_day_lat_insolation(ndays,nlats,γ_1,ϖ_0,e_0)
-plot_day_lat_insolation(days,lats,F2,"YlOrRd",  "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example4a.png")
-plot_day_lat_insolation(days,lats,F2-F0,"PRGn", "ToA Insolation Difference: γ_1 = $(γ_1)^∘ - γ_0 = $(γ_0)^∘", "example4b.png")
+days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
+days, lats, F2 = calc_day_lat_insolation(365, 180, γ1, ϖ0, e0)
 
-# decrease γ to 18.0°
-γ_2 = 18.0
-ϖ_0 = 282.95
-e_0 = 0.017
+title = "obliq=" * "$(γ1)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+plot_day_lat_insolation(days,lats,F2,"YlOrRd",  title, "example3a.png")
 
-days, lats, F3 = calc_day_lat_insolation(ndays,nlats,γ_2,ϖ_0,e_0)
-plot_day_lat_insolation(days,lats,F3,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example4c.png")
-plot_day_lat_insolation(days,lats,F3-F0,"PRGn", "ToA Insolation Difference: γ_1 = $(γ_1)^∘ - γ_0 = $(γ_0)^∘", "example4d.png")
-
-#####
-##### Example 6
-#####
-
-# now change obliquity to 60.0°
-γ_3 = 60.0
-ϖ_0 = 282.95
-e_0 = 0.017
-
-days, lats, F4 = calc_day_lat_insolation(ndays,nlats,γ_3,ϖ_0,e_0)
-plot_day_lat_insolation(days,lats,F4,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example6a.png")
-plot_day_lat_insolation(days,lats,F4-F0,"PRGn", "ToA Insolation Difference: γ_1 = 60.0^∘ - γ_0 = 23.44^∘", "example6b.png")
-
-# now change obliquity to 97.86°
-γ = 97.86
-ϖ_0 = 282.95
-e_0 = 0.017
-
-days, lats, F5 = calc_day_lat_insolation(ndays,nlats,γ,ϖ_0,e_0)
-plot_day_lat_insolation(days,lats,F5,"YlOrRd", "γ_0 = $(γ_0)^∘, ϖ_0 = $(ϖ_0)^∘, e = $(e_0)", "example6c.png")
-plot_day_lat_insolation(days,lats,F5-F0,"PRGn", "ToA Insolation Difference: γ_1 = 97.86^∘ - γ_0 = 23.44^∘", "example6d.png")
-
+title = "insolation diff: obliq0=" * "$(γ0)" * ", obliq1=" * "$(γ1)"
+plot_day_lat_insolation(days,lats,F2-F0,"PRGn", title, "example3b.png")
 ```
-## Example 2
-![](example2.png)
-## Example 3
 ![](example3a.png)
 ![](example3b.png)
+
 ## Example 4
+```@example
+include("../../examples/plot_insolation.jl") # hide
+
+# decrease γ further to 18.0°
+γ0 = 23.44 # hide
+γ2 = 18.0
+ϖ0 = 282.95
+e0 = 0.017
+
+days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
+days, lats, F3 = calc_day_lat_insolation(365, 180, γ2, ϖ0, e0)
+
+title = "obliq=" * "$(γ2)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+plot_day_lat_insolation(days,lats,F3,"YlOrRd", title, "example4a.png")
+
+title = "insolation diff: obliq0=" * "$(γ0)" * ", obliq1=" * "$(γ2)"
+plot_day_lat_insolation(days,lats,F3-F0,"PRGn", title, "example4b.png")
+```
 ![](example4a.png)
 ![](example4b.png)
-![](example4c.png)
-![](example4d.png)
+
+## Example 5
+```@example
+include("../../examples/plot_insolation.jl") # hide
+
+# now change obliquity to 60.0°
+γ0 = 23.44 # hide
+γ3 = 60.0
+ϖ0 = 282.95
+e0 = 0.017
+
+days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
+days, lats, F4 = calc_day_lat_insolation(365, 180, γ3, ϖ0, e0)
+
+title = "obliq=" * "$(γ3)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+plot_day_lat_insolation(days,lats,F4,"YlOrRd", title, "example5a.png")
+
+title = "insolation diff: obliq0=" * "$(γ0)" * ", obliq1=" * "$(γ3)"
+plot_day_lat_insolation(days,lats,F4-F0,"PRGn", title, "example5b.png")
+```
+![](example5a.png)
+![](example5b.png)
+
 ## Example 6
+```@example
+include("../../examples/plot_insolation.jl") # hide
+
+# now change obliquity to 97.86°
+γ0 = 23.44 # hide
+γ4 = 97.86
+ϖ0 = 282.95
+e0 = 0.017
+
+days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
+days, lats, F5 = calc_day_lat_insolation(365, 180, γ4, ϖ0, e0)
+
+title = "obliq=" * "$(γ4)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+plot_day_lat_insolation(days,lats,F5,"YlOrRd", title, "example6a.png")
+
+title = "insolation diff: obliq0=" * "$(γ0)" * ", obliq1=" * "$(γ4)"
+plot_day_lat_insolation(days,lats,F5-F0,"PRGn", title, "example6b.png")
+
+```
 ![](example6a.png)
 ![](example6b.png)
-![](example6c.png)
-![](example6d.png)
