@@ -1,12 +1,13 @@
 using Insolation
 using Insolation.SolarZenithAngle
 
-@static if Insolation.haspkg("Plots")
-  using Plots
-  const export_plots = true
-else
-  const export_plots = false
-end
+using Plots
+# @static if Insolation.haspkg("Plots")
+#   using Plots
+#   const export_plots = true
+# else
+#   const export_plots = false
+# end
 
 """
     calc_day_lat_insolation(n_days::I,
