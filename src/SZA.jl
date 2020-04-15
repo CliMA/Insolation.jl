@@ -12,6 +12,9 @@ export instantaneous_zenith_angle, daily_zenith_angle
                                latitude::FT) where {FT <: Real}
 
     returns the zenith angle at a particular longitude and latitude on the given date
+
+    add docs: https://www.esrl.noaa.gov/gmd/grad/solcalc/
+    https://www.cfa.harvard.edu/~jzhao/times.html
 """
 function instantaneous_zenith_angle(date::DateTime,
                       timezone::FT,
