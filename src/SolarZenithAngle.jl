@@ -65,8 +65,58 @@ function instantaneous_zenith_angle(date::DateTime,
     RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
 
     # hour angle, radians
-    hours = Dates.hour(date) - timezone
-    GMST = mod(6.6974243242 + 2400.117188*jc + hours, 24.0)
+    UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
+    GMST = mod(6.6974243242 + 2400.117188*jc + UTC_hours, 24.0)
+    GMSTrad = mod(deg2rad(GMST * (360.0/24.0)), 2*π)
+    LMST = GMSTrad + λ
+    η = mod(LMST - RA, 2*π)
+
+    # zenith angle
+    sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
+
+    return sza, d
+end
+
+"""
+    instantaneous_zenith_angle(date::DateTime,
+                               timezone::FT,
+                               longitude::FT,
+                               latitude::FT,
+                               obliquity::FT,
+                               perihelion::FT,
+                               eccentricity::FT) where {FT <: Real}
+
+returns the zenith angle and earth-sun distance
+at a particular longitude and latitude on the given date
+given orbital parameters: obliquity, longitude of perihelion, and eccentricity
+"""
+function instantaneous_zenith_angle(date::DateTime,
+                                    timezone::FT,
+                                    longitude::FT,
+                                    latitude::FT) where {FT <: Real}
+    λ = deg2rad(longitude)
+    ϕ = deg2rad(latitude)
+    γ = deg2rad(obliquity)
+    ϖ = deg2rad(perihelion)
+    ecc = eccentricity
+    
+    # solar longitude and true anomaly
+    days_since_equinox = Dates.day(date) - 76.0
+    TL = mod(2*π * days_since_equinox / (year_anom() / day_length()), 2*π)
+    TA = mod(TL - ϖ, 2*π)
+
+    # radius earth-sun distance, AU and m
+    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
+    d = d_au * astro_unit()
+
+    # declination, radians
+    δ = mod(asin(sin(γ) * sin(TL)), 2*π)
+    # right acension, radians
+    RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
+
+    # hour angle, radians
+    UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
+    GMST = mod(6.6974243242 + 2400.117188*jc + UTC_hours, 24.0)
     GMSTrad = mod(deg2rad(GMST * (360.0/24.0)), 2*π)
     LMST = GMSTrad + λ
     η = mod(LMST - RA, 2*π)

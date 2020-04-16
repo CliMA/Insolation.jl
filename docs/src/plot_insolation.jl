@@ -58,14 +58,14 @@ function plot_day_lat_insolation(d_arr::Array{I},
   savefig(file_name)
 end
 
-function main()
-  γ0 = 23.44
-  ϖ0 = 282.95
-  e0 = 0.017
+# function main()
+#   γ0 = 23.44
+#   ϖ0 = 282.95
+#   e0 = 0.017
 
-  days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
-  title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
-  plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "example1.png")
-end
+#   days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
+#   title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+#   plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "example1.png")
+# end
 
-main()
+# main()
