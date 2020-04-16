@@ -1,12 +1,8 @@
-# Solar Zenith Angle
-
-```@meta
-CurrentModule = Insolation.SolarZenithAngle
-```
+# Insolation Examples
 
 ## Example 1
 ```@example
-include("../../examples/plot_insolation.jl")
+include("plot_insolation.jl")
 
 # 2018 orbital constants
 γ0 = 23.44
@@ -21,7 +17,7 @@ plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "example1.png")
 
 ## Example 2
 ```@example
-include("../../examples/plot_insolation.jl") # hide
+include("plot_insolation.jl") # hide
 
 # turn longitude of perihelion by 180°
 γ0 = 23.44
@@ -43,7 +39,7 @@ plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "example2b.png")
 
 ## Example 3
 ```@example
-include("../../examples/plot_insolation.jl") # hide
+include("plot_insolation.jl") # hide
 
 # perihelion back to normal. decrease γ to 22.0°
 γ0 = 23.44 # hide
@@ -65,7 +61,7 @@ plot_day_lat_insolation(days,lats,F2-F0,"PRGn", title, "example3b.png")
 
 ## Example 4
 ```@example
-include("../../examples/plot_insolation.jl") # hide
+include("plot_insolation.jl") # hide
 
 # decrease γ further to 18.0°
 γ0 = 23.44 # hide
@@ -87,7 +83,7 @@ plot_day_lat_insolation(days,lats,F3-F0,"PRGn", title, "example4b.png")
 
 ## Example 5
 ```@example
-include("../../examples/plot_insolation.jl") # hide
+include("plot_insolation.jl") # hide
 
 # now change obliquity to 60.0°
 γ0 = 23.44 # hide
@@ -109,7 +105,7 @@ plot_day_lat_insolation(days,lats,F4-F0,"PRGn", title, "example5b.png")
 
 ## Example 6
 ```@example
-include("../../examples/plot_insolation.jl") # hide
+include("plot_insolation.jl") # hide
 
 # now change obliquity to 97.86°
 γ0 = 23.44 # hide

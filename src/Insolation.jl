@@ -1,6 +1,7 @@
 module Insolation
 
+include("OrbitalParameters.jl")
 include("SolarZenithAngle.jl")
-include("SZA.jl")
+include("SolarInsolation.jl")
 
 end # module

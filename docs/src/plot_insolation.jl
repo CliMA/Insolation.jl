@@ -1,5 +1,4 @@
-using Insolation
-using Insolation.SolarZenithAngle
+using Insolation.SolarInsolation
 using Plots
 
 """
@@ -14,13 +13,15 @@ function calc_day_lat_insolation(n_days::I,
                                 γ::FT,
                                 ϖ::FT,
                                 e::FT) where {FT<:AbstractFloat,I<:Int}
+  equinox_day = 76
   d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
   l_arr = Array{I}(round.(collect(range(-90, stop = 90, length = n_lats))))
+  l_arr = collect(range(-90, stop = 90, length = n_lats))
   F_arr = zeros(FT, n_days, n_lats)
   # loop over days
   for (i, day) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
-      F_arr[i, j] = calc_point_insolation(day, lat, γ, ϖ, e)
+      F_arr[i, j] = daily_insolation(day-equinox_day, γ, ϖ, e, lat)
     end
   end
   return d_arr, l_arr, F_arr
@@ -35,7 +36,7 @@ end
                             file_name) where {FT<:AbstractFloat,I<:Int}
 """
 function plot_day_lat_insolation(d_arr::Array{I},
-                                 l_arr::Array{I},
+                                 l_arr::Array{FT},
                                  F_arr::Array{FT},
                                  scmap,
                                  stitle,
@@ -56,3 +57,15 @@ function plot_day_lat_insolation(d_arr::Array{I},
   # plot(Fbar,l_arr,"k-", xlabel="Average ToA Insolation [W/m^2]")
   savefig(file_name)
 end
+
+function main()
+  γ0 = 23.44
+  ϖ0 = 282.95
+  e0 = 0.017
+
+  days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
+  title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+  plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "example1.png")
+end
+
+main()
