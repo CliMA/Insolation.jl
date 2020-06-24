@@ -1,7 +1,7 @@
 using Documenter, Insolation
 
 makedocs(
-    sitename="Insolation.jl Documentation",
+    sitename="Insolation.jl",
     doctest = false,
     strict = false,
     format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true",),
@@ -9,7 +9,9 @@ makedocs(
     clean = false,
     pages = Any[
         "Home" => "index.md"
-        "Solar Zenith Angle" => "SolarZenithAngle.md"
+        "Zenith Angle Examples" => "ZenithAngleExamples.md"
+        "Insolation Examples" => "InsolationExamples.md"
+        "Library" => "library.md"
     ]
 )
 
