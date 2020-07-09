@@ -13,22 +13,29 @@ connect: Connection refused
 GKS: can&#39;t connect to GKS socket application
 
 GKS: Open failed in routine OPEN_WS
-GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example1.png" alt/></p><h2 id="Example-2-1"><a class="docs-heading-anchor" href="#Example-2-1">Example 2</a><a class="docs-heading-anchor-permalink" href="#Example-2-1" title="Permalink"></a></h2><pre><code class="language-">include(&quot;plot_zenith.jl&quot;) # hide
-
-# turn longitude of perihelion by 180°
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example1.png" alt/></p><h2 id="Example-2-1"><a class="docs-heading-anchor" href="#Example-2-1">Example 2</a><a class="docs-heading-anchor-permalink" href="#Example-2-1" title="Permalink"></a></h2><pre><code class="language-julia"># turn longitude of perihelion by 180°
 γ0 = 23.44
-ϖ0 = 282.95 # hide
 ϖ1 = ϖ0 + 180.0
 e0 = 0.017
 
-days, lats, S0 = calc_day_lat_sza(365, 180, γ0, ϖ0, e0) # hide
 days, lats, S1 = calc_day_lat_sza(365, 180, γ0, ϖ1, e0)
 
 title = &quot;obliq=&quot; * &quot;$(γ0)&quot; * &quot;, perihelion=&quot; * &quot;$(ϖ1)&quot; * &quot;, ecc=&quot; * &quot;$(e0)&quot;
 plot_day_lat_sza(days, lats, S1, &quot;YlOrRd&quot;,  title, &quot;sza_example2a.png&quot;)
 
 title = &quot;SZA diff: perihelion0=&quot; * &quot;$(ϖ0)&quot; * &quot;, perihelion1=&quot; * &quot;$(ϖ1)&quot;
-plot_day_lat_sza(days,lats,S1-S0,&quot;PRGn&quot;, title, &quot;sza_example2b.png&quot;)</code></pre><p><img src="../sza_example2a.png" alt/> <img src="../sza_example2b.png" alt/></p><h2 id="Example-3-1"><a class="docs-heading-anchor" href="#Example-3-1">Example 3</a><a class="docs-heading-anchor-permalink" href="#Example-3-1" title="Permalink"></a></h2><pre><code class="language-julia"># perihelion back to normal. decrease γ to 22.0°
+plot_day_lat_sza(days,lats,S1-S0,&quot;PRGn&quot;, title, &quot;sza_example2b.png&quot;)</code></pre><pre><code class="language-none">/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS
+/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example2a.png" alt/> <img src="../sza_example2b.png" alt/></p><h2 id="Example-3-1"><a class="docs-heading-anchor" href="#Example-3-1">Example 3</a><a class="docs-heading-anchor-permalink" href="#Example-3-1" title="Permalink"></a></h2><pre><code class="language-julia"># perihelion back to normal. decrease γ to 22.0°
 γ1 = 22.0
 ϖ0 = 282.95
 e0 = 0.017
@@ -39,7 +46,18 @@ title = &quot;obliq=&quot; * &quot;$(γ1)&quot; * &quot;, perihelion=&quot; * &q
 plot_day_lat_sza(days,lats,S2,&quot;YlOrRd&quot;,  title, &quot;sza_example3a.png&quot;)
 
 title = &quot;SZA diff: obliq0=&quot; * &quot;$(γ0)&quot; * &quot;, obliq1=&quot; * &quot;$(γ1)&quot;
-plot_day_lat_sza(days,lats,S2-S0,&quot;PRGn&quot;, title, &quot;sza_example3b.png&quot;)</code></pre><p><img src="../sza_example3a.png" alt/> <img src="../sza_example3b.png" alt/></p><h2 id="Example-4-1"><a class="docs-heading-anchor" href="#Example-4-1">Example 4</a><a class="docs-heading-anchor-permalink" href="#Example-4-1" title="Permalink"></a></h2><pre><code class="language-julia"># decrease γ further to 18.0°
+plot_day_lat_sza(days,lats,S2-S0,&quot;PRGn&quot;, title, &quot;sza_example3b.png&quot;)</code></pre><pre><code class="language-none">/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS
+/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example3a.png" alt/> <img src="../sza_example3b.png" alt/></p><h2 id="Example-4-1"><a class="docs-heading-anchor" href="#Example-4-1">Example 4</a><a class="docs-heading-anchor-permalink" href="#Example-4-1" title="Permalink"></a></h2><pre><code class="language-julia"># decrease γ further to 18.0°
 γ2 = 18.0
 ϖ0 = 282.95
 e0 = 0.017
@@ -50,7 +68,18 @@ title = &quot;obliq=&quot; * &quot;$(γ2)&quot; * &quot;, perihelion=&quot; * &q
 plot_day_lat_sza(days,lats,S3,&quot;YlOrRd&quot;, title, &quot;sza_example4a.png&quot;)
 
 title = &quot;SZA diff: obliq0=&quot; * &quot;$(γ0)&quot; * &quot;, obliq1=&quot; * &quot;$(γ2)&quot;
-plot_day_lat_sza(days,lats,S3-S0,&quot;PRGn&quot;, title, &quot;sza_example4b.png&quot;)</code></pre><p><img src="../sza_example4a.png" alt/> <img src="../sza_example4b.png" alt/></p><h2 id="Example-5-1"><a class="docs-heading-anchor" href="#Example-5-1">Example 5</a><a class="docs-heading-anchor-permalink" href="#Example-5-1" title="Permalink"></a></h2><pre><code class="language-julia"># now change obliquity to 60.0°
+plot_day_lat_sza(days,lats,S3-S0,&quot;PRGn&quot;, title, &quot;sza_example4b.png&quot;)</code></pre><pre><code class="language-none">/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS
+/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example4a.png" alt/> <img src="../sza_example4b.png" alt/></p><h2 id="Example-5-1"><a class="docs-heading-anchor" href="#Example-5-1">Example 5</a><a class="docs-heading-anchor-permalink" href="#Example-5-1" title="Permalink"></a></h2><pre><code class="language-julia"># now change obliquity to 60.0°
 γ3 = 60.0
 ϖ0 = 282.95
 e0 = 0.017
@@ -61,7 +90,18 @@ title = &quot;obliq=&quot; * &quot;$(γ3)&quot; * &quot;, perihelion=&quot; * &q
 plot_day_lat_sza(days,lats,S4,&quot;YlOrRd&quot;, title, &quot;sza_example5a.png&quot;)
 
 title = &quot;SZA diff: obliq0=&quot; * &quot;$(γ0)&quot; * &quot;, obliq1=&quot; * &quot;$(γ3)&quot;
-plot_day_lat_sza(days,lats,S4-S0,&quot;PRGn&quot;, title, &quot;sza_example5b.png&quot;)</code></pre><p><img src="../sza_example5a.png" alt/> <img src="../sza_example5b.png" alt/></p><h2 id="Example-6-1"><a class="docs-heading-anchor" href="#Example-6-1">Example 6</a><a class="docs-heading-anchor-permalink" href="#Example-6-1" title="Permalink"></a></h2><pre><code class="language-julia"># now change obliquity to 97.86°
+plot_day_lat_sza(days,lats,S4-S0,&quot;PRGn&quot;, title, &quot;sza_example5b.png&quot;)</code></pre><pre><code class="language-none">/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS
+/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example5a.png" alt/> <img src="../sza_example5b.png" alt/></p><h2 id="Example-6-1"><a class="docs-heading-anchor" href="#Example-6-1">Example 6</a><a class="docs-heading-anchor-permalink" href="#Example-6-1" title="Permalink"></a></h2><pre><code class="language-julia"># now change obliquity to 97.86°
 γ4 = 97.86
 ϖ0 = 282.95
 e0 = 0.017
@@ -72,4 +112,15 @@ title = &quot;obliq=&quot; * &quot;$(γ4)&quot; * &quot;, perihelion=&quot; * &q
 plot_day_lat_sza(days,lats,S5,&quot;YlOrRd&quot;, title, &quot;sza_example6a.png&quot;)
 
 title = &quot;SZA diff: obliq0=&quot; * &quot;$(γ0)&quot; * &quot;, obliq1=&quot; * &quot;$(γ4)&quot;
-plot_day_lat_sza(days,lats,S5-S0,&quot;PRGn&quot;, title, &quot;sza_example6b.png&quot;)</code></pre><p><img src="../sza_example6a.png" alt/> <img src="../sza_example6b.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../InsolationExamples/">Insolation Examples »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 24 June 2020 23:29">Wednesday 24 June 2020</span>. Using Julia version 1.6.0-DEV.292.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot_day_lat_sza(days,lats,S5-S0,&quot;PRGn&quot;, title, &quot;sza_example6b.png&quot;)</code></pre><pre><code class="language-none">/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS
+/home/travis/.julia/packages/GR/yMV3y/src/../deps/gr/bin/gksqt: error while loading shared libraries: libQt5Widgets.so.5: cannot open shared object file: No such file or directory
+connect: Connection refused
+GKS: can&#39;t connect to GKS socket application
+
+GKS: Open failed in routine OPEN_WS
+GKS: GKS not in proper state. GKS must be either in the state WSOP or WSAC in routine ACTIVATE_WS</code></pre><p><img src="../sza_example6a.png" alt/> <img src="../sza_example6b.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../InsolationExamples/">Insolation Examples »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 9 July 2020 06:48">Thursday 9 July 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
