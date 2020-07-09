@@ -93,7 +93,10 @@ given orbital parameters: obliquity, longitude of perihelion, and eccentricity
 function instantaneous_zenith_angle(date::DateTime,
                                     timezone::FT,
                                     longitude::FT,
-                                    latitude::FT) where {FT <: Real}
+                                    latitude::FT,
+                                    obliquity::FT,
+                                    perihelion::FT,
+                                    eccentricity::FT) where {FT <: Real}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
     γ = deg2rad(obliquity)
