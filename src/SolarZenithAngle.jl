@@ -210,9 +210,14 @@ function daily_zenith_angle(days_since_equinox::I,
     ecc = eccentricity
     ϕ = deg2rad(latitude)
 
+    # calculate mean anomaly at vernal equinox and mean anomaly
+    β = (1 - ecc^2)^0.5
+    MA_VE = mod(-ϖ + (ecc + ecc^3/4)*(1+β)*sin(ϖ), 2*π)
+    MA = mod(2*π*days_since_equinox / (year_anom() / day_length()) + MA_VE, 2*π)
+
     # solar longitude and true anomaly
-    TL = mod(2*π * days_since_equinox / (year_anom() / day_length()), 2*π)
-    TA = mod(TL - ϖ, 2*π)
+    TA = mod(MA + (2*ecc - ecc^3/4)*sin(MA), 2*π)
+    TL = mod(TA + ϖ, 2*π)
 
     # radius earth-sun distance, AU and m
     d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
