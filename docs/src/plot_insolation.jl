@@ -65,7 +65,19 @@ end
 
 #   days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
 #   title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
-#   plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "example1.png")
+#   plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
+
+#   γ0 = 23.44
+#   ϖ0 = 282.95 # hide
+#   ϖ1 = ϖ0 + 180.0
+#   e0 = 0.017
+
+#   days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
+#   title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ1)" * ", ecc=" * "$(e0)"
+#   plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
+
+#   title = "insolation diff: perihelion0=" * "$(ϖ0)" * ", perihelion1=" * "$(ϖ1)"
+#   plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "insol_example2b.png")
 # end
 
 # main()

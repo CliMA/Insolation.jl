@@ -1,5 +1,9 @@
-using Test, Insolation
+using Test
 
-@testset "My test" begin
-    @test 1 == 1
+@testset "Zenith Angle" begin
+    include("test_zenith_angle.jl")
+end
+
+@testset "Insolation" begin
+    include("test_insolation.jl")
 end
