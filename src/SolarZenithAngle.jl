@@ -102,11 +102,25 @@ function instantaneous_zenith_angle(date::DateTime,
     γ = deg2rad(obliquity)
     ϖ = deg2rad(perihelion)
     ecc = eccentricity
+
+    # julian day
+    julian_day_abs = datetime2julian(date)
+    # elapsed days referenced to noon 1 Jan 2000 UTC
+    jd = julian_day_abs - 2451545.0
+    # julian century
+    jc = jd / (year_anom() / day_length() * 100.0)
     
-    # solar longitude and true anomaly
+    # days since equinox
     days_since_equinox = Dates.day(date) - 76.0
-    TL = mod(2*π * days_since_equinox / (year_anom() / day_length()), 2*π)
-    TA = mod(TL - ϖ, 2*π)
+
+    # calculate mean anomaly at vernal equinox and mean anomaly
+    β = (1 - ecc^2)^0.5
+    MA_VE = mod(-ϖ + (ecc + ecc^3/4)*(1+β)*sin(ϖ), 2*π)
+    MA = mod(2*π*days_since_equinox / (year_anom() / day_length()) + MA_VE, 2*π)
+
+    # solar longitude and true anomaly
+    TA = mod(MA + (2*ecc - ecc^3/4)*sin(MA), 2*π)
+    TL = mod(TA + ϖ, 2*π)
 
     # radius earth-sun distance, AU and m
     d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
