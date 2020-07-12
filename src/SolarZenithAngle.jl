@@ -74,6 +74,15 @@ function instantaneous_zenith_angle(date::DateTime,
     # zenith angle
     sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
 
+    # parallax correction
+    parallax = (planet_radius() / astro_unit()) * sin(sza)
+    sza = mod(sza + parallax, 2*π)
+
+    # Set to a max of 90 deg.
+    if sza > π/2.0
+        sza = π/2.0
+    end
+
     return sza, d
 end
 
@@ -140,6 +149,11 @@ function instantaneous_zenith_angle(date::DateTime,
 
     # zenith angle
     sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
+
+    # Set to a max of 90 deg.
+    if sza > π/2.0
+        sza = π/2.0
+    end
 
     return sza, d
 end
