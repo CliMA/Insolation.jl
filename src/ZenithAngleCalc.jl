@@ -146,7 +146,7 @@ function instantaneous_zenith_angle(date::DateTime,
     TA = true_anomaly(date)
     ecc = eccentricity(date)
     γ = obliquity(date)
-    GMST = GMST(date, timezone)
+    GMSTrad = GMST(date, timezone)
     d = earth_sun_dist(ecc, TA)
 
     # declination, radians
@@ -155,8 +155,10 @@ function instantaneous_zenith_angle(date::DateTime,
     RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
 
     # hour angle, radians
-    LMST = GMST + λ
+    LMST = mod(GMSTrad + λ, 2*π)
     η = mod(LMST - RA, 2*π)
+    #println(rad2deg(LMST), "\t new")
+    println(rad2deg(η), "\t new")
 
     # zenith angle
     sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
@@ -201,7 +203,7 @@ function instantaneous_zenith_angle(date::DateTime,
 
     TA = true_anomaly(date)
     TL = mod(TA + ϖ, 2*π)
-    GMST = GMST(date, timezone)
+    GMSTrad = GMST(date, timezone)
     d = earth_sun_dist(ecc, TA)
 
     # declination, radians
@@ -210,7 +212,7 @@ function instantaneous_zenith_angle(date::DateTime,
     RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
 
     # hour angle, radians
-    LMST = GMST + λ
+    LMST = GMSTrad + λ
     η = mod(LMST - RA, 2*π)
 
     # zenith angle

@@ -44,6 +44,8 @@ function inst_sza(date, tz, dLongitude, dLatitude)
     dGreenwichMeanSiderealTime = 6.6974243242 + 0.0657098283 * dElapsedJulianDays + dDecimalHours
     dLocalMeanSiderealTime = (dGreenwichMeanSiderealTime * 15. + dLongitude) * (π / 180.)
     dHourAngle = dLocalMeanSiderealTime - dRightAscension
+    #println(dLocalMeanSiderealTime, "\t old")
+    println(dHourAngle, "\t old")
     dLatitudeInRadians = dLatitude * (π / 180.)
     dCos_Latitude = cos(dLatitudeInRadians)
     dSin_Latitude = sin(dLatitudeInRadians)
