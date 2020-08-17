@@ -1,9 +1,110 @@
-module SolarZenithAngle
+module ZenithAngleCalc
 
 using Dates
 using ..OrbitalParameters
 
 export instantaneous_zenith_angle, daily_zenith_angle
+
+"""
+    julian_century(date::DateTime)
+returns the julian century (centuries since Jan 1, 2000)
+given the datetime
+"""
+function julian_century(date::DateTime)
+    # julian day
+    julian_day_abs = datetime2julian(date)
+    julian_day_ref = 2451545.0
+    # elapsed days referenced to noon 1 Jan 2000 UTC
+    jd = julian_day_abs - julian_day_ref
+    # julian century
+    jc = jd / (year_anom() / day_length() * 100.0)
+    return jc
+end
+
+"""
+    true_longitude(date::DateTime)
+returns the true solar longitude in radians
+given the datetime
+
+formula from "Astronomical Algorithms" by Jean Meeus
+chapter 25, ML = equation 25.2
+"""
+function true_longitude(date::DateTime)
+    jc = julian_century(date)
+    # mean solar longitude
+    ML = deg2rad(mod(280.46646 + 36000.76983*jc + 0.0003032*jc^2, 360.0))
+    # solar equation of center
+    SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
+    # true longitude
+    TL = ML + SC
+    return TL
+end
+
+"""
+    true_anomaly(date::DateTime)
+returns the true solar anomaly in radians
+
+formula from "Astronomical Algorithms" by Jean Meeus
+chapter 25, MA = equation 25.3
+"""
+function true_anomaly(date::DateTime)
+    jc = julian_century(date)
+    # mean anomaly, radians
+    MA = deg2rad(mod(357.52911 + 35999.05029*jc - 0.0001537*jc^2, 360.0))
+    # solar equation of center
+    SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
+    # true anomaly
+    TA = MA + SC
+    return TA
+end
+
+"""
+    eccentricity(date::DateTime)
+returns the eccentricity of Earth's orbit
+given the datetime
+
+formula from "Astronomical Algorithms" by Jean Meeus
+chapter 25, equation 25.4
+"""
+function eccentricity(date::DateTime)
+    jc = julian_century(date)
+    # eccentricity
+    ecc = 0.016708634 - 0.000042037*jc - 0.0000001267*jc^2
+    return ecc
+end
+
+"""
+    obliquity(date::DateTime)
+returns the obliquity of Earth's orbit in radians
+given the datetime
+
+formula from "Astronomical Algorithms" by Jean Meeus
+chapter 22, approximation ignorning nutation of obliquity, Δϵ
+"""
+function obliquity(date::DateTime)
+    jc = julian_century(date)
+    # obliquity
+    γ = deg2rad(mod(23.439291 - 0.01300417*jc - 1.638889e-7*jc^2 + 5.036111e-7*jc^3, 360.0))
+    return γ
+end
+
+"""
+    GMST(date::DateTime, timezone::FT)
+
+returns the Greenwich mean sidereal time in radians
+given the datetime and timezone
+
+formula from "Astronomical Algorithms" by Jean Meeus
+chapter 12, equation 12.4
+"""
+function GMST(date::DateTime, timezone::FT)
+    jc = julian_century(date)
+    # Greenwich mean sidereal time, radians
+    UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
+    GMST = mod(6.6974243242 + 2400.117188*jc + UTC_hours, 24.0)
+    GMSTrad = mod(deg2rad(GMST * (360.0/24.0)), 2*π)
+    return GMSTrad
+end
 
 """
     instantaneous_zenith_angle(date::DateTime,
@@ -14,14 +115,11 @@ export instantaneous_zenith_angle, daily_zenith_angle
 returns the zenith angle and earth-sun distance
 at a particular longitude and latitude on the given date
 
-add citations: 
-- https://www.esrl.noaa.gov/gmd/grad/solcalc/
-- https://www.cfa.harvard.edu/~jzhao/times.html
-- https://github.com/thabbott/zenithangle/blob/master/solar.js
-- https://github.com/claresinger/3d-cloud-rad/blob/master/sza-scripts/sza_utils.py
-- http://farside.ph.utexas.edu/Books/Syntaxis/Almagest/node36.html
-- https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
-- "Astronomical Algorithms" by Jean Meeus
+equations from Chapter 25 of "Astronomical Algorithms" by Jean Meeus
+see documentation for details
+
+details about times can be found in: 
+https://www.cfa.harvard.edu/~jzhao/times.html
 """
 function instantaneous_zenith_angle(date::DateTime,
                                     timezone::FT,
@@ -30,30 +128,11 @@ function instantaneous_zenith_angle(date::DateTime,
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
     
-    # julian day
-    julian_day_abs = datetime2julian(date)
-    # elapsed days referenced to noon 1 Jan 2000 UTC
-    jd = julian_day_abs - 2451545.0
-    # julian century
-    jc = jd / (year_anom() / day_length() * 100.0)
-
-    # mean solar longitude, radians
-    ML = deg2rad(mod(280.46646 + 36000.76983*jc + 0.0003032*jc^2, 360.0))
-    # mean anomaly, radians
-    MA = deg2rad(mod(357.52911 + 35999.05029*jc - 0.0001537*jc^2, 360.0))
-    # solar equation of center
-    SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
-    # true longitude
-    TL = ML + SC
-    # true anomaly
-    TA = MA + SC
-
-    # eccentricity
-    ecc = 0.016708634 - 0.000042037*jc - 0.0000001267*jc^2
-    # obliquity, radians
-    γ = deg2rad(mod(23.439291 - 0.01300417*jc - 1.638889e-7*jc^2 + 5.036111e-7*jc^3, 360.0))
-    # longitude of perihelion, radians
-    ϖ = mod(TL - TA, 2*π)
+    TL = true_longitude(date)
+    TA = true_anomaly(date)
+    ecc = eccentricity(date)
+    γ = obliquity(date)
+    GMST = GMST(date, timezone)
 
     # radius earth-sun distance, AU and m
     d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
@@ -65,10 +144,7 @@ function instantaneous_zenith_angle(date::DateTime,
     RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
 
     # hour angle, radians
-    UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
-    GMST = mod(6.6974243242 + 2400.117188*jc + UTC_hours, 24.0)
-    GMSTrad = mod(deg2rad(GMST * (360.0/24.0)), 2*π)
-    LMST = GMSTrad + λ
+    LMST = GMST + λ
     η = mod(LMST - RA, 2*π)
 
     # zenith angle
@@ -112,23 +188,7 @@ function instantaneous_zenith_angle(date::DateTime,
     ϖ = deg2rad(perihelion)
     ecc = eccentricity
 
-    # julian day
-    julian_day_abs = datetime2julian(date)
-    # elapsed days referenced to noon 1 Jan 2000 UTC
-    jd = julian_day_abs - 2451545.0
-    # julian century
-    jc = jd / (year_anom() / day_length() * 100.0)
-    
-    # days since equinox
-    days_since_equinox = Dates.day(date) - 76.0
-
-    # calculate mean anomaly at vernal equinox and mean anomaly
-    β = (1 - ecc^2)^0.5
-    MA_VE = mod(-ϖ + (ecc + ecc^3/4)*(1+β)*sin(ϖ), 2*π)
-    MA = mod(2*π*days_since_equinox / (year_anom() / day_length()) + MA_VE, 2*π)
-
-    # solar longitude and true anomaly
-    TA = mod(MA + (2*ecc - ecc^3/4)*sin(MA), 2*π)
+    TA = true_anomaly(date)
     TL = mod(TA + ϖ, 2*π)
 
     # radius earth-sun distance, AU and m
@@ -141,10 +201,8 @@ function instantaneous_zenith_angle(date::DateTime,
     RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
 
     # hour angle, radians
-    UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
-    GMST = mod(6.6974243242 + 2400.117188*jc + UTC_hours, 24.0)
-    GMSTrad = mod(deg2rad(GMST * (360.0/24.0)), 2*π)
-    LMST = GMSTrad + λ
+    GMST = GMST(date, timezone)
+    LMST = GMST + λ
     η = mod(LMST - RA, 2*π)
 
     # zenith angle
@@ -168,31 +226,11 @@ at a particular latitude on the given date
 function daily_zenith_angle(date::DateTime,
                             latitude::FT) where {FT <: Real}
     ϕ = deg2rad(latitude)
-    
-    # julian day
-    julian_day_abs = datetime2julian(date)
-    # elapsed days referenced to noon 1 Jan 2000 UTC
-    jd = julian_day_abs - 2451545.0
-    # julian century
-    jc = jd / (year_anom() / day_length() * 100.0)
 
-    # mean solar longitude, radians
-    ML = deg2rad(mod(280.46646 + 36000.76983*jc + 0.0003032*jc^2, 360.0))
-    # mean anomaly, radians
-    MA = deg2rad(mod(357.52911 + 35999.05029*jc - 0.0001537*jc^2, 360.0))
-    # solar equation of center
-    SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
-    # true longitude
-    TL = ML + SC
-    # true anomaly
-    TA = MA + SC
-
-    # eccentricity
-    ecc = 0.016708634 - 0.000042037*jc - 0.0000001267*jc^2
-    # obliquity, radians
-    γ = deg2rad(mod(23.439291 - 0.01300417*jc - 1.638889e-7*jc^2 + 5.036111e-7*jc^3, 360.0))
-    # longitude of perihelion, radians
-    ϖ = mod(TL - TA, 2*π)
+    TL = true_longitude(date)
+    TA = true_anomaly(date)
+    ecc = eccentricity(date)
+    γ = obliquity(date)
 
     # radius earth-sun distance, AU and m
     d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
