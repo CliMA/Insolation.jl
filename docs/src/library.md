@@ -1,17 +1,17 @@
-# Library
+# Application Programming Interface (APIs)
 
 Documenting the public user interface
 
-## Solar Zenith Angle
+## Zenith Angle
 ```@autodocs
-Modules = [Insolation.SolarZenithAngle]
+Modules = [Insolation.ZenithAngleCalc]
 Private = false
-Pages   = ["SolarZenithAngle.jl"]
+Pages   = ["ZenithAngleCalc.jl"]
 ```
 
-## Solar Insolation
+## Insolation
 ```@autodocs
-Modules = [Insolation.SolarInsolation]
+Modules = [Insolation.InsolationCalc]
 Private = false
-Pages   = ["SolarInsolation.jl"]
+Pages   = ["InsolationCalc.jl"]
 ```

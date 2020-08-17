@@ -1,4 +1,5 @@
 # Insolation Examples
+These examples are from a homework assignment in ESE 101 at Caltech
 
 ## Example 1
 ```@example

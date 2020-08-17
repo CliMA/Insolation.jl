@@ -33,6 +33,8 @@ function true_longitude(date::DateTime)
     jc = julian_century(date)
     # mean solar longitude
     ML = deg2rad(mod(280.46646 + 36000.76983*jc + 0.0003032*jc^2, 360.0))
+    # mean anomaly, radians
+    MA = deg2rad(mod(357.52911 + 35999.05029*jc - 0.0001537*jc^2, 360.0))
     # solar equation of center
     SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
     # true longitude
@@ -89,7 +91,7 @@ function obliquity(date::DateTime)
 end
 
 """
-    GMST(date::DateTime, timezone::FT)
+    GMST(date::DateTime, timezone::FT) where {FT <: Real}
 
 returns the Greenwich mean sidereal time in radians
 given the datetime and timezone
@@ -97,7 +99,7 @@ given the datetime and timezone
 formula from "Astronomical Algorithms" by Jean Meeus
 chapter 12, equation 12.4
 """
-function GMST(date::DateTime, timezone::FT)
+function GMST(date::DateTime, timezone::FT) where {FT <: Real}
     jc = julian_century(date)
     # Greenwich mean sidereal time, radians
     UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
@@ -107,7 +109,7 @@ function GMST(date::DateTime, timezone::FT)
 end
 
 """
-    earth_sun_dist(ecc::FT, TA::FT) 
+    earth_sun_dist(ecc::FT, TA::FT) where {FT <: Real}
 
 returns the Earth-sun distance in meters
 given the eccentricity and true anomaly
@@ -115,7 +117,7 @@ given the eccentricity and true anomaly
 formula from "Astronomical Algorithms" by Jean Meeus
 chapter 25, equation 25.5
 """
-function earth_sun_dist(ecc::FT, TA::FT)
+function earth_sun_dist(ecc::FT, TA::FT) where {FT <: Real}
     d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
     d = d_au * astro_unit()
     return d
