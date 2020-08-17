@@ -107,6 +107,21 @@ function GMST(date::DateTime, timezone::FT)
 end
 
 """
+    earth_sun_dist(ecc::FT, TA::FT) 
+
+returns the Earth-sun distance in meters
+given the eccentricity and true anomaly
+
+formula from "Astronomical Algorithms" by Jean Meeus
+chapter 25, equation 25.5
+"""
+function earth_sun_dist(ecc::FT, TA::FT)
+    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
+    d = d_au * astro_unit()
+    return d
+end
+
+"""
     instantaneous_zenith_angle(date::DateTime,
                                timezone::FT,
                                longitude::FT,
@@ -115,11 +130,8 @@ end
 returns the zenith angle and earth-sun distance
 at a particular longitude and latitude on the given date
 
-equations from Chapter 25 of "Astronomical Algorithms" by Jean Meeus
+equations from "Astronomical Algorithms" by Jean Meeus
 see documentation for details
-
-details about times can be found in: 
-https://www.cfa.harvard.edu/~jzhao/times.html
 """
 function instantaneous_zenith_angle(date::DateTime,
                                     timezone::FT,
@@ -133,10 +145,7 @@ function instantaneous_zenith_angle(date::DateTime,
     ecc = eccentricity(date)
     γ = obliquity(date)
     GMST = GMST(date, timezone)
-
-    # radius earth-sun distance, AU and m
-    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
-    d = d_au * astro_unit()
+    d = earth_sun_dist(ecc, TA)
 
     # declination, radians
     δ = mod(asin(sin(γ) * sin(TL)), 2*π)
@@ -190,10 +199,8 @@ function instantaneous_zenith_angle(date::DateTime,
 
     TA = true_anomaly(date)
     TL = mod(TA + ϖ, 2*π)
-
-    # radius earth-sun distance, AU and m
-    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
-    d = d_au * astro_unit()
+    GMST = GMST(date, timezone)
+    d = earth_sun_dist(ecc, TA)
 
     # declination, radians
     δ = mod(asin(sin(γ) * sin(TL)), 2*π)
@@ -201,7 +208,6 @@ function instantaneous_zenith_angle(date::DateTime,
     RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
 
     # hour angle, radians
-    GMST = GMST(date, timezone)
     LMST = GMST + λ
     η = mod(LMST - RA, 2*π)
 
@@ -231,10 +237,7 @@ function daily_zenith_angle(date::DateTime,
     TA = true_anomaly(date)
     ecc = eccentricity(date)
     γ = obliquity(date)
-
-    # radius earth-sun distance, AU and m
-    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
-    d = d_au * astro_unit()
+    d = earth_sun_dist(ecc, TA)
 
     # declination, radians
     δ = mod(asin(sin(γ) * sin(TL)), 2*π)
@@ -286,8 +289,7 @@ function daily_zenith_angle(days_since_equinox::I,
     TL = mod(TA + ϖ, 2*π)
 
     # radius earth-sun distance, AU and m
-    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
-    d = d_au * astro_unit()
+    d = earth_sun_dist(ecc, TA)
 
     # declination, radians
     δ = mod(asin(sin(γ) * sin(TL)), 2*π)
