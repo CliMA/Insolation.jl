@@ -1,5 +1,8 @@
 using Documenter, Insolation
 
+# https://github.com/jheinen/GR.jl/issues/278#issuecomment-587090846
+ENV["GKSwstype"] = "100"
+
 makedocs(
     sitename="Insolation.jl",
     doctest = false,
