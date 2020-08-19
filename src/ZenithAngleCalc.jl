@@ -7,7 +7,7 @@ export instantaneous_zenith_angle, daily_zenith_angle
 
 """
     julian_century(date::DateTime)
-returns the julian century (centuries since Jan 1, 2000)
+returns the julian century (centuries since Jan 1, 2000 at 12h UT)
 given the datetime
 """
 function julian_century(date::DateTime)
@@ -96,15 +96,20 @@ end
 returns the Greenwich mean sidereal time in radians
 given the datetime and timezone
 
-formula from "Astronomical Algorithms" by Jean Meeus
-chapter 12, equation 12.4
+formula from https://www.cfa.harvard.edu/~jzhao/times.html#ref7
+page 50, "Explanatory Supplement to the Astronomical Almanac" by Seidelmann
+same as 12.4 from "Astronomical Algorithms" by Jean Meeus, but -180°
+to account for counting from 0:00 not 12:00
 """
 function GMST(date::DateTime, timezone::FT) where {FT <: Real}
     jc = julian_century(date)
-    # Greenwich mean sidereal time, radians
     UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
-    GMST = mod(6.6974243242 + 2400.117188*jc + UTC_hours, 24.0)
-    GMSTrad = mod(deg2rad(GMST * (360.0/24.0)), 2*π)
+    UTC_deg = UTC_hours * 15.0
+
+    # Greenwich mean sidereal time, radians
+    GMSTdeg = mod(100.460618375 + 36000.770053608336*jc + 0.0003879333*jc^2 - 2.58333e-8*jc^3 + UTC_deg, 360.0)
+    GMSTrad = deg2rad(GMSTdeg)
+
     return GMSTrad
 end
 
@@ -152,13 +157,13 @@ function instantaneous_zenith_angle(date::DateTime,
     # declination, radians
     δ = mod(asin(sin(γ) * sin(TL)), 2*π)
     # right acension, radians
-    RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
+    Y = cos(γ) * sin(TL)
+    X = cos(TL)
+    RA = mod(atan(Y,X), 2*π)
 
     # hour angle, radians
     LMST = mod(GMSTrad + λ, 2*π)
     η = mod(LMST - RA, 2*π)
-    #println(rad2deg(LMST), "\t new")
-    println(rad2deg(η), "\t new")
 
     # zenith angle
     sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
