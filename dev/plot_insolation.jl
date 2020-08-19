@@ -1,4 +1,4 @@
-using Insolation.SolarInsolation
+using Insolation.InsolationCalc
 using Plots
 
 """
@@ -52,32 +52,29 @@ function plot_day_lat_insolation(d_arr::Array{I},
   p = contourf(d_arr, l_arr, F_arr', c=cmap, clims=(vmin,vmax), title=stitle, 
     xlabel="Days since Jan 1", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
 
-  # subplot(121)
-  # Fbar = sum(F_arr, dims=1)./size(F_arr,1)
-  # plot(Fbar,l_arr,"k-", xlabel="Average ToA Insolation [W/m^2]")
   savefig(file_name)
 end
 
-# function main()
-#   γ0 = 23.44
-#   ϖ0 = 282.95
-#   e0 = 0.017
+function main()
+  γ0 = 23.44
+  ϖ0 = 282.95
+  e0 = 0.017
 
-#   days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
-#   title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
-#   plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
+  days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
+  title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
+  plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
 
-#   γ0 = 23.44
-#   ϖ0 = 282.95 # hide
-#   ϖ1 = ϖ0 + 180.0
-#   e0 = 0.017
+  γ0 = 23.44
+  ϖ0 = 282.95 # hide
+  ϖ1 = ϖ0 + 180.0
+  e0 = 0.017
 
-#   days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
-#   title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ1)" * ", ecc=" * "$(e0)"
-#   plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
+  days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
+  title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ1)" * ", ecc=" * "$(e0)"
+  plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
 
-#   title = "insolation diff: perihelion0=" * "$(ϖ0)" * ", perihelion1=" * "$(ϖ1)"
-#   plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "insol_example2b.png")
-# end
+  title = "insolation diff: perihelion0=" * "$(ϖ0)" * ", perihelion1=" * "$(ϖ1)"
+  plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "insol_example2b.png")
+end
 
-# main()
+main()
