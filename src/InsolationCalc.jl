@@ -1,7 +1,7 @@
-module SolarInsolation
+module InsolationCalc
 
 using Dates
-using ..SolarZenithAngle
+using ..ZenithAngleCalc
 using ..OrbitalParameters
 
 export instantaneous_insolation, daily_insolation, insolation

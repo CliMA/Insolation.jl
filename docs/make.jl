@@ -9,9 +9,9 @@ makedocs(
     clean = false,
     pages = Any[
         "Home" => "index.md"
-        "Zenith Angle Examples" => "ZenithAngleExamples.md"
+        "Zenith Angle Equations" => "ZenithAngleEquations.md"
         "Insolation Examples" => "InsolationExamples.md"
-        "Library" => "library.md"
+        "APIs" => "library.md"
     ]
 )
 

@@ -1,5 +1,5 @@
 using Dates
-using Insolation.SolarInsolation
+using Insolation.InsolationCalc
 
 rtol = 1e-2
 
