@@ -22,6 +22,7 @@ script:
                                                       Pkg.build();
                                                       Pkg.test(coverage=true);'
 
+  - sudo apt install libxt6 libxrender1 libxext6 libgl1-mesa-glx libqt5widgets5
   - export DOCUMENTER_DEBUG="true"
   - julia --project=docs/ --color=yes -e 'using Pkg;
                                           Pkg.develop(PackageSpec(path=pwd())); 
