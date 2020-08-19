@@ -107,7 +107,7 @@ function GMST(date::DateTime, timezone::FT) where {FT <: Real}
     UTC_deg = UTC_hours * 15.0
 
     # Greenwich mean sidereal time, radians
-    GMSTdeg = mod(100.460618375 + 36000.770053608336*jc + 0.0003879333*jc^2 - 2.58333e-8*jc^3 + UTC_deg, 360.0)
+    GMSTdeg = mod(100.460618375 + 36000.7700536083*jc + 0.00038793*jc^2 - 2.58333e-8*jc^3 + UTC_deg, 360.0)
     GMSTrad = deg2rad(GMSTdeg)
 
     return GMSTrad

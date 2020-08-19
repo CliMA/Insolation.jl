@@ -6,12 +6,12 @@ by Jean Meeus.
 The Julian century (``jc``) is defined as the centuries
 since 1 Jan 2000 12:00 UTC.
 
-## True Solar Longitude/Anomaly
+## True Solar Longitude/Anomaly (in degrees)
 ```math
 \begin{aligned}
-ML &= 280.46646 + 36000.76983 jc + 0.0003032 jc^2 \\
-MA &= 357.52911 + 35999.05029 jc - 0.0001537 jc^2 \\
-SC &= \sin(MA) (1.914602-0.004817 jc-0.000014 jc^2) \\
+ML_{deg} &= 280.46646 + 36000.76983 jc + 0.0003032 jc^2 \\
+MA_{deg} &= 357.52911 + 35999.05029 jc - 0.0001537 jc^2 \\
+SC_{deg} &= \sin(MA) (1.914602-0.004817 jc-0.000014 jc^2) \\
 &\hspace{1cm}+ \sin(2 MA) (0.019993-0.000101 jc) \\
 &\hspace{1cm}+ \sin(3 MA) (0.000289) \\
 TL &= ML + SC \\
@@ -19,11 +19,11 @@ TA &= MA + SC
 \end{aligned}
 ```
 
-## Eccentricity and Obliquity
+## Eccentricity and Obliquity (in degrees)
 ```math
 \begin{aligned}
 e &= 0.016708634 - 0.000042037 jc - 0.0000001267 jc^2 \\
-\gamma &= 23.439291 - 0.01300417 jc - 1.638889e-7 jc^2 + 5.036111e-7 jc^3
+\gamma_{deg} &= 23.439291 - 0.01300417 jc - 1.638889e-7 jc^2 + 5.036111e-7 jc^3
 \end{aligned}
 ```
 
@@ -35,9 +35,12 @@ RA &= \arctan \left( \frac{\cos(\gamma) \sin(TL)}{\cos(TL)} \right)
 \end{aligned}
 ```
 
-## Greenwich mean sidereal time
+## Greenwich mean sidereal time (in degrees)
 ```math
-GMST = 6.6974243242 + 2400.117188 jc + UTC_{hours}
+\begin{aligned}
+UTC_{deg} &= (hour + min/60.0 + sec/3600.0 - timezone) * 15.0 \\
+GMST_{deg} &= 100.460618375 + 36000.7700536083 jc + 0.00038793 jc^2 - 2.58333e-8 jc^3 + UTC_{deg}
+\end{aligned}
 ```
 
 ## Hour Angle
