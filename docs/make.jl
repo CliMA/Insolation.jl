@@ -13,7 +13,6 @@ makedocs(
     pages = Any[
         "Home" => "index.md"
         "Zenith Angle Equations" => "ZenithAngleEquations.md"
-        "Insolation Examples" => "InsolationExamples.md"
         "APIs" => "library.md"
     ]
 )
