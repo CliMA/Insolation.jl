@@ -41,6 +41,11 @@ where $t_s$ is the time of local solar noon and $T_d$ is the length of a day.
 \cos(\theta) = \cos(\phi) \cos(\delta) \cos(\eta) + \sin(\phi) \sin(\delta)
 ```
 
+## Azimuth Angle
+```math
+\tan(\zeta) = \frac{\sin(\eta)}{\cos(\eta)\sin(\phi) - \tan(\delta)\cos(\phi)}
+```
+
 ## Earth-Sun Distance
 ```math
 d = \frac{1-e^2}{1+e\cos(A)} d_0

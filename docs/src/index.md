@@ -7,8 +7,8 @@ CurrentModule = Insolation
 `Insolation.jl` is a library that calculates the zenith angle and insolation 
 at a given point on Earth (lat, lon) for a given date/time and orbital configuration 
 (obliquity, eccentricity, and longitude of perihelion). The library is split
-between two files, `ZenithAngleCalc.jl` which calculates the zenith angle, and 
-`InsolationCalc.jl` which calculates the insolation given a zenith angle.
+between two files, `ZenithAngleCalc.jl` which calculates the zenith angle, azimuth angle, and Earth-sun distance, 
+and `InsolationCalc.jl` which calculates the insolation given a zenith angle.
 
 The zenith angle and insolation can both be calculated either as instantaneous 
 values or as daily averaged values. The functions in `ZenithAngleCalc.jl` are 
@@ -19,7 +19,7 @@ The equations used for calculating orbital parameters are from Tapio Schneider's
 See [Zenith Angle Equations](@ref) for more details.
 
 This package has been designed to be flexible for non-Earth settings as well.
-This specific functionality has not yet been implemented [as of 17 Aug 2020].
+This specific functionality has not yet been implemented [as of 22 Feb 2021].
 
 ## Authors
 `Insolation.jl` is being developed by [the Climate Modeling Alliance](https://clima.caltech.edu).
