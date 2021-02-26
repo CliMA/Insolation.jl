@@ -3,10 +3,17 @@ These equations are from Tapio Schneiders's textbook draft chapter 3.
 
 ## Mean Anomaly (3.6)
 ```math
-M = \frac{2\pi (t - t_{epoch})}{Y_a} + M_{epoch}
+\begin{aligned}
+\beta &= \sqrt{1-e^2} \\
+M_{V0} &= -\varpi_0 + \left(e+\frac{1}{4}e^3 \right) (1+\beta)sin(\varpi_0) - \frac{1}{2}e^2 \left(\frac{1}{2}+\beta \right) sin(2\varpi_0) + \frac{1}{4}e^3 \left(\frac{1}{3}+\beta \right) sin(3\varpi_0) \\
+t_V &= \frac{Y_a (M_{V0} - M_0)}{2\pi} + t_0 \\
+M_V &= -\varpi + \left(e+\frac{1}{4}e^3 \right) (1+\beta)sin(\varpi) - \frac{1}{2}e^2 \left(\frac{1}{2}+\beta \right) sin(2\varpi) + \frac{1}{4}e^3 \left(\frac{1}{3}+\beta  \right) sin(3\varpi) \\
+M &= \frac{2\pi (t - t_V)}{Y_a} + M_V
+\end{aligned}
 ```
-where $t_{epoch}$ is the time at the epoch (J2000), defined as January 1, 2000 at 12hr UTC
-and $M_{epoch}$ is the mean anomaly at the epoch.
+where $e$ is the oribital eccentricity, $t_0$ is the time at the epoch (J2000), defined as January 1, 2000 at 12hr UTC, 
+$M_0$ is the mean anomaly at the epoch, $\varpi_0$ is the longitude of perihelion at the epoch,
+and $Y_a$ is the length of the anomalistic year.
 
 ## True Anomaly (3.8)
 ```math
@@ -22,6 +29,7 @@ L = A + \varpi
 ```math
 \sin \delta = \sin \gamma \sin L
 ```
+where $\gamma$ is the orbital obliquity.
 
 ## Hour Angle (3.17)
 ```math
@@ -33,6 +41,7 @@ where $t_s$ is the time of local solar noon and $T_d$ is the length of a day.
 ```math
 \cos \theta = \cos \phi \cos \delta \cos \eta + \sin \phi \sin \delta
 ```
+where $\phi$ is the latitude.
 
 ## Sunrise/Sunset Angle (3.19)
 ```math
@@ -41,7 +50,7 @@ where $t_s$ is the time of local solar noon and $T_d$ is the length of a day.
 
 ## Daily-averaged Zenith Angle (3.20)
 ```math
-\overline{\cos \theta} = \frac{1}{\pi} \left( \eta_d \sin \phi \sin \delta + \cos \phi \cos \delta \cos \eta_d\right)
+\overline{\cos \theta} = \frac{1}{\pi} \left( \eta_d \sin \phi \sin \delta + \cos \phi \cos \delta \cos \eta_d \right)
 ```
 
 ## Azimuth Angle

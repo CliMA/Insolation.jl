@@ -61,14 +61,14 @@ function plot_day_lat_insolation(d_arr::Array{I},
 end
 
 # function main()
-#   γ0 = obliquity()
-#   ϖ0 = perihelion()
-#   e0 = eccentricity()
+#   γ0 = γ_epoch()
+#   ϖ0 = ϖ_epoch()
+#   e0 = e_epoch()
 #   days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
 #   title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ0, e0)
 #   plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
 
-#   ϖ1 = perihelion() + π
+#   ϖ1 = ϖ_epoch() + π
 #   days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
 #   title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ1, e0)
 #   plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
