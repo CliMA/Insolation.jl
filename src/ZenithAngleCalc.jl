@@ -5,11 +5,27 @@ using ..OrbitalParameters
 
 export instantaneous_zenith_angle, daily_zenith_angle
 
+function mean_anomaly_vernal_equinox(ϖ::FT, e::FT) where {FT <: Real}
+    # mean anomaly at vernal equinox, radians (3.11)
+    β = (1-e^2)^0.5
+    M_v = -ϖ + (e+0.25*e^3)*(1+β)*sin(ϖ) - 0.5*e^2*(0.5+β)*sin(2ϖ) + 0.25*e^3*(1/3+β)*sin(3ϖ)
+    return M_v
+end
+
 function distance_declination(date::DateTime, γ::FT, ϖ::FT, e::FT) where {FT <: Real}
-    # mean anomaly, radians (3.6)
-    julian_day_abs = datetime2julian(date)
-    sec_since_epoch = (julian_day_abs - epoch()) * day_length()
-    MA = mod(2π * sec_since_epoch / year_anom() + mean_anom_epoch(), 2π)
+    # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
+    M_v0 = mean_anomaly_vernal_equinox(ϖ_epoch(), e)
+    time_v = year_anom() * (M_v0 - mean_anom_epoch()) / 2π + epoch()*day_length()
+
+    # mean anomaly given mean anomaly at vernal equinox (3.10)
+    time = datetime2julian(date)*day_length()
+    M_v = mean_anomaly_vernal_equinox(ϖ, e)
+    MA = mod(2π * (time - time_v) / year_anom() + M_v, 2π)
+
+    # # mean anomaly, radians (3.6)
+    # julian_day_abs = datetime2julian(date)
+    # sec_since_epoch = (julian_day_abs - epoch()) * day_length()
+    # MA = mod(2π * sec_since_epoch / year_anom() + mean_anom_epoch(), 2π)
 
     # true anomaly, radians (3.8)
     TA = mod(MA + (2*e - e^FT(3/4))*sin(MA) + FT(5/4)*e^2*sin(2*MA) + FT(13/12)*e^3*sin(3*MA), 2π)
@@ -30,9 +46,9 @@ end
     instantaneous_zenith_angle(date::DateTime,
                                longitude::FT,
                                latitude::FT,
-                               γ::FT=obliquity(),
-                               ϖ::FT=perihelion(),
-                               e::FT=eccentricity()) where {FT <: Real}
+                               γ::FT=γ_epoch(),
+                               ϖ::FT=ϖ_epoch(),
+                               e::FT=e_epoch()) where {FT <: Real}
 
 returns the zenith angle and earth-sun distance
 at a particular longitude and latitude on the given date (and time UTC)
@@ -41,9 +57,9 @@ given orbital parameters: obliquity, longitude of perihelion, and eccentricity
 function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
                                     latitude::FT,
-                                    γ::FT=obliquity(),
-                                    ϖ::FT=perihelion(),
-                                    e::FT=eccentricity()) where {FT <: Real}
+                                    γ::FT=γ_epoch(),
+                                    ϖ::FT=ϖ_epoch(),
+                                    e::FT=e_epoch()) where {FT <: Real}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
 
@@ -69,18 +85,18 @@ end
 """
     daily_zenith_angle(date::DateTime,
                        latitude::FT,
-                       γ::FT=obliquity(),
-                       ϖ::FT=perihelion(),
-                       e::FT=eccentricity()) where {FT <: Real}
+                       γ::FT=γ_epoch(),
+                       ϖ::FT=ϖ_epoch(),
+                       e::FT=e_epoch()) where {FT <: Real}
 returns the daily averaged zenith angle and earth-sun distance
 at a particular latitude given the date and orbital parameters
 obliquity, longitude of perihelion, and eccentricity
 """
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
-                            γ::FT=obliquity(),
-                            ϖ::FT=perihelion(),
-                            e::FT=eccentricity()) where {FT <: Real}
+                            γ::FT=γ_epoch(),
+                            ϖ::FT=ϖ_epoch(),
+                            e::FT=e_epoch()) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
     d, δ = distance_declination(date, γ, ϖ, e)
