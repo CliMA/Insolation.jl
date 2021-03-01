@@ -15,17 +15,12 @@ end
 function distance_declination(date::DateTime, γ::FT, ϖ::FT, e::FT) where {FT <: Real}
     # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
     M_v0 = mean_anomaly_vernal_equinox(ϖ_epoch(), e)
-    time_v = year_anom() * (M_v0 - mean_anom_epoch()) / 2π + epoch()*day_length()
+    time_v = year_anom() * (M_v0 - M_epoch()) / 2π + epoch()*day_length()
 
     # mean anomaly given mean anomaly at vernal equinox (3.10)
     time = datetime2julian(date)*day_length()
     M_v = mean_anomaly_vernal_equinox(ϖ, e)
     MA = mod(2π * (time - time_v) / year_anom() + M_v, 2π)
-
-    # # mean anomaly, radians (3.6)
-    # julian_day_abs = datetime2julian(date)
-    # sec_since_epoch = (julian_day_abs - epoch()) * day_length()
-    # MA = mod(2π * sec_since_epoch / year_anom() + mean_anom_epoch(), 2π)
 
     # true anomaly, radians (3.8)
     TA = mod(MA + (2*e - e^FT(3/4))*sin(MA) + FT(5/4)*e^2*sin(2*MA) + FT(13/12)*e^3*sin(3*MA), 2π)
@@ -65,19 +60,17 @@ function instantaneous_zenith_angle(date::DateTime,
 
     d, δ = distance_declination(date, γ, ϖ, e)
 
-    # hour angle, radians (3.17)
+    # hour angle, zero at local solar noon, radians (3.17)
     julian_day_abs = datetime2julian(date)
     η_UTC = 2π * (mod(julian_day_abs, 1) - FT(0.5))
-    η = η_UTC + λ
+    η = mod(η_UTC + λ, 2π)
 
     # zenith angle, radians (3.18)
-    sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
-    if sza > π/2.0
-        sza = π/2.0
-    end
+    sza = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), 2π)
 
-    # solar azimuth angle
-    azi = atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ))
+    # solar azimuth angle, azi = 0 when due E and increasing CCW
+    # azi = 3π/2 (due S) when η=0 at local solar noon
+    azi = mod(3π/2 - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), 2π)
 
     return sza, azi, d
 end
@@ -112,7 +105,7 @@ function daily_zenith_angle(date::DateTime,
     end
     
     # daily averaged zenith angle (3.20)
-    daily_sza = acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd)))
+    daily_sza = mod(acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), 2π)
 
     return daily_sza, d
 end

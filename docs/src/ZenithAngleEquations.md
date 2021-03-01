@@ -55,8 +55,9 @@ where $\phi$ is the latitude.
 
 ## Azimuth Angle
 ```math
-\tan \zeta = \frac{\sin \eta}{\cos \eta \sin \phi - \tan \delta \cos \phi}
+\zeta = \frac{3\pi}{2} - arctan \left( \frac{\sin \eta}{\cos \eta \sin \phi - \tan \delta \cos \phi} \right)
 ```
+where the azimuth is defined as 0 to the East and increasing counter-clockwise, such that at local solar noon when $\eta=0$, then $\zeta = \frac{3\pi}{2}$.
 
 ## Earth-Sun Distance (3.1)
 ```math
