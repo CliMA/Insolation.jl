@@ -9,15 +9,15 @@ end
 
 function distance_declination(date::DateTime, param_set::APS, γ::FT, ϖ::FT, e::FT) where {FT <: Real}
     Ya::FT = year_anom(param_set)
-    day::FT = Planet.day(param_set)
+    day_length::FT = Planet.day(param_set)
     AU::FT = astro_unit()
     
     # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
     M_v0 = mean_anomaly_vernal_equinox(ϖ_epoch(), e)
-    time_v = Ya * (M_v0 - M_epoch()) / 2π + epoch()*day
+    time_v = Ya * (M_v0 - M_epoch()) / 2π + epoch()
 
     # mean anomaly given mean anomaly at vernal equinox (3.10)
-    time = datetime2julian(date)*day
+    time = datetime2julian(date)*day_length
     M_v = mean_anomaly_vernal_equinox(ϖ, e)
     MA = mod(2π * (time - time_v) / Ya + M_v, 2π)
 
