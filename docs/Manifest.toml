@@ -21,6 +21,12 @@ git-tree-sha1 = "c3598e525718abcc440f69cc6d5f60dda0a1b61e"
 uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.6+5"
 
+[[CLIMAParameters]]
+deps = ["Test"]
+git-tree-sha1 = "ee428f34aa7357ef2c91fc5ccbc74dc366b87b9b"
+uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
+version = "0.1.9"
+
 [[ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
 git-tree-sha1 = "c73d9cfc2a9d8433dc77f5bff4bddf46b1d78c20"
@@ -131,7 +137,7 @@ uuid = "4d00f742-c7ba-57c2-abde-4428a4b178cb"
 version = "0.8.3"
 
 [[Insolation]]
-deps = ["Dates", "Documenter", "DocumenterTools", "Formatting", "Test"]
+deps = ["CLIMAParameters", "Dates", "Documenter", "DocumenterTools", "Test"]
 path = "/Users/claresinger/Research/Insolation.jl"
 uuid = "e98cc03f-d57e-4e3c-b70c-8d51efe9e0d8"
 version = "0.1.0"

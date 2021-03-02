@@ -4,14 +4,14 @@ Documenting the public user interface
 
 ## Zenith Angle
 ```@autodocs
-Modules = [Insolation.ZenithAngleCalc]
+Modules = [Insolation]
 Private = false
 Pages   = ["ZenithAngleCalc.jl"]
 ```
 
 ## Insolation
 ```@autodocs
-Modules = [Insolation.InsolationCalc]
+Modules = [Insolation]
 Private = false
 Pages   = ["InsolationCalc.jl"]
 ```

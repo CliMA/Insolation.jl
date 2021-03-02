@@ -3,6 +3,10 @@ These examples are from a homework assignment in ESE 101 at Caltech
 
 ## Example 1
 ```@example
+using CLIMAParameters
+struct EarthParameterSet <: AbstractEarthParameterSet end
+const param_set = EarthParameterSet()
+
 include("plot_insolation.jl")
 
 # orbital constants
@@ -10,7 +14,7 @@ include("plot_insolation.jl")
 ϖ0 = ϖ_epoch()
 e0 = e_epoch()
 
-days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
+days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0)
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ0, e0) #hide
 plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
 ```
@@ -18,6 +22,10 @@ plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
 
 ## Example 2
 ```@example
+using CLIMAParameters # hide
+struct EarthParameterSet <: AbstractEarthParameterSet end # hide
+const param_set = EarthParameterSet() # hide
+
 include("plot_insolation.jl") # hide
 
 # turn longitude of perihelion by 180°
@@ -26,8 +34,8 @@ include("plot_insolation.jl") # hide
 ϖ1 = ϖ0 + π
 e0 = e_epoch()
 
-days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
-days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
+days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0) # hide
+days, lats, F1 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ1, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ1, e0) # hide
 plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
@@ -39,6 +47,10 @@ plot_day_lat_insolation(days, lats, F1-F0, "PRGn", title, "insol_example2b.png")
 
 ## Example 3
 ```@example
+using CLIMAParameters # hide
+struct EarthParameterSet <: AbstractEarthParameterSet end # hide
+const param_set = EarthParameterSet() # hide
+
 include("plot_insolation.jl") # hide
 
 # perihelion back to normal. decrease γ to 22.0°
@@ -47,8 +59,8 @@ include("plot_insolation.jl") # hide
 ϖ0 = ϖ_epoch()
 e0 = e_epoch()
 
-days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
-days, lats, F2 = calc_day_lat_insolation(365, 180, γ1, ϖ0, e0)
+days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0) # hide
+days, lats, F2 = calc_day_lat_insolation(365, 180, param_set, γ1, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ1, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F2,"YlOrRd",  title, "insol_example3a.png")
@@ -60,6 +72,10 @@ plot_day_lat_insolation(days, lats, F2-F0, "PRGn", title, "insol_example3b.png")
 
 ## Example 4
 ```@example
+using CLIMAParameters # hide
+struct EarthParameterSet <: AbstractEarthParameterSet end # hide
+const param_set = EarthParameterSet() # hide
+
 include("plot_insolation.jl") # hide
 
 # decrease γ further to 18.0°
@@ -68,8 +84,8 @@ include("plot_insolation.jl") # hide
 ϖ0 = ϖ_epoch()
 e0 = e_epoch()
 
-days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
-days, lats, F3 = calc_day_lat_insolation(365, 180, γ2, ϖ0, e0)
+days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0) # hide
+days, lats, F3 = calc_day_lat_insolation(365, 180, param_set, γ2, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ2, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F3,"YlOrRd", title, "insol_example4a.png")
@@ -81,6 +97,10 @@ plot_day_lat_insolation(days, lats, F3-F0, "PRGn", title, "insol_example4b.png")
 
 ## Example 5
 ```@example
+using CLIMAParameters # hide
+struct EarthParameterSet <: AbstractEarthParameterSet end # hide
+const param_set = EarthParameterSet() # hide
+
 include("plot_insolation.jl") # hide
 
 # now change obliquity to 60.0°
@@ -89,8 +109,8 @@ include("plot_insolation.jl") # hide
 ϖ0 = ϖ_epoch()
 e0 = e_epoch()
 
-days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
-days, lats, F4 = calc_day_lat_insolation(365, 180, γ3, ϖ0, e0)
+days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0) # hide
+days, lats, F4 = calc_day_lat_insolation(365, 180, param_set, γ3, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ3, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F4,"YlOrRd", title, "insol_example5a.png")
@@ -102,6 +122,10 @@ plot_day_lat_insolation(days, lats, F4-F0, "PRGn", title, "insol_example5b.png")
 
 ## Example 6
 ```@example
+using CLIMAParameters # hide
+struct EarthParameterSet <: AbstractEarthParameterSet end # hide
+const param_set = EarthParameterSet() # hide
+
 include("plot_insolation.jl") # hide
 
 # now change obliquity to 97.86°
@@ -110,8 +134,8 @@ include("plot_insolation.jl") # hide
 ϖ0 = ϖ_epoch()
 e0 = e_epoch()
 
-days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0) # hide
-days, lats, F5 = calc_day_lat_insolation(365, 180, γ4, ϖ0, e0)
+days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0) # hide
+days, lats, F5 = calc_day_lat_insolation(365, 180, param_set, γ4, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ4, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F5,"YlOrRd", title, "insol_example6a.png")
