@@ -1,6 +1,7 @@
 using Insolation
 using Plots
 using Dates
+using Statistics
 using Formatting
 
 using CLIMAParameters: AbstractParameterSet
@@ -21,7 +22,6 @@ function calc_day_lat_insolation(n_days::I,
                                 ϖ::FT,
                                 e::FT) where {FT<:Real,I<:Int}
   d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
-  l_arr = Array{I}(round.(collect(range(-90, stop = 90, length = n_lats))))
   l_arr = collect(range(-90, stop = 90, length = n_lats))
   F_arr = zeros(FT, n_days, n_lats)
   # loop over days
@@ -56,9 +56,14 @@ function plot_day_lat_insolation(d_arr::Array{I},
     cmap = :PRGn
     vmin, vmax = ceil(max(abs.(F_arr)...)/10)*-10, ceil(max(abs.(F_arr)...)/10)*10
   end
-  
-  p = contourf(d_arr, l_arr, F_arr', c=cmap, clims=(vmin,vmax), title=stitle, 
-    xlabel="Days since Jan 1 2020", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
+
+  p1 = contourf(d_arr, l_arr, F_arr', c=cmap, clims=(vmin,vmax), 
+    title=stitle, xlabel="Days since Jan 1 2020", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
+  meanF = mean(F_arr, dims=1)[1,:]
+  x1,x2 = [floor(minimum(meanF)), ceil(maximum(meanF))]
+  p2 = plot(meanF, l_arr, xlabel="Annual-mean TOA \nInsolation [W/m2]", 
+    ylims=[-90,90], yticks=[-90,-60,-30,0,30,60,90], xlims=[x1,x2], legend = false)
+  plot(p1, p2, layout = grid(1,2, widths=(0.8,0.2)), size=(800,400), dpi=150)
 
   savefig(file_name)
 end
@@ -81,7 +86,7 @@ end
 #   title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ1, e0)
 #   plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
 
-#   title = format("insolation diff: w0 = {:.2f}, w1 = {:.2f}", ϖ0, ϖ1)
+#   title = format("insolation diff: w1 = {:.2f} - w0 = {:.2f}", ϖ1, ϖ0)
 #   plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "insol_example2b.png")
 # end
 

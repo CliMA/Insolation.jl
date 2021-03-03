@@ -39,7 +39,7 @@ days, lats, F1 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ1, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ1, e0) # hide
 plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
-title = format("insolation diff: w0 = {:.2f}, w1 = {:.2f}", ϖ0, ϖ1) # hide
+title = format("insolation diff: w' = {:.2f} - w = {:.2f}", ϖ1,  ϖ0) # hide
 plot_day_lat_insolation(days, lats, F1-F0, "PRGn", title, "insol_example2b.png")
 ```
 ![](insol_example2a.png)
@@ -64,7 +64,7 @@ days, lats, F2 = calc_day_lat_insolation(365, 180, param_set, γ1, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ1, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F2,"YlOrRd",  title, "insol_example3a.png")
-title = format("insolation diff: g0 = {:.2f}, g1 = {:.2f}", γ0, γ1) # hide
+title = format("insolation diff: g' = {:.2f} - g = {:.2f}", γ1, γ0) # hide
 plot_day_lat_insolation(days, lats, F2-F0, "PRGn", title, "insol_example3b.png")
 ```
 ![](insol_example3a.png)
@@ -89,7 +89,7 @@ days, lats, F3 = calc_day_lat_insolation(365, 180, param_set, γ2, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ2, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F3,"YlOrRd", title, "insol_example4a.png")
-title = format("insolation diff: g0 = {:.2f}, g1 = {:.2f}", γ0, γ2) # hide
+title = format("insolation diff: g' = {:.2f} - g = {:.2f}", γ2, γ0) # hide
 plot_day_lat_insolation(days, lats, F3-F0, "PRGn", title, "insol_example4b.png")
 ```
 ![](insol_example4a.png)
@@ -114,7 +114,7 @@ days, lats, F4 = calc_day_lat_insolation(365, 180, param_set, γ3, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ3, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F4,"YlOrRd", title, "insol_example5a.png")
-title = format("insolation diff: g0 = {:.2f}, g1 = {:.2f}", γ0, γ3) # hide
+title = format("insolation diff: g' = {:.2f} - g = {:.2f}", γ3, γ0) # hide
 plot_day_lat_insolation(days, lats, F4-F0, "PRGn", title, "insol_example5b.png")
 ```
 ![](insol_example5a.png)
@@ -139,7 +139,7 @@ days, lats, F5 = calc_day_lat_insolation(365, 180, param_set, γ4, ϖ0, e0)
 
 title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ4, ϖ0, e0) # hide
 plot_day_lat_insolation(days,lats,F5,"YlOrRd", title, "insol_example6a.png")
-title = format("insolation diff: g0 = {:.2f}, g1 = {:.2f}", γ0, γ4) # hide
+title = format("insolation diff: g' = {:.2f} - g = {:.2f}", γ4, γ0) # hide
 plot_day_lat_insolation(days, lats, F5-F0, "PRGn", title, "insol_example6b.png")
 
 ```
