@@ -1,10 +1,22 @@
 export instantaneous_zenith_angle, daily_zenith_angle
 
+# mean anomaly at vernal equinox, radians (eq 3.11)
 function mean_anomaly_vernal_equinox(ϖ::FT, e::FT) where {FT <: Real}
-    # mean anomaly at vernal equinox, radians (3.11)
-    β = (1-e^2)^0.5
-    M_v = -ϖ + (e+0.25*e^3)*(1+β)*sin(ϖ) - 0.5*e^2*(0.5+β)*sin(2ϖ) + 0.25*e^3*(1/3+β)*sin(3ϖ)
+    β = (FT(1)-e^FT(2))^FT(1/2)
+    M_v = -ϖ + (e+FT(1/4)*e^FT(3))*(FT(1)+β)*sin(ϖ)
+            - FT(1/2)*e^FT(2)*(FT(1/2)+β)*sin(2ϖ)
+            + FT(1/4)*e^FT(3)*(FT(1/3)+β)*sin(3ϖ)
+    M_v = mod(M_v, 2π)
     return M_v
+end
+
+# true anomaly, radians (eq 3.8)
+function true_anomaly(MA::FT, e::FT) where {FT <: Real}
+    TA = MA + (FT(2)*e - FT(1/4)*e^FT(3))*sin(MA) 
+            + FT(5/4)*e^2*sin(2MA) 
+            + FT(13/12)*e^3*sin(3MA)
+    TA = mod(TA, 2π)
+    return TA
 end
 
 function distance_declination(date::DateTime, param_set::APS, γ::FT, ϖ::FT, e::FT) where {FT <: Real}
@@ -22,7 +34,7 @@ function distance_declination(date::DateTime, param_set::APS, γ::FT, ϖ::FT, e:
     MA = mod(2π * (time - time_v) / Ya + M_v, 2π)
 
     # true anomaly, radians (3.8)
-    TA = mod(MA + (2*e - e^FT(3/4))*sin(MA) + FT(5/4)*e^2*sin(2*MA) + FT(13/12)*e^3*sin(3*MA), 2π)
+    TA = true_anomaly(MA, e)
 
     # true longitude, radians (3.9)
     TL = mod(TA + ϖ, 2π)
@@ -31,7 +43,7 @@ function distance_declination(date::DateTime, param_set::APS, γ::FT, ϖ::FT, e:
     δ = mod(asin(sin(γ) * sin(TL)), 2π)
 
     # earth-sun distance, (3.1)
-    d = AU * (1 - e^2) / (1 + e*cos(TA))
+    d = AU * (1 - e^FT(2)) / (FT(1) + e*cos(TA))
 
     return d, δ
 end
@@ -64,7 +76,7 @@ function instantaneous_zenith_angle(date::DateTime,
 
     # hour angle, zero at local solar noon, radians (3.17)
     julian_day_abs = datetime2julian(date)
-    η_UTC = 2π * (mod(julian_day_abs, 1) - FT(0.5))
+    η_UTC = 2π * mod(julian_day_abs, 1)
     η = mod(η_UTC + λ, 2π)
 
     # zenith angle, radians (3.18)
