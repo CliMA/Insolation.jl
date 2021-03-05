@@ -6,7 +6,7 @@ ENV["GKSwstype"] = "100"
 makedocs(
     sitename="Insolation.jl",
     doctest = false,
-    strict = false,
+    strict = true,
     format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true",),
     modules = [Documenter, Insolation],
     clean = false,
