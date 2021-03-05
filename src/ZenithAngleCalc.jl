@@ -19,14 +19,22 @@ function true_anomaly(MA::FT, e::FT) where {FT <: Real}
     return TA
 end
 
-function distance_declination(date::DateTime, param_set::APS, γ::FT, ϖ::FT, e::FT) where {FT <: Real}
+function distance_declination(::Type{FT}, date::DateTime, param_set::APS) where {FT <: Real}
     Ya::FT = year_anom(param_set)
     day_length::FT = Planet.day(param_set)
     AU::FT = astro_unit()
+
+    _epoch::FT = epoch(param_set)
+    M0::FT = mean_anom_epoch(param_set)
+    ϖ0::FT = lon_perihelion_epoch(param_set)
+
+    γ::FT = obliq_epoch(param_set)
+    ϖ::FT = lon_perihelion(param_set)
+    e::FT = eccentricity_epoch(param_set)
     
     # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
-    M_v0 = mean_anomaly_vernal_equinox(ϖ_epoch(), e)
-    time_v = Ya * (M_v0 - M_epoch()) / 2π + epoch()
+    M_v0 = mean_anomaly_vernal_equinox(ϖ0, e)
+    time_v = Ya * (M_v0 - M0) / 2π + _epoch
 
     # mean anomaly given mean anomaly at vernal equinox (3.10)
     time = datetime2julian(date)*day_length
@@ -65,14 +73,11 @@ param_set is an AbstractParameterSet from CLIMAParameters.jl
 function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
                                     latitude::FT,
-                                    param_set::APS,
-                                    γ::FT=γ_epoch(),
-                                    ϖ::FT=ϖ_epoch(),
-                                    e::FT=e_epoch()) where {FT <: Real}
+                                    param_set::APS) where {FT <: Real}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
 
-    d, δ = distance_declination(date, param_set, γ, ϖ, e)
+    d, δ = distance_declination(FT, date, param_set)
 
     # hour angle, zero at local solar noon, radians (3.17)
     julian_day_abs = datetime2julian(date)
@@ -80,13 +85,13 @@ function instantaneous_zenith_angle(date::DateTime,
     η = mod(η_UTC + λ, 2π)
 
     # zenith angle, radians (3.18)
-    sza = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), 2π)
+    θ = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), 2π)
 
-    # solar azimuth angle, azi = 0 when due E and increasing CCW
-    # azi = 3π/2 (due S) when η=0 at local solar noon
-    azi = mod(3π/2 - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), 2π)
+    # solar azimuth angle, ζ = 0 when due E and increasing CCW
+    # ζ = 3π/2 (due S) when η=0 at local solar noon
+    ζ = mod(3π/2 - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), 2π)
 
-    return sza, azi, d
+    return θ, ζ, d
 end
 
 """
@@ -103,13 +108,10 @@ param_set is an AbstractParameterSet from CLIMAParameters.jl
 """
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
-                            param_set::APS,
-                            γ::FT=γ_epoch(),
-                            ϖ::FT=ϖ_epoch(),
-                            e::FT=e_epoch()) where {FT <: Real}
+                            param_set::APS) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
-    d, δ = distance_declination(date, param_set, γ, ϖ, e)
+    d, δ = distance_declination(FT, date, param_set)
     
     # sunrise/sunset angle (3.19)
     T = tan(ϕ) * tan(δ)
@@ -122,7 +124,7 @@ function daily_zenith_angle(date::DateTime,
     end
     
     # daily averaged zenith angle (3.20)
-    daily_sza = mod(acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), 2π)
+    daily_θ = mod(acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), 2π)
 
-    return daily_sza, d
+    return daily_θ, d
 end
