@@ -60,10 +60,7 @@ end
     instantaneous_zenith_angle(date::DateTime,
                                longitude::FT,
                                latitude::FT,
-                               param_set::APS,
-                               γ::FT=γ_epoch(),
-                               ϖ::FT=ϖ_epoch(),
-                               e::FT=e_epoch()) where {FT <: Real}
+                               param_set::APS) where {FT <: Real}
 
 returns the zenith angle and earth-sun distance
 at a particular longitude and latitude on the given date (and time UTC)
@@ -97,10 +94,7 @@ end
 """
     daily_zenith_angle(date::DateTime,
                        latitude::FT,
-                       param_set::APS,
-                       γ::FT=γ_epoch(),
-                       ϖ::FT=ϖ_epoch(),
-                       e::FT=e_epoch()) where {FT <: Real}
+                       param_set::APS) where {FT <: Real}
 returns the daily averaged zenith angle and earth-sun distance
 at a particular latitude given the date and orbital parameters
 obliquity, longitude of perihelion, and eccentricity
