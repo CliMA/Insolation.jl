@@ -1,4 +1,4 @@
-export insolation, solar_flux_and_mu
+export insolation, solar_flux_and_cos_sza
 
 """
     insolation(θ::FT, d::FT, param_set::APS) where {FT <: Real}
@@ -21,7 +21,7 @@ function insolation(θ::FT, d::FT, param_set::APS) where {FT <: Real}
 end
 
 """
-    solar_flux_and_mu(date::DateTime,
+    solar_flux_and_cos_sza(date::DateTime,
                       longitude::FT,
                       latitude::FT,
                       param_set::APS) where {FT <: Real}
@@ -31,7 +31,7 @@ the total solar irradiance (TSI) weighted by the earth-sun distance
 and cos(solar zenith angle) for input to RRTMGP.jl
 param_set is an AbstractParameterSet from CLIMAParameters.jl
 """
-function solar_flux_and_mu(date::DateTime,
+function solar_flux_and_cos_sza(date::DateTime,
                            longitude::FT,
                            latitude::FT,
                            param_set::APS) where {FT <: Real}
