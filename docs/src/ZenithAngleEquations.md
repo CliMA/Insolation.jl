@@ -17,7 +17,7 @@ and $Y_a$ is the length of the anomalistic year.
 
 ## True Anomaly (3.8)
 ```math
-A = M + (2e - e^{3/4}) \sin(M) + \frac{5}{4} e^2 \sin(2M) + \frac{13}{12} e^3 \sin(3M)
+A = M + \left( 2e - \frac{1}{4}e^{3} \right) \sin(M) + \frac{5}{4} e^2 \sin(2M) + \frac{13}{12} e^3 \sin(3M)
 ```
 
 ## True Longitude (3.9)

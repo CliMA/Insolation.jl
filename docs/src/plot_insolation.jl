@@ -11,24 +11,19 @@ Base.broadcastable(param_set::APS) = Ref(param_set)
 """
     calc_day_lat_insolation(n_days::I,
                             n_lats::I,
-                            γ::FT,
-                            ϖ::FT,
-                            e::FT) where {FT<:Real,I<:Int}
+                            param_set::APS) where {I<:Int}
 """
 function calc_day_lat_insolation(n_days::I,
                                 n_lats::I,
-                                param_set::APS,
-                                γ::FT,
-                                ϖ::FT,
-                                e::FT) where {FT<:Real,I<:Int}
+                                param_set::APS) where {I<:Int}
   d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
   l_arr = collect(range(-90, stop = 90, length = n_lats))
-  F_arr = zeros(FT, n_days, n_lats)
+  F_arr = zeros(n_days, n_lats)
   # loop over days
   for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
         date = Dates.DateTime(2020,1,1) + Dates.Day(d)
-        θ, dist = daily_zenith_angle(date, lat, param_set, γ, ϖ, e)
+        θ, dist = daily_zenith_angle(date, lat, param_set)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
   end
@@ -67,27 +62,3 @@ function plot_day_lat_insolation(d_arr::Array{I},
 
   savefig(file_name)
 end
-
-# using CLIMAParameters
-# struct EarthParameterSet <: AbstractEarthParameterSet end
-# const param_set = EarthParameterSet()
-
-# function main()
-#   γ0 = γ_epoch()
-#   ϖ0 = ϖ_epoch()
-#   e0 = e_epoch()
-
-#   days, lats, F0 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ0, e0)
-#   title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ0, e0)
-#   plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
-
-#   ϖ1 = ϖ_epoch() + π
-#   days, lats, F1 = calc_day_lat_insolation(365, 180, param_set, γ0, ϖ1, e0)
-#   title = format("g = {:.2f}, w = {:.2f}, e = {:.2f}", γ0, ϖ1, e0)
-#   plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
-
-#   title = format("insolation diff: w1 = {:.2f} - w0 = {:.2f}", ϖ1, ϖ0)
-#   plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "insol_example2b.png")
-# end
-
-# main()
