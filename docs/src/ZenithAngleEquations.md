@@ -1,68 +1,66 @@
 # Zenith Angle Equations
-These equations are from the book "Astronomical Algorithms"
-by Jean Meeus.
+These equations are from Tapio Schneiders's textbook draft chapter 3.
 
-## Times: Julian Date/Julian Century
-The Julian century (``jc``) is defined as the centuries
-since 1 Jan 2000 12:00 UTC.
-
-## True Solar Longitude/Anomaly (in degrees)
+## Mean Anomaly (3.6)
 ```math
 \begin{aligned}
-ML_{deg} &= 280.46646 + 36000.76983 jc + 0.0003032 jc^2 \\
-MA_{deg} &= 357.52911 + 35999.05029 jc - 0.0001537 jc^2 \\
-SC_{deg} &= \sin(MA) (1.914602-0.004817 jc-0.000014 jc^2) \\
-&\hspace{1cm}+ \sin(2 MA) (0.019993-0.000101 jc) \\
-&\hspace{1cm}+ \sin(3 MA) (0.000289) \\
-TL &= ML + SC \\
-TA &= MA + SC
+\beta &= \sqrt{1-e^2} \\
+M_{V0} &= -\varpi_0 + \left(e+\frac{1}{4}e^3 \right) (1+\beta)sin(\varpi_0) - \frac{1}{2}e^2 \left(\frac{1}{2}+\beta \right) sin(2\varpi_0) + \frac{1}{4}e^3 \left(\frac{1}{3}+\beta \right) sin(3\varpi_0) \\
+t_V &= \frac{Y_a (M_{V0} - M_0)}{2\pi} + t_0 \\
+M_V &= -\varpi + \left(e+\frac{1}{4}e^3 \right) (1+\beta)sin(\varpi) - \frac{1}{2}e^2 \left(\frac{1}{2}+\beta \right) sin(2\varpi) + \frac{1}{4}e^3 \left(\frac{1}{3}+\beta  \right) sin(3\varpi) \\
+M &= \frac{2\pi (t - t_V)}{Y_a} + M_V
 \end{aligned}
 ```
+where $e$ is the oribital eccentricity, $t_0$ is the time at the epoch (J2000), defined as January 1, 2000 at 12hr UTC, 
+$M_0$ is the mean anomaly at the epoch, $\varpi_0$ is the longitude of perihelion at the epoch,
+and $Y_a$ is the length of the anomalistic year.
 
-## Eccentricity and Obliquity (in degrees)
+## True Anomaly (3.8)
 ```math
-\begin{aligned}
-e &= 0.016708634 - 0.000042037 jc - 0.0000001267 jc^2 \\
-\gamma_{deg} &= 23.439291 - 0.01300417 jc - 1.638889e-7 jc^2 + 5.036111e-7 jc^3
-\end{aligned}
+A = M + \left( 2e - \frac{1}{4}e^{3} \right) \sin(M) + \frac{5}{4} e^2 \sin(2M) + \frac{13}{12} e^3 \sin(3M)
 ```
 
-## Declination and Right Acension
+## True Longitude (3.9)
 ```math
-\begin{aligned}
-\delta &= \arcsin(sin(\gamma) \sin(TL)) \\
-RA &= \arctan \left( \frac{\cos(\gamma) \sin(TL)}{\cos(TL)} \right)
-\end{aligned}
+L = A + \varpi
 ```
 
-## Greenwich mean sidereal time (in degrees)
+## Declination (3.16)
 ```math
-\begin{aligned}
-UTC_{deg} &= (hour + min/60.0 + sec/3600.0 - timezone) * 15.0 \\
-GMST_{deg} &= 100.460618375 + 36000.7700536083 jc + 0.00038793 jc^2 - 2.58333e-8 jc^3 + UTC_{deg}
-\end{aligned}
+\sin \delta = \sin \gamma \sin L
+```
+where $\gamma$ is the orbital obliquity.
+
+## Hour Angle (3.17)
+```math
+\eta = \frac{2\pi (t-t_s)}{T_d}
+```
+where $t_s$ is the time of local solar noon and $T_d$ is the length of a day.
+
+## Zenith Angle (3.18)
+```math
+\cos \theta = \cos \phi \cos \delta \cos \eta + \sin \phi \sin \delta
+```
+where $\phi$ is the latitude.
+
+## Sunrise/Sunset Angle (3.19)
+```math
+\cos \eta_d = - \tan \phi \tan \delta
 ```
 
-## Hour Angle
+## Daily-averaged Zenith Angle (3.20)
 ```math
-\eta = GMST + \lambda - RA
+\overline{\cos \theta} = \frac{1}{\pi} \left( \eta_d \sin \phi \sin \delta + \cos \phi \cos \delta \cos \eta_d \right)
 ```
 
-## Zenith Angle
+## Azimuth Angle
 ```math
-\theta = \arccos(\cos(\phi) \cos(\delta) \cos(\eta) + \sin(\phi) \sin(\delta))
+\zeta = \frac{3\pi}{2} - arctan \left( \frac{\sin \eta}{\cos \eta \sin \phi - \tan \delta \cos \phi} \right)
 ```
+where the azimuth is defined as 0 to the East and increasing counter-clockwise, such that at local solar noon when $\eta=0$, then $\zeta = \frac{3\pi}{2}$.
 
-## Daily averaged zenith angle
+## Earth-Sun Distance (3.1)
 ```math
-\begin{aligned}
-T &= \tan(\phi) \tan(\delta) \\
-\eta_d &= \left\{ \begin{array}{ll} \eta_d = \pi & T \geq 1 \\ \eta_d = 0 & T \leq -1 \\ \eta_d = \arccos(-T) & else \end{array} \right. \\
-\overline{\theta} &= \arccos \left( \left(\frac{1}{\pi} \right) (\eta_d \sin(\phi) \sin(\delta) + \cos(\phi) \cos(\delta) \sin(\eta_d)) \right)
-\end{aligned}
+d = \frac{1-e^2}{1+e\cos A} d_0
 ```
-
-## Earth-Sun Distance
-```math
-d_{au} = \frac{1.000001018 (1.0 - e^2)}{1.0 + e \cos(TA)}
-```
+where $d_0$ is 1 AU.

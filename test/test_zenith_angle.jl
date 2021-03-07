@@ -1,151 +1,34 @@
 using Dates
-using Insolation.ZenithAngleCalc
-include("reference_sza_codes.jl")
+using Insolation 
+
+using CLIMAParameters
+using CLIMAParameters.Planet
+struct EarthParameterSet <: AbstractEarthParameterSet end
+const param_set = EarthParameterSet()
 
 rtol = 1e-2
 
-PST = -7.0
-California = [-105.0, 40.0]
+## Test Zenith
+date = Dates.DateTime(2020, 1, 1, 6, 0, 0)
+lon, lat = [0.0, 0.0]
+sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
+@test sza ≈ π/2 rtol=rtol
 
-tz = PST
-lon, lat = California
+date = Dates.DateTime(2020, 1, 1, 18, 0, 0)
+sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
+@test sza ≈ π/2 rtol=rtol
 
-γ = 23.44
-ϖ = 282.95
-e = 0.017
+## Test Azimuth
+date = Dates.DateTime(2020, 1, 1, 0, 0, 0)
+lon, lat = [0.0, 40.0]
+sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
+@test azi ≈ π/2 rtol=rtol
 
-days_since_equinox = 85
+date = Dates.DateTime(2020, 1, 1, 12, 0, 0)
+sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
+@test azi ≈ 3π/2 rtol=rtol
 
-doprint = false
-
-date = Dates.DateTime(2020,3,21,12,0,0)
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,3,21,17,0,0)
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,3,21,12,0,0)
-lat = 85.0
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,3,21,4,0,0)
-lon, lat = California
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,8,21,11,0,0)
-lat = -85.0
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,8,21,11,0,0)
-lon, lat = [105.0, 40.0]
-tz = 7.0
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,8,21,11,0,0)
-lon, lat = [-105.0, 40.0]
-tz = -7.0
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-date = Dates.DateTime(2020,3,21,12,0,0)
-lon, lat = California
-tz = PST
-sza, d = instantaneous_zenith_angle(date, tz, lon, lat, γ, ϖ, e)
-sza_ref = inst_sza(date, tz, lon, lat)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-sza, d = daily_zenith_angle(date, lat)
-sza_ref = daily_sza(1, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-lon, lat = California
-sza, d = daily_zenith_angle(days_since_equinox, γ, ϖ, e, lat)
-sza_ref = daily_sza(days_since_equinox, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-lat = -85.0
-sza, d = daily_zenith_angle(days_since_equinox, γ, ϖ, e, lat)
-sza_ref = daily_sza(days_since_equinox, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-lon, lat = California
-ϖ = 282.95 + 180.0
-sza, d = daily_zenith_angle(days_since_equinox, γ, ϖ, e, lat)
-sza_ref = daily_sza(days_since_equinox, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-γ = 22.0
-ϖ = 282.95
-sza, d = daily_zenith_angle(days_since_equinox, γ, ϖ, e, lat)
-sza_ref = daily_sza(days_since_equinox, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-γ = 18.0
-sza, d = daily_zenith_angle(days_since_equinox, γ, ϖ, e, lat)
-sza_ref = daily_sza(days_since_equinox, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-γ = 97.86
-sza, d = daily_zenith_angle(days_since_equinox, γ, ϖ, e, lat)
-sza_ref = daily_sza(days_since_equinox, lat, γ, ϖ, e)
-@test rad2deg(sza) ≈ sza_ref rtol=rtol
-if doprint
-    println(rad2deg(sza), "\t", sza_ref)
-end
-
-# julia --project --color=yes --check-bounds=yes -e 'using Pkg; Pkg.instantiate(); Pkg.build(); Pkg.test(coverage=true);'
+## Test Distance
+date = Dates.DateTime(2000, 3, 22, 0, 0, 0)
+sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
+@test d ≈ orbit_semimaj(param_set) rtol=rtol

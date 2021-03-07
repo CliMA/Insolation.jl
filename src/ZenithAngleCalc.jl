@@ -1,322 +1,124 @@
-module ZenithAngleCalc
-
-using Dates
-using ..OrbitalParameters
-
 export instantaneous_zenith_angle, daily_zenith_angle
 
-"""
-    julian_century(date::DateTime)
-returns the julian century (centuries since Jan 1, 2000 at 12h UT)
-given the datetime
-"""
-function julian_century(date::DateTime)
-    # julian day
-    julian_day_abs = datetime2julian(date)
-    julian_day_ref = 2451545.0
-    # elapsed days referenced to noon 1 Jan 2000 UTC
-    jd = julian_day_abs - julian_day_ref
-    # julian century
-    jc = jd / (year_anom() / day_length() * 100.0)
-    return jc
+# mean anomaly at vernal equinox, radians (eq 3.11)
+function mean_anomaly_vernal_equinox(ϖ::FT, e::FT) where {FT <: Real}
+    β = (FT(1)-e^FT(2))^FT(1/2)
+    M_v = -ϖ + (e+FT(1/4)*e^FT(3))*(FT(1)+β)*sin(ϖ)
+            - FT(1/2)*e^FT(2)*(FT(1/2)+β)*sin(2ϖ)
+            + FT(1/4)*e^FT(3)*(FT(1/3)+β)*sin(3ϖ)
+    M_v = mod(M_v, 2π)
+    return M_v
 end
 
-"""
-    true_longitude(date::DateTime)
-returns the true solar longitude in radians
-given the datetime
-
-formula from "Astronomical Algorithms" by Jean Meeus
-chapter 25, ML = equation 25.2
-"""
-function true_longitude(date::DateTime)
-    jc = julian_century(date)
-    # mean solar longitude
-    ML = deg2rad(mod(280.46646 + 36000.76983*jc + 0.0003032*jc^2, 360.0))
-    # mean anomaly, radians
-    MA = deg2rad(mod(357.52911 + 35999.05029*jc - 0.0001537*jc^2, 360.0))
-    # solar equation of center
-    SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
-    # true longitude
-    TL = ML + SC
-    return TL
-end
-
-"""
-    true_anomaly(date::DateTime)
-returns the true solar anomaly in radians
-
-formula from "Astronomical Algorithms" by Jean Meeus
-chapter 25, MA = equation 25.3
-"""
-function true_anomaly(date::DateTime)
-    jc = julian_century(date)
-    # mean anomaly, radians
-    MA = deg2rad(mod(357.52911 + 35999.05029*jc - 0.0001537*jc^2, 360.0))
-    # solar equation of center
-    SC = deg2rad(sin(MA)*(1.914602-0.004817*jc-0.000014*jc^2) + sin(2*MA)*(0.019993-0.000101*jc) + sin(3*MA)*0.000289)
-    # true anomaly
-    TA = MA + SC
+# true anomaly, radians (eq 3.8)
+function true_anomaly(MA::FT, e::FT) where {FT <: Real}
+    TA = MA + (FT(2)*e - FT(1/4)*e^FT(3))*sin(MA) 
+            + FT(5/4)*e^2*sin(2MA) 
+            + FT(13/12)*e^3*sin(3MA)
+    TA = mod(TA, 2π)
     return TA
 end
 
-"""
-    eccentricity(date::DateTime)
-returns the eccentricity of Earth's orbit
-given the datetime
+function distance_declination(::Type{FT}, date::DateTime, param_set::APS) where {FT <: Real}
+    Ya::FT = year_anom(param_set)
+    day_length::FT = Planet.day(param_set)
+    AU::FT = astro_unit()
 
-formula from "Astronomical Algorithms" by Jean Meeus
-chapter 25, equation 25.4
-"""
-function eccentricity(date::DateTime)
-    jc = julian_century(date)
-    # eccentricity
-    ecc = 0.016708634 - 0.000042037*jc - 0.0000001267*jc^2
-    return ecc
-end
+    _epoch::FT = epoch(param_set)
+    M0::FT = mean_anom_epoch(param_set)
+    ϖ0::FT = lon_perihelion_epoch(param_set)
 
-"""
-    obliquity(date::DateTime)
-returns the obliquity of Earth's orbit in radians
-given the datetime
-
-formula from "Astronomical Algorithms" by Jean Meeus
-chapter 22, approximation ignorning nutation of obliquity, Δϵ
-"""
-function obliquity(date::DateTime)
-    jc = julian_century(date)
-    # obliquity
-    γ = deg2rad(mod(23.439291 - 0.01300417*jc - 1.638889e-7*jc^2 + 5.036111e-7*jc^3, 360.0))
-    return γ
-end
-
-"""
-    GMST(date::DateTime, timezone::FT) where {FT <: Real}
-
-returns the Greenwich mean sidereal time in radians
-given the datetime and timezone
-
-formula from https://www.cfa.harvard.edu/~jzhao/times.html#ref7
-page 50, "Explanatory Supplement to the Astronomical Almanac" by Seidelmann
-same as 12.4 from "Astronomical Algorithms" by Jean Meeus, but -180°
-to account for counting from 0:00 not 12:00
-"""
-function GMST(date::DateTime, timezone::FT) where {FT <: Real}
-    jc = julian_century(date)
-    UTC_hours = Dates.hour(date) + Dates.minute(date)/60.0 + Dates.second(date)/3600.0 - timezone
-    UTC_deg = UTC_hours * 15.0
-
-    # Greenwich mean sidereal time, radians
-    GMSTdeg = mod(100.460618375 + 36000.7700536083*jc + 0.00038793*jc^2 - 2.58333e-8*jc^3 + UTC_deg, 360.0)
-    GMSTrad = deg2rad(GMSTdeg)
-
-    return GMSTrad
-end
-
-"""
-    earth_sun_dist(ecc::FT, TA::FT) where {FT <: Real}
-
-returns the Earth-sun distance in meters
-given the eccentricity and true anomaly
-
-formula from "Astronomical Algorithms" by Jean Meeus
-chapter 25, equation 25.5
-"""
-function earth_sun_dist(ecc::FT, TA::FT) where {FT <: Real}
-    d_au = (1.000001018 * (1.0 - ecc^2)) / (1.0 + ecc*cos(TA))
-    d = d_au * astro_unit()
-    return d
-end
-
-"""
-    instantaneous_zenith_angle(date::DateTime,
-                               timezone::FT,
-                               longitude::FT,
-                               latitude::FT) where {FT <: Real}
-
-returns the zenith angle and earth-sun distance
-at a particular longitude and latitude on the given date
-
-equations from "Astronomical Algorithms" by Jean Meeus
-see documentation for details
-"""
-function instantaneous_zenith_angle(date::DateTime,
-                                    timezone::FT,
-                                    longitude::FT,
-                                    latitude::FT) where {FT <: Real}
-    λ = deg2rad(longitude)
-    ϕ = deg2rad(latitude)
+    γ::FT = obliq_epoch(param_set)
+    ϖ::FT = lon_perihelion(param_set)
+    e::FT = eccentricity_epoch(param_set)
     
-    TL = true_longitude(date)
-    TA = true_anomaly(date)
-    ecc = eccentricity(date)
-    γ = obliquity(date)
-    GMSTrad = GMST(date, timezone)
-    d = earth_sun_dist(ecc, TA)
+    # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
+    M_v0 = mean_anomaly_vernal_equinox(ϖ0, e)
+    time_v = Ya * (M_v0 - M0) / 2π + _epoch
 
-    # declination, radians
-    δ = mod(asin(sin(γ) * sin(TL)), 2*π)
-    # right acension, radians
-    Y = cos(γ) * sin(TL)
-    X = cos(TL)
-    RA = mod(atan(Y,X), 2*π)
+    # mean anomaly given mean anomaly at vernal equinox (3.10)
+    time = datetime2julian(date)*day_length
+    M_v = mean_anomaly_vernal_equinox(ϖ, e)
+    MA = mod(2π * (time - time_v) / Ya + M_v, 2π)
 
-    # hour angle, radians
-    LMST = mod(GMSTrad + λ, 2*π)
-    η = mod(LMST - RA, 2*π)
+    # true anomaly, radians (3.8)
+    TA = true_anomaly(MA, e)
 
-    # zenith angle
-    sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
+    # true longitude, radians (3.9)
+    TL = mod(TA + ϖ, 2π)
 
-    # parallax correction
-    parallax = (planet_radius() / astro_unit()) * sin(sza)
-    sza = mod(sza + parallax, 2*π)
+    # declination, radians (3.16)
+    δ = mod(asin(sin(γ) * sin(TL)), 2π)
 
-    # Set to a max of 90 deg.
-    if sza > π/2.0
-        sza = π/2.0
-    end
+    # earth-sun distance, (3.1)
+    d = AU * (1 - e^FT(2)) / (FT(1) + e*cos(TA))
 
-    return sza, d
+    return d, δ
 end
 
 """
     instantaneous_zenith_angle(date::DateTime,
-                               timezone::FT,
                                longitude::FT,
                                latitude::FT,
-                               obliquity::FT,
-                               perihelion::FT,
-                               eccentricity::FT) where {FT <: Real}
+                               param_set::APS) where {FT <: Real}
 
 returns the zenith angle and earth-sun distance
-at a particular longitude and latitude on the given date
+at a particular longitude and latitude on the given date (and time UTC)
 given orbital parameters: obliquity, longitude of perihelion, and eccentricity
+param_set is an AbstractParameterSet from CLIMAParameters.jl
 """
 function instantaneous_zenith_angle(date::DateTime,
-                                    timezone::FT,
                                     longitude::FT,
                                     latitude::FT,
-                                    obliquity::FT,
-                                    perihelion::FT,
-                                    eccentricity::FT) where {FT <: Real}
+                                    param_set::APS) where {FT <: Real}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
-    γ = deg2rad(obliquity)
-    ϖ = deg2rad(perihelion)
-    ecc = eccentricity
 
-    TA = true_anomaly(date)
-    TL = mod(TA + ϖ, 2*π)
-    GMSTrad = GMST(date, timezone)
-    d = earth_sun_dist(ecc, TA)
+    d, δ = distance_declination(FT, date, param_set)
 
-    # declination, radians
-    δ = mod(asin(sin(γ) * sin(TL)), 2*π)
-    # right acension, radians
-    RA = mod(atan(cos(γ) * sin(TL) / cos(TL)), 2*π)
+    # hour angle, zero at local solar noon, radians (3.17)
+    julian_day_abs = datetime2julian(date)
+    η_UTC = 2π * mod(julian_day_abs, 1)
+    η = mod(η_UTC + λ, 2π)
 
-    # hour angle, radians
-    LMST = GMSTrad + λ
-    η = mod(LMST - RA, 2*π)
+    # zenith angle, radians (3.18)
+    θ = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), 2π)
 
-    # zenith angle
-    sza = acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ))
+    # solar azimuth angle, ζ = 0 when due E and increasing CCW
+    # ζ = 3π/2 (due S) when η=0 at local solar noon
+    ζ = mod(3π/2 - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), 2π)
 
-    # Set to a max of 90 deg.
-    if sza > π/2.0
-        sza = π/2.0
-    end
-
-    return sza, d
+    return θ, ζ, d
 end
 
 """
     daily_zenith_angle(date::DateTime,
-                       latitude::FT) where {FT <: Real}
-
+                       latitude::FT,
+                       param_set::APS) where {FT <: Real}
 returns the daily averaged zenith angle and earth-sun distance
-at a particular latitude on the given date
+at a particular latitude given the date and orbital parameters
+obliquity, longitude of perihelion, and eccentricity
+param_set is an AbstractParameterSet from CLIMAParameters.jl
 """
 function daily_zenith_angle(date::DateTime,
-                            latitude::FT) where {FT <: Real}
+                            latitude::FT,
+                            param_set::APS) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
-    TL = true_longitude(date)
-    TA = true_anomaly(date)
-    ecc = eccentricity(date)
-    γ = obliquity(date)
-    d = earth_sun_dist(ecc, TA)
-
-    # declination, radians
-    δ = mod(asin(sin(γ) * sin(TL)), 2*π)
+    d, δ = distance_declination(FT, date, param_set)
     
-    # sunrise/sunset angle
+    # sunrise/sunset angle (3.19)
     T = tan(ϕ) * tan(δ)
     if T >= 1
         ηd = π
     elseif T <= -1
         ηd = 0.0
     else
-        ηd = acos(-1 * T)
+        ηd = acos(-1*T)
     end
     
-    # daily averaged zenith angle
-    szabar = acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd)))
+    # daily averaged zenith angle (3.20)
+    daily_θ = mod(acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), 2π)
 
-    return szabar, d
-end
-
-"""
-    daily_zenith_angle(days_since_equinox::I,
-                       obliquity::FT,
-                       perihelion::FT,
-                       eccentricity::FT,
-                       latitude::FT) where {FT <: Real, I <: Int}
-
-returns the daily averaged zenith angle and earth-sun distance
-at a particular latitude given the days since vernal equinox (defined as March 21),
-orbital obliquity, longitude of perihelion, and eccentricity
-"""
-function daily_zenith_angle(days_since_equinox::I,
-                            obliquity::FT,
-                            perihelion::FT,
-                            eccentricity::FT,
-                            latitude::FT) where {FT <: Real, I <: Int}
-    γ = deg2rad(obliquity)
-    ϖ = deg2rad(perihelion)
-    ecc = eccentricity
-    ϕ = deg2rad(latitude)
-
-    # calculate mean anomaly at vernal equinox and mean anomaly
-    β = (1 - ecc^2)^0.5
-    MA_VE = mod(-ϖ + (ecc + ecc^3/4)*(1+β)*sin(ϖ), 2*π)
-    MA = mod(2*π*days_since_equinox / (year_anom() / day_length()) + MA_VE, 2*π)
-
-    # solar longitude and true anomaly
-    TA = mod(MA + (2*ecc - ecc^3/4)*sin(MA), 2*π)
-    TL = mod(TA + ϖ, 2*π)
-
-    # radius earth-sun distance, AU and m
-    d = earth_sun_dist(ecc, TA)
-
-    # declination, radians
-    δ = mod(asin(sin(γ) * sin(TL)), 2*π)
-    
-    # sunrise/sunset angle
-    T = tan(ϕ) * tan(δ)
-    if T >= 1
-        ηd = π
-    elseif T <= -1
-        ηd = 0.0
-    else
-        ηd = acos(-1 * T)
-    end
-    
-    # daily averaged zenith angle
-    szabar = acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd)))
-
-    return szabar, d
-end
-
+    return daily_θ, d
 end
