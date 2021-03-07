@@ -16,6 +16,13 @@ matrix:
 
 codecov: true
 
+branches:
+  only:
+    # This is where pull requests from "bors r+" are built.
+    - staging
+    # This is where pull requests from "bors try" are built.
+    - trying
+
 script:
   - julia --project --color=yes --check-bounds=yes -e 'using Pkg; 
                                                       Pkg.instantiate(); 
