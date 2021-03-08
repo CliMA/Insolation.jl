@@ -1,5 +1,5 @@
 status = [
-  "clima.Insolation.jl"
+  "continuous-integration/travis-ci/push"
 ]
 delete_merged_branches = true
 timeout_sec = 3600
