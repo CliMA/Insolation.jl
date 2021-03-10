@@ -22,6 +22,8 @@ branches:
     - staging
     # This is where pull requests from "bors try" are built.
     - trying
+    # Uncomment this to enable building pull requests.
+    - master
 
 script:
   - julia --project --color=yes --check-bounds=yes -e 'using Pkg; 

@@ -25,7 +25,7 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/claresinger/Insolation.jl.git",
+    repo = "github.com/CliMA/Insolation.jl.git",
     target = "build",
     push_preview = true,
 )
