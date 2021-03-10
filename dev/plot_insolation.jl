@@ -1,27 +1,30 @@
-using Insolation.InsolationCalc
+using Insolation
 using Plots
+using Dates
+using Statistics
+using Formatting
+
+using CLIMAParameters: AbstractParameterSet
+const APS = AbstractParameterSet
+Base.broadcastable(param_set::APS) = Ref(param_set)
 
 """
     calc_day_lat_insolation(n_days::I,
                             n_lats::I,
-                            γ::FT,
-                            ϖ::FT,
-                            e::FT) where {FT<:AbstractFloat,I<:Int}
+                            param_set::APS) where {I<:Int}
 """
 function calc_day_lat_insolation(n_days::I,
                                 n_lats::I,
-                                γ::FT,
-                                ϖ::FT,
-                                e::FT) where {FT<:AbstractFloat,I<:Int}
-  equinox_day = 76
+                                param_set::APS) where {I<:Int}
   d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
-  l_arr = Array{I}(round.(collect(range(-90, stop = 90, length = n_lats))))
   l_arr = collect(range(-90, stop = 90, length = n_lats))
-  F_arr = zeros(FT, n_days, n_lats)
+  F_arr = zeros(n_days, n_lats)
   # loop over days
-  for (i, day) in enumerate(d_arr)
+  for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
-      F_arr[i, j] = daily_insolation(day-equinox_day, γ, ϖ, e, lat)
+        date = Dates.DateTime(2020,1,1) + Dates.Day(d)
+        θ, dist = daily_zenith_angle(date, lat, param_set)
+        F_arr[i, j] = insolation(θ, dist, param_set)
     end
   end
   return d_arr, l_arr, F_arr
@@ -48,33 +51,14 @@ function plot_day_lat_insolation(d_arr::Array{I},
     cmap = :PRGn
     vmin, vmax = ceil(max(abs.(F_arr)...)/10)*-10, ceil(max(abs.(F_arr)...)/10)*10
   end
-  
-  p = contourf(d_arr, l_arr, F_arr', c=cmap, clims=(vmin,vmax), title=stitle, 
-    xlabel="Days since Jan 1", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
+
+  p1 = contourf(d_arr, l_arr, F_arr', c=cmap, clims=(vmin,vmax), 
+    title=stitle, xlabel="Days since Jan 1 2020", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
+  meanF = mean(F_arr, dims=1)[1,:]
+  x1,x2 = [floor(minimum(meanF)), ceil(maximum(meanF))]
+  p2 = plot(meanF, l_arr, xlabel="Annual-mean TOA \nInsolation [W/m2]", 
+    ylims=[-90,90], yticks=[-90,-60,-30,0,30,60,90], xlims=[x1,x2], legend = false)
+  plot(p1, p2, layout = grid(1,2, widths=(0.8,0.2)), size=(800,400), dpi=150)
 
   savefig(file_name)
 end
-
-function main()
-  γ0 = 23.44
-  ϖ0 = 282.95
-  e0 = 0.017
-
-  days, lats, F0 = calc_day_lat_insolation(365, 180, γ0, ϖ0, e0)
-  title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ0)" * ", ecc=" * "$(e0)"
-  plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
-
-  γ0 = 23.44
-  ϖ0 = 282.95 # hide
-  ϖ1 = ϖ0 + 180.0
-  e0 = 0.017
-
-  days, lats, F1 = calc_day_lat_insolation(365, 180, γ0, ϖ1, e0)
-  title = "obliq=" * "$(γ0)" * ", perihelion=" * "$(ϖ1)" * ", ecc=" * "$(e0)"
-  plot_day_lat_insolation(days, lats, F1, "YlOrRd",  title, "insol_example2a.png")
-
-  title = "insolation diff: perihelion0=" * "$(ϖ0)" * ", perihelion1=" * "$(ϖ1)"
-  plot_day_lat_insolation(days,lats,F1-F0,"PRGn", title, "insol_example2b.png")
-end
-
-main()
