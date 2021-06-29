@@ -28,4 +28,6 @@ deploydocs(
     repo = "github.com/CliMA/Insolation.jl.git",
     target = "build",
     push_preview = true,
+    devbranch = "main",
+    forcepush = true,
 )
