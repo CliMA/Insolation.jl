@@ -10,8 +10,8 @@ function insolation(θ::FT, d::FT, param_set::APS) where {FT <: Real}
     S0::FT = tot_solar_irrad(param_set)
     AU::FT = astro_unit()
     # set max. zenith angle to π/2, insolation should not be negative
-    if θ > π/2
-        θ = π/2
+    if θ > FT(π)/FT(2)
+        θ = FT(π)/FT(2)
     end
     # weighted irradiance (3.12)
     S = S0 * (AU / d)^2
@@ -40,8 +40,8 @@ function solar_flux_and_cos_sza(date::DateTime,
     # θ = solar zenith angle, ζ = solar azimuth angle, d = earth-sun distance
     θ, ζ, d = instantaneous_zenith_angle(date, longitude, latitude, param_set)
     # set max. zenith angle to π/2, insolation should not be negative
-    if θ > π/2
-        θ = π/2
+    if θ > FT(π)/FT(2)
+        θ = FT(π)/FT(2)
     end
     μ = cos(θ)
     # TOA solar flux (3.12)
