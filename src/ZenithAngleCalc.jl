@@ -2,20 +2,20 @@ export instantaneous_zenith_angle, daily_zenith_angle
 
 # mean anomaly at vernal equinox, radians (eq 3.11)
 function mean_anomaly_vernal_equinox(ϖ::FT, e::FT) where {FT <: Real}
-    β = (FT(1)-e^FT(2))^FT(1/2)
-    M_v = -ϖ + (e+FT(1/4)*e^FT(3))*(FT(1)+β)*sin(ϖ)
-            - FT(1/2)*e^FT(2)*(FT(1/2)+β)*sin(2ϖ)
-            + FT(1/4)*e^FT(3)*(FT(1/3)+β)*sin(3ϖ)
-    M_v = mod(M_v, 2π)
+    β = (FT(1)-e^FT(2))^FT(0.5)
+    M_v = -ϖ + (e+FT(0.25)*e^FT(3))*(FT(1)+β)*sin(ϖ)
+            - FT(0.5)*e^FT(2)*(FT(0.5)+β)*sin(FT(2)*ϖ)
+            + FT(0.25)*e^FT(3)*(FT(1)/FT(3)+β)*sin(FT(3)*ϖ)
+    M_v = mod(M_v, FT(2)*FT(π))
     return M_v
 end
 
 # true anomaly, radians (eq 3.8)
 function true_anomaly(MA::FT, e::FT) where {FT <: Real}
-    TA = MA + (FT(2)*e - FT(1/4)*e^FT(3))*sin(MA) 
-            + FT(5/4)*e^2*sin(2MA) 
-            + FT(13/12)*e^3*sin(3MA)
-    TA = mod(TA, 2π)
+    TA = MA + (FT(2)*e - FT(0.25)*e^FT(3))*sin(MA) 
+            + FT(1.25)*e^FT(2)*sin(FT(2)*MA) 
+            + FT(13)/FT(12)*e^FT(3)*sin(FT(3)*MA)
+    TA = mod(TA, FT(2)*FT(π))
     return TA
 end
 
@@ -34,24 +34,24 @@ function distance_declination(::Type{FT}, date::DateTime, param_set::APS) where 
     
     # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
     M_v0 = mean_anomaly_vernal_equinox(ϖ0, e)
-    time_v = Ya * (M_v0 - M0) / 2π + _epoch
+    time_v = Ya * (M_v0 - M0) / (FT(2)*FT(π)) + _epoch
 
     # mean anomaly given mean anomaly at vernal equinox (3.10)
-    time = datetime2julian(date)*day_length
+    time = FT(datetime2julian(date))*day_length
     M_v = mean_anomaly_vernal_equinox(ϖ, e)
-    MA = mod(2π * (time - time_v) / Ya + M_v, 2π)
+    MA = mod(FT(2)*FT(π) * (time - time_v) / Ya + M_v, FT(2)*FT(π))
 
     # true anomaly, radians (3.8)
     TA = true_anomaly(MA, e)
 
     # true longitude, radians (3.9)
-    TL = mod(TA + ϖ, 2π)
+    TL = mod(TA + ϖ, FT(2)*FT(π))
 
     # declination, radians (3.16)
-    δ = mod(asin(sin(γ) * sin(TL)), 2π)
+    δ = mod(asin(sin(γ) * sin(TL)), FT(2)*FT(π))
 
     # earth-sun distance, (3.1)
-    d = AU * (1 - e^FT(2)) / (FT(1) + e*cos(TA))
+    d = AU * (FT(1) - e^FT(2)) / (FT(1) + e*cos(TA))
 
     return d, δ
 end
@@ -77,16 +77,16 @@ function instantaneous_zenith_angle(date::DateTime,
     d, δ = distance_declination(FT, date, param_set)
 
     # hour angle, zero at local solar noon, radians (3.17)
-    julian_day_abs = datetime2julian(date)
-    η_UTC = 2π * mod(julian_day_abs, 1)
-    η = mod(η_UTC + λ, 2π)
+    julian_day_abs = FT(datetime2julian(date))
+    η_UTC = FT(2)*FT(π) * mod(julian_day_abs, FT(1))
+    η = mod(η_UTC + λ, FT(2)*FT(π))
 
     # zenith angle, radians (3.18)
-    θ = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), 2π)
+    θ = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), FT(2)*FT(π))
 
     # solar azimuth angle, ζ = 0 when due E and increasing CCW
     # ζ = 3π/2 (due S) when η=0 at local solar noon
-    ζ = mod(3π/2 - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), 2π)
+    ζ = mod(FT(1.5)*FT(π) - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), FT(2)*FT(π))
 
     return θ, ζ, d
 end
@@ -109,16 +109,16 @@ function daily_zenith_angle(date::DateTime,
     
     # sunrise/sunset angle (3.19)
     T = tan(ϕ) * tan(δ)
-    if T >= 1
-        ηd = π
-    elseif T <= -1
-        ηd = 0.0
+    if T >= FT(1)
+        ηd = FT(π)
+    elseif T <= FT(-1)
+        ηd = FT(0.0)
     else
-        ηd = acos(-1*T)
+        ηd = acos(FT(-1)*T)
     end
     
     # daily averaged zenith angle (3.20)
-    daily_θ = mod(acos((1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), 2π)
+    daily_θ = mod(acos(FT(1)/FT(π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), FT(2)*FT(π))
 
     return daily_θ, d
 end
