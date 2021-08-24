@@ -63,8 +63,6 @@ area_fac = abs.(cosd.(l_arr))
 global_mean_insol = sum(zonal_mean_insol * area_fac) / sum(area_fac)
 @test global_mean_insol ≈ tot_solar_irrad(param_set) / 4 rtol=rtol
 
-
-
 ## Test symmetry of insolation at equinox
 date = Dates.DateTime(2021,3,20,9,34)
 F_arr = zeros(nlats)
