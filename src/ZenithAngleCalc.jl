@@ -19,7 +19,14 @@ function true_anomaly(MA::FT, e::FT) where {FT <: Real}
     return TA
 end
 
-function distance_declination(::Type{FT}, date::DateTime, param_set::APS) where {FT <: Real}
+# equation of time, radians
+function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
+    Δt = -FT(2)*e*sin(MA) + tan(γ/FT(2))^FT(2)*sin(FT(2)*(MA + ϖ)) 
+    Δt = mod(Δt+π, FT(2)*FT(π))-π
+end
+
+# calculate the distance, declination, and hour angle (at lon=0)
+function distance_declination_hourangle(::Type{FT}, date::DateTime, param_set::APS) where {FT <: Real}
     Ya::FT = year_anom(param_set)
     day_length::FT = Planet.day(param_set)
     AU::FT = astro_unit()
@@ -37,7 +44,7 @@ function distance_declination(::Type{FT}, date::DateTime, param_set::APS) where 
     time_v = Ya * (M_v0 - M0) / (FT(2)*FT(π)) + _epoch
 
     # mean anomaly given mean anomaly at vernal equinox (3.10)
-    time = datetime2julian(date)*day_length
+    time = datetime2julian(date) * day_length # in seconds
     M_v = mean_anomaly_vernal_equinox(ϖ, e)
     MA = mod(FT(2)*FT(π) * FT(time - time_v) / Ya + M_v, FT(2)*FT(π))
 
@@ -53,7 +60,11 @@ function distance_declination(::Type{FT}, date::DateTime, param_set::APS) where 
     # earth-sun distance, (3.1)
     d = AU * (FT(1) - e^FT(2)) / (FT(1) + e*cos(TA))
 
-    return d, δ
+    # hour angle, zero at local solar noon, radians (3.17)
+    Δt = equation_of_time(e, MA, γ, ϖ) / 2π * day_length # radians to seconds
+    η_UTC = mod(FT(2)*FT(π) * FT(time + Δt) / day_length, FT(2)*FT(π))
+
+    return d, δ, η_UTC
 end
 
 """
@@ -74,11 +85,9 @@ function instantaneous_zenith_angle(date::DateTime,
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
 
-    d, δ = distance_declination(FT, date, param_set)
+    d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set)
 
-    # hour angle, zero at local solar noon, radians (3.17)
-    julian_day_abs = datetime2julian(date)
-    η_UTC = FT(2)*FT(π) * FT(mod(julian_day_abs, 1))
+    # hour angle
     η = mod(η_UTC + λ, FT(2)*FT(π))
 
     # zenith angle, radians (3.18)
@@ -105,7 +114,7 @@ function daily_zenith_angle(date::DateTime,
                             param_set::APS) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
-    d, δ = distance_declination(FT, date, param_set)
+    d, δ, _ = distance_declination_hourangle(FT, date, param_set)
     
     # sunrise/sunset angle (3.19)
     T = tan(ϕ) * tan(δ)

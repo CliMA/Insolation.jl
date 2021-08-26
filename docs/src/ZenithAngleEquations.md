@@ -14,6 +14,7 @@ M &= \frac{2\pi (t - t_V)}{Y_a} + M_V
 where $e$ is the oribital eccentricity, $t_0$ is the time at the epoch (J2000), defined as January 1, 2000 at 12hr UTC, 
 $M_0$ is the mean anomaly at the epoch, $\varpi_0$ is the longitude of perihelion at the epoch,
 and $Y_a$ is the length of the anomalistic year.
+$t_V$ is the time of the vernal equinox, $M_V$ is the mean anomaly at the vernal equinox, and $M$ is the mean anomaly at current time $t$.
 
 ## True Anomaly (3.8)
 ```math
@@ -31,11 +32,16 @@ L = A + \varpi
 ```
 where $\gamma$ is the orbital obliquity.
 
+## Equation of Time 
+```math
+\Delta t = -2 e \sin(M) + \tan^2(\gamma/2) \sin(2M+2\varpi)
+```
+
 ## Hour Angle (3.17)
 ```math
-\eta = \frac{2\pi (t-t_s)}{T_d}
+\eta = \frac{2\pi (t+\Delta t)}{T_d}
 ```
-where $t_s$ is the time of local solar noon and $T_d$ is the length of a day.
+where $t$ is the current time referenced to the epoch $t_0$ and $\Delta t$ is the correction from the equation of time that distinguishes between mean solar time and the apparant solar time, which differ due to the eccentricity of Earth's orbit and the obliquity of the ecliptic. $T_d$ is the length of a day.
 
 ## Zenith Angle (3.18)
 ```math
