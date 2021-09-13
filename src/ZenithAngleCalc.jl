@@ -26,7 +26,7 @@ function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
 end
 
 # calculate the distance, declination, and hour angle (at lon=0)
-function distance_declination_hourangle(::Type{FT}, date::DateTime, param_set::APS) where {FT <: Real}
+function distance_declination_hourangle(::Type{FT}, date::DateTime, param_set::APS, eot_correction::Bool) where {FT <: Real}
     Ya::FT = year_anom(param_set)
     day_length::FT = Planet.day(param_set)
     AU::FT = astro_unit()
@@ -61,7 +61,11 @@ function distance_declination_hourangle(::Type{FT}, date::DateTime, param_set::A
     d = AU * (FT(1) - e^FT(2)) / (FT(1) + e*cos(TA))
 
     # hour angle, zero at local solar noon, radians (3.17)
-    Δt = equation_of_time(e, MA, γ, ϖ) / 2π * day_length # radians to seconds
+    if eot_correction
+        Δt = equation_of_time(e, MA, γ, ϖ) / 2π * day_length # radians to seconds
+    else
+        Δt = FT(0)
+    end
     η_UTC = mod(FT(2)*FT(π) * FT(time + Δt) / day_length, FT(2)*FT(π))
 
     return d, δ, η_UTC
@@ -81,11 +85,12 @@ param_set is an AbstractParameterSet from CLIMAParameters.jl
 function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
                                     latitude::FT,
-                                    param_set::APS) where {FT <: Real}
+                                    param_set::APS; 
+                                    eot_correction::Bool=true) where {FT <: Real}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
 
-    d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set)
+    d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set, eot_correction)
 
     # hour angle
     η = mod(η_UTC + λ, FT(2)*FT(π))
@@ -111,10 +116,11 @@ param_set is an AbstractParameterSet from CLIMAParameters.jl
 """
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
-                            param_set::APS) where {FT <: Real}
+                            param_set::APS;
+                            eot_correction::Bool=true) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
-    d, δ, _ = distance_declination_hourangle(FT, date, param_set)
+    d, δ, _ = distance_declination_hourangle(FT, date, param_set, eot_correction)
     
     # sunrise/sunset angle (3.19)
     T = tan(ϕ) * tan(δ)
