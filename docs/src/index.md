@@ -19,7 +19,7 @@ The equations used for calculating orbital parameters are from Tapio Schneider's
 See [Zenith Angle Equations](@ref) for more details.
 
 This package has been designed to be flexible for non-Earth settings as well.
-This specific functionality has not yet been implemented [as of 22 Feb 2021].
+This specific functionality has not yet been implemented [as of 13 Sept 2021].
 
 ## Authors
 `Insolation.jl` is being developed by [the Climate Modeling Alliance](https://clima.caltech.edu).
