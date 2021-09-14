@@ -14,3 +14,8 @@ docs/site/
 *.pvtu
 *.swp
 *.png
+
+*Manifest.toml
+
+src/data/*.tsv
+src/data/*.ipynb

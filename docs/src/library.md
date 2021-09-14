@@ -2,6 +2,13 @@
 
 Documenting the public user interface
 
+## Orbital Parameters
+```@autodocs
+Modules = [Insolation]
+Private = false
+Pages   = ["Insolation.jl"]
+```
+
 ## Zenith Angle
 ```@autodocs
 Modules = [Insolation]
