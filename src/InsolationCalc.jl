@@ -3,8 +3,8 @@ export insolation, solar_flux_and_cos_sza
 """
     insolation(θ::FT, d::FT, param_set::APS) where {FT <: Real}
 
-returns the insolation given the zenith angle and earth-sun distance
-param_set is an AbstractParameterSet from CLIMAParameters.jl
+Returns the insolation given the zenith angle and earth-sun distance
+param_set is an AbstractParameterSet from CLIMAParameters.jl.
 """
 function insolation(θ::FT, d::FT, param_set::APS) where {FT <: Real}
     S0::FT = tot_solar_irrad(param_set)
@@ -26,10 +26,10 @@ end
                       latitude::FT,
                       param_set::APS) where {FT <: Real}
 
-returns the top-of-atmosphere (TOA) solar flux, i.e. 
+Returns the top-of-atmosphere (TOA) solar flux, i.e. 
 the total solar irradiance (TSI) weighted by the earth-sun distance
 and cos(solar zenith angle) for input to RRTMGP.jl
-param_set is an AbstractParameterSet from CLIMAParameters.jl
+param_set is an AbstractParameterSet from CLIMAParameters.jl.
 """
 function solar_flux_and_cos_sza(date::DateTime,
                            longitude::FT,

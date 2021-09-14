@@ -75,12 +75,17 @@ end
     instantaneous_zenith_angle(date::DateTime,
                                longitude::FT,
                                latitude::FT,
-                               param_set::APS) where {FT <: Real}
+                               param_set::APS;
+                               eot_correction::Bool=true) where {FT <: Real}
 
-returns the zenith angle and earth-sun distance
+Returns the zenith angle and earth-sun distance
 at a particular longitude and latitude on the given date (and time UTC)
 given orbital parameters: obliquity, longitude of perihelion, and eccentricity
-param_set is an AbstractParameterSet from CLIMAParameters.jl
+param_set is an AbstractParameterSet from CLIMAParameters.jl.
+
+eot_correction is an optional Boolean keyword argument that defaults to true
+when set to true the equation of time correction is turned on.
+This switch functionality is implemented for easy comparisons with reanalyses.
 """
 function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
@@ -108,11 +113,16 @@ end
 """
     daily_zenith_angle(date::DateTime,
                        latitude::FT,
-                       param_set::APS) where {FT <: Real}
-returns the daily averaged zenith angle and earth-sun distance
+                       param_set::APS;
+                       eot_correction::Bool=true) where {FT <: Real}
+Returns the daily averaged zenith angle and earth-sun distance
 at a particular latitude given the date and orbital parameters
 obliquity, longitude of perihelion, and eccentricity
-param_set is an AbstractParameterSet from CLIMAParameters.jl
+param_set is an AbstractParameterSet from CLIMAParameters.jl.
+
+eot_correction is an optional Boolean keyword argument that defaults to true
+when set to true the equation of time correction is turned on.
+This switch functionality is implemented for easy comparisons with reanalyses.
 """
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
