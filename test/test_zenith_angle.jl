@@ -29,13 +29,11 @@ sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 # solar noon at equator, eot correction = false
 date = Dates.DateTime(2020, 2, 20, 12, 0, 0)
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set; eot_correction=false)
-println(sza, azi)
 @test azi ≈ 3π/2 rtol=rtol
 
 # sunset at equator, eot correction = false
 date = Dates.DateTime(2020, 2, 20, 18, 0, 0)
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set; eot_correction=false)
-println(sza, azi)
 @test sza ≈ π/2 rtol=rtol
 
 ## Test Polar Night

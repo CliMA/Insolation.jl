@@ -8,7 +8,7 @@ end
     include("test_insolation.jl")
 end
 
-# @testset "Long-term Variations" begin
-#     include("test_equinox.jl")
-#     include("test_perihelion.jl")
-# end
+@testset "Long-term Variations" begin
+    include("test_perihelion.jl")
+    include("test_equinox.jl")
+end

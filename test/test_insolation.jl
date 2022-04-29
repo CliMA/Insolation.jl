@@ -94,3 +94,6 @@ end
 
 zonal_mean_insol_rotate = mean(F_arr, dims=1)
 @test zonal_mean_insol_rotate ≈ zonal_mean_insol rtol=rtol
+
+# revert ϖ
+CLIMAParameters.Planet.lon_perihelion(::EarthParameterSet) = lon_perihelion_epoch(param_set)
