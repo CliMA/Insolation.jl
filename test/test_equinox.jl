@@ -7,10 +7,11 @@ using Insolation
 using Plots
 
 using CLIMAParameters
-using CLIMAParameters.Planet
+using CLIMAParameters.Planet: year_anom
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const param_set = EarthParameterSet()
-#CLIMAParameters.Planet.lon_perihelion(::EarthParameterSet) = deg2rad(282.937348 + 180)
+CLIMAParameters.Planet.year_anom(::EarthParameterSet) = 365.24219 * CLIMAParameters.Planet.day(param_set)
+# 365.256363004 = sidereal, 365.24219 tropical, 365.259636 anomalistic
 
 atol = 1e-6
 rtol = 1e-2
@@ -27,24 +28,17 @@ end
 function xtodate(x, year)
     basedate = Dates.DateTime(year, 3, 1)
     deltat = Dates.Second(round((x-1)*86400))
-    date = basedate + deltat
-    return date
+    return basedate + deltat
 end
 
-day = zeros(length(1900:2100))
+days = zeros(length(1900:2100))
 for (i,year) in enumerate(1900:2100)
     f = (x -> zdiff(x, year))
-    # println(f(1), f(15), f(30))
-    day[i] = find_zeros(f,1.,30)[1]
+    days[i] = find_zeros(f,1.,30)[1]
 end
 
-# plot(1900:2100, day)
-# xlabel!("Year")
-# ylabel!("Day in March")
-# title!("Date of vernal equinox")
-
 # test mean is about March 21
-@test mean(day) ≈ 21 atol=0.5
+@test mean(days) ≈ 21 atol=0.5
 
-test decreasing
-@test mean(day[:100]) > mean(day[100:end])
+# test decreasing
+@test mean(days[:100]) > mean(days[100:end])
