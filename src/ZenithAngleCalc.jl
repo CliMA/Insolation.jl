@@ -26,27 +26,40 @@ function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
 end
 
 # calculate the distance, declination, and hour angle (at lon=0)
-function distance_declination_hourangle(::Type{FT}, date::DateTime, param_set::APS, eot_correction::Bool) where {FT <: Real}
+function distance_declination_hourangle(::Type{FT},
+                                        date::DateTime,
+                                        param_set::APS,
+                                        eot_correction::Bool,
+                                        milankovitch::Bool) where {FT <: Real}
     Ya::FT = year_anom(param_set)
     day_length::FT = Planet.day(param_set)
     AU::FT = astro_unit()
-
     _epoch::FT = epoch(param_set)
     M0::FT = mean_anom_epoch(param_set)
     ϖ0::FT = lon_perihelion_epoch(param_set)
+    γ0::FT = obliq_epoch(param_set)
+    e0::FT = eccentricity_epoch(param_set)
 
-    γ::FT = obliq_epoch(param_set)
-    ϖ::FT = lon_perihelion(param_set)
-    e::FT = eccentricity_epoch(param_set)
+    time = datetime2julian(date) * day_length # in seconds
+    
+    if milankovitch
+        dt = time - _epoch
+        ϖ = mod(ϖ0 + 2π*dt/(26e3*Ya) + 2π*dt/(112e3*Ya), 2π)
+        γ = γ0 + deg2rad(1.2)*sin(2π*dt/(41e3*Ya))
+        e = e0 + 0.04*sin(2π*dt/(405e3*Ya)) + 0.02*sin(2π*dt/(110e3*Ya))
+    else
+        ϖ::FT = lon_perihelion(param_set)
+        γ = γ0
+        e = e0
+    end
     
     # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
     M_v0 = mean_anomaly_vernal_equinox(ϖ0, e)
-    time_v = Ya * (M_v0 - M0) / (FT(2)*FT(π)) + _epoch
+    time_v0 = Ya * (M_v0 - M0) / (FT(2)*FT(π)) + _epoch
 
     # mean anomaly given mean anomaly at vernal equinox (3.10)
-    time = datetime2julian(date) * day_length # in seconds
     M_v = mean_anomaly_vernal_equinox(ϖ, e)
-    MA = mod(FT(2)*FT(π) * FT(time - time_v) / Ya + M_v, FT(2)*FT(π))
+    MA = mod(FT(2)*FT(π) * FT(time - time_v0) / Ya + M_v, FT(2)*FT(π))
 
     # true anomaly, radians (3.8)
     TA = true_anomaly(MA, e)
@@ -91,11 +104,12 @@ function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
                                     latitude::FT,
                                     param_set::APS; 
-                                    eot_correction::Bool=true) where {FT <: Real}
+                                    eot_correction::Bool=true,
+                                    milankovitch::Bool=true) where {FT <: Real}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
 
-    d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set, eot_correction)
+    d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set, eot_correction, milankovitch)
 
     # hour angle
     η = mod(η_UTC + λ, FT(2)*FT(π))
@@ -127,10 +141,11 @@ This switch functionality is implemented for easy comparisons with reanalyses.
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
                             param_set::APS;
-                            eot_correction::Bool=true) where {FT <: Real}
+                            eot_correction::Bool=true,
+                            milankovitch::Bool=true) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
-    d, δ, _ = distance_declination_hourangle(FT, date, param_set, eot_correction)
+    d, δ, _ = distance_declination_hourangle(FT, date, param_set, eot_correction,milankovitch)
     
     # sunrise/sunset angle (3.19)
     T = tan(ϕ) * tan(δ)
