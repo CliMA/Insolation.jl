@@ -66,7 +66,7 @@ for (i,year) in enumerate(1900:2100)
     days[i] = find_zeros(f,1.,30)[1]
 end
 
-plot(1900:2100, days)
+plot(1900:2100, days, legend=false, dpi=150)
 xlabel!("Year")
 ylabel!("Day in March")
 title!("Date of vernal equinox")
@@ -109,7 +109,7 @@ for (i,year) in enumerate(years)
     days[i] = Optim.minimizer(res)[1]
 end
 
-plot((years), days)
+plot((years), days, legend=false, dpi=150)
 xlabel!("Year")
 ylabel!("Day in Jan")
 title!("Date of perihelion")
