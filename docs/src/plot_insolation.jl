@@ -23,7 +23,7 @@ function calc_day_lat_insolation(n_days::I,
   for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
         date = Dates.DateTime(2020,1,1) + Dates.Day(d)
-        θ, dist = daily_zenith_angle(date, lat, param_set)
+        θ, dist = daily_zenith_angle(date, lat, param_set, milankovitch=false)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
   end
