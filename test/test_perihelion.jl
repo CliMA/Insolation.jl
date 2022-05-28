@@ -1,20 +1,14 @@
 push!(LOAD_PATH, joinpath(@__DIR__, ".."))
 
+using Insolation
+using Dates
 using Statistics
 using Optim
-using Dates
-using Insolation 
-using Plots
 
 using CLIMAParameters
 using CLIMAParameters.Planet
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const param_set = EarthParameterSet()
-CLIMAParameters.Planet.year_anom(::EarthParameterSet) = 365.24219 * CLIMAParameters.Planet.day(param_set)
-# 365.256363004 = sidereal, 365.24219 tropical, 365.259636 anomalistic
-
-atol = 1e-6
-rtol = 1e-2
 
 # x is date relative to Jan 1, with 1.00 representing Jan 1 00:00
 function xtojandate(x, year)
@@ -27,7 +21,7 @@ end
 # Earth-Sun distance
 function edist(x, year)
     date = xtojandate(x,year)
-    _, dist = daily_zenith_angle(date, 0., param_set)
+    _, dist = daily_zenith_angle(date, FT(0), param_set)
     return dist/astro_unit()
 end
 
@@ -40,7 +34,7 @@ for (i,year) in enumerate(years)
 end
 
 # test mean is about Jan 3.5
-@test mean(days) ≈ 3.5 atol=0.5
+@test mean(days) ≈ 3.5 atol=1
 
 # test increasing
 @test mean(days[:100]) < mean(days[100:end])

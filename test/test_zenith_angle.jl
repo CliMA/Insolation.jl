@@ -12,12 +12,12 @@ rtol = 1e-2
 
 # sunrise at equator
 date = Dates.DateTime(2020, 2, 20, 6, 11, 0)
-lon, lat = [0.0, 0.0]
+lon, lat = [FT(0.0), FT(0.0)]
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 @test sza ≈ π/2 rtol=rtol
 
 # solar noon at equator
-date = Dates.DateTime(2020, 2, 20, 12, 13, 0)
+date = Dates.DateTime(2020, 2, 20, 12, 14, 0)
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 @test azi ≈ 3π/2 rtol=rtol
 
@@ -39,25 +39,23 @@ sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set; eot_correcti
 ## Test Polar Night
 # polar night NH 1
 date = Dates.DateTime(2020, 12, 20, 11, 0, 0)
-lon, lat = [0.0, 80.0]
+lon, lat = [FT(0.0), FT(80.0)]
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 @test sza > π/2
 
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
-lon, lat = [0.0, 80.0]
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 @test sza > π/2
 
 # polar night SH 1
 date = Dates.DateTime(2020, 6, 20, 11, 0, 0)
-lon, lat = [0.0, -80.0]
+lon, lat = [FT(0.0), FT(-80.0)]
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 @test sza > π/2
 
 # polar night SH 2
 date = Dates.DateTime(2020, 6, 20, 23, 0, 0)
-lon, lat = [0.0, -80.0]
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 @test sza > π/2
 
