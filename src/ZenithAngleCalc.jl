@@ -1,29 +1,51 @@
 export instantaneous_zenith_angle, daily_zenith_angle
-
-# mean anomaly at vernal equinox, radians (eq 3.11)
-function mean_anomaly_vernal_equinox(ϖ::FT, e::FT) where {FT <: Real}
-    β = (FT(1)-e^FT(2))^FT(0.5)
-    M_v = -ϖ + (e+FT(0.25)*e^FT(3))*(FT(1)+β)*sin(ϖ)
-            - FT(0.5)*e^FT(2)*(FT(0.5)+β)*sin(FT(2)*ϖ)
-            + FT(0.25)*e^FT(3)*(FT(1)/FT(3)+β)*sin(FT(3)*ϖ)
-    M_v = mod(M_v, FT(2)*FT(π))
-    return M_v
-end
+export orbital_params
 
 # true anomaly, radians (eq 3.8)
 function true_anomaly(MA::FT, e::FT) where {FT <: Real}
-    TA = MA + (FT(2)*e - FT(0.25)*e^FT(3))*sin(MA) 
-            + FT(1.25)*e^FT(2)*sin(FT(2)*MA) 
-            + FT(13)/FT(12)*e^FT(3)*sin(FT(3)*MA)
-    TA = mod(TA, FT(2)*FT(π))
-    return TA
+    TA = MA + (2*e - FT(1/4)*e^3)*sin(MA) 
+            + FT(5/4)*e^2*sin(2*MA) 
+            + FT(13/12)*e^3*sin(3*MA)
+    return mod(TA, FT(2π))
 end
 
 # equation of time, radians
 function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
-    Δt = -FT(2)*e*sin(MA) + tan(γ/FT(2))^FT(2)*sin(FT(2)*(MA + ϖ)) 
-    Δt = mod(Δt+π, FT(2)*FT(π))-π
+    _Δt = -2*e*sin(MA) + tan(γ/2)^2*sin(2*(MA + ϖ));
+    return mod(_Δt+FT(π), FT(2π)) - FT(π)
 end
+
+"""
+    orbital_params(dt::FT, param_set) where {FT <: Real}
+
+This function returns the orbital parameters (ϖ, γ, e) at a given 
+`dt` number of years after the `_epoch`.
+The parameters vary due to Milankovitch cycles. 
+The dominant 10 frequencies of these cycles are used based on a
+Fourier analysis of the parameters as calculated in the
+Lasker et al. (2004) paper.
+Data from this paper are in the "src/data/INSOL.LA2004.BTL.csv" file.
+# Berger A. and Loutre M.F. (1991) paper. 
+# Data from this paper is in the "src/data/orbit91.tsv" file.
+"""
+function orbital_params(dt::FT) where {FT <: Real}
+    x = np.loadtxt("INSOL.LA2004.BTL.csv", delimiter=",", skiprows=1)
+    e = CubicSplineInterpolation(x[:,0], x[:,1])(dt)
+    γ = CubicSplineInterpolation(x[:,0], x[:,2])(dt)
+    ϖ = CubicSplineInterpolation(x[:,0], x[:,3])(dt)
+    return [ϖ, γ, e]
+end
+# function orbital_params(dt::FT, param_set) where {FT <: Real}
+#     ϖ0::FT = lon_perihelion_epoch(param_set)
+#     γ0::FT = obliq_epoch(param_set)
+#     e0::FT = eccentricity_epoch(param_set)
+
+#     ϖ = FT(mod(ϖ0 + 2π*dt/(26e3) + 2π*dt/(112e3), 2π))
+#     γ = FT(γ0 + deg2rad(1.2)*sin(2π*dt/(41e3)))
+#     e = FT(e0 + 0.02*sin(2π*dt/(405e3)) + 0.01*sin(2π*dt/(110e3)))
+#     return [ϖ, γ, e]
+# end
+
 
 # calculate the distance, declination, and hour angle (at lon=0)
 function distance_declination_hourangle(::Type{FT},
@@ -36,50 +58,41 @@ function distance_declination_hourangle(::Type{FT},
     AU::FT = astro_unit()
     _epoch::FT = epoch(param_set)
     M0::FT = mean_anom_epoch(param_set)
-    ϖ0::FT = lon_perihelion_epoch(param_set)
-    γ0::FT = obliq_epoch(param_set)
-    e0::FT = eccentricity_epoch(param_set)
 
     time = datetime2julian(date) * day_length # in seconds
+    dt = FT(time - _epoch) / Ya
     
-    if milankovitch
-        dt = time - _epoch
-        ϖ = mod(ϖ0 + 2π*dt/(26e3*Ya) + 2π*dt/(112e3*Ya), 2π)
-        γ = γ0 + deg2rad(1.2)*sin(2π*dt/(41e3*Ya))
-        e = e0 + 0.04*sin(2π*dt/(405e3*Ya)) + 0.02*sin(2π*dt/(110e3*Ya))
-    else
-        ϖ::FT = lon_perihelion(param_set)
-        γ = γ0
-        e = e0
-    end
-    
-    # time of vernal equinox in the epoch (rearrangement of 3.6 and 3.10)
-    M_v0 = mean_anomaly_vernal_equinox(ϖ0, e)
-    time_v0 = Ya * (M_v0 - M0) / (FT(2)*FT(π)) + _epoch
+    # mean anomaly given mean anomaly at epoch (3.6)
+    MA = mod(FT(2π) * dt + M0, FT(2π))
 
-    # mean anomaly given mean anomaly at vernal equinox (3.10)
-    M_v = mean_anomaly_vernal_equinox(ϖ, e)
-    MA = mod(FT(2)*FT(π) * FT(time - time_v0) / Ya + M_v, FT(2)*FT(π))
+    # calculate orbital parameters or take values at J2000
+    if milankovitch
+        ϖ, γ, e = orbital_params(dt, param_set)
+    else
+        ϖ::FT = lon_perihelion_epoch(param_set)
+        γ::FT = obliq_epoch(param_set)
+        e::FT = eccentricity_epoch(param_set)
+    end
 
     # true anomaly, radians (3.8)
     TA = true_anomaly(MA, e)
 
     # true longitude, radians (3.9)
-    TL = mod(TA + ϖ, FT(2)*FT(π))
+    TL = mod(TA + ϖ, FT(2π))
 
     # declination, radians (3.16)
-    δ = mod(asin(sin(γ) * sin(TL)), FT(2)*FT(π))
+    δ = mod(asin(sin(γ) * sin(TL)), FT(2π))
 
     # earth-sun distance, (3.1)
-    d = AU * (FT(1) - e^FT(2)) / (FT(1) + e*cos(TA))
+    d = AU * (1 - e^2) / (1 + e*cos(TA))
 
     # hour angle, zero at local solar noon, radians (3.17)
     if eot_correction
-        Δt = equation_of_time(e, MA, γ, ϖ) / 2π * day_length # radians to seconds
+        Δt = equation_of_time(e, MA, γ, ϖ) / FT(2π) * day_length # radians to seconds
     else
         Δt = FT(0)
     end
-    η_UTC = mod(FT(2)*FT(π) * FT(time + Δt) / day_length, FT(2)*FT(π))
+    η_UTC = mod(FT(2π) * FT(time + Δt) / day_length, FT(2π))
 
     return d, δ, η_UTC
 end
@@ -89,16 +102,21 @@ end
                                longitude::FT,
                                latitude::FT,
                                param_set::APS;
-                               eot_correction::Bool=true) where {FT <: Real}
+                               eot_correction::Bool=true,
+                               milankovitch::Bool=true) where {FT <: Real}
 
 Returns the zenith angle and earth-sun distance
 at a particular longitude and latitude on the given date (and time UTC)
 given orbital parameters: obliquity, longitude of perihelion, and eccentricity
 param_set is an AbstractParameterSet from CLIMAParameters.jl.
 
-eot_correction is an optional Boolean keyword argument that defaults to true
+`eot_correction` is an optional Boolean keyword argument that defaults to true
 when set to true the equation of time correction is turned on.
 This switch functionality is implemented for easy comparisons with reanalyses.
+
+`milankovitch` is an optional Boolean keyword argument that defaults to true
+when set to true the orbital parameters are calculated for the given DateTime
+when set to false the orbital parameters at the J2000 epoch from CLIMAParameters are used.
 """
 function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
@@ -112,14 +130,14 @@ function instantaneous_zenith_angle(date::DateTime,
     d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set, eot_correction, milankovitch)
 
     # hour angle
-    η = mod(η_UTC + λ, FT(2)*FT(π))
+    η = mod(η_UTC + λ, FT(2π))
 
     # zenith angle, radians (3.18)
-    θ = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), FT(2)*FT(π))
+    θ = mod(acos(cos(ϕ)*cos(δ)*cos(η) + sin(ϕ)*sin(δ)), FT(2π))
 
     # solar azimuth angle, ζ = 0 when due E and increasing CCW
     # ζ = 3π/2 (due S) when η=0 at local solar noon
-    ζ = mod(FT(1.5)*FT(π) - atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), FT(2)*FT(π))
+    ζ = mod(FT(3π/2)- atan(sin(η), cos(η)*sin(ϕ) - tan(δ)*cos(ϕ)), FT(2π))
 
     return θ, ζ, d
 end
@@ -128,15 +146,21 @@ end
     daily_zenith_angle(date::DateTime,
                        latitude::FT,
                        param_set::APS;
-                       eot_correction::Bool=true) where {FT <: Real}
+                       eot_correction::Bool=true,
+                       milankovitch::Bool=true) where {FT <: Real}
+
 Returns the daily averaged zenith angle and earth-sun distance
 at a particular latitude given the date and orbital parameters
 obliquity, longitude of perihelion, and eccentricity
 param_set is an AbstractParameterSet from CLIMAParameters.jl.
 
-eot_correction is an optional Boolean keyword argument that defaults to true
+`eot_correction` is an optional Boolean keyword argument that defaults to true
 when set to true the equation of time correction is turned on.
 This switch functionality is implemented for easy comparisons with reanalyses.
+
+`milankovitch` is an optional Boolean keyword argument that defaults to true
+when set to true the orbital parameters are calculated for the given DateTime,
+when set to false the orbital parameters at the J2000 epoch from CLIMAParameters are used.
 """
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
@@ -152,13 +176,13 @@ function daily_zenith_angle(date::DateTime,
     if T >= FT(1)
         ηd = FT(π)
     elseif T <= FT(-1)
-        ηd = FT(0.0)
+        ηd = FT(0)
     else
         ηd = acos(FT(-1)*T)
     end
     
     # daily averaged zenith angle (3.20)
-    daily_θ = mod(acos(FT(1)/FT(π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), FT(2)*FT(π))
+    daily_θ = mod(acos(FT(1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), FT(2π))
 
     return daily_θ, d
 end

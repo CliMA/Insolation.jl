@@ -1,6 +1,7 @@
 module Insolation
 
 using Dates
+using Interpolations
 
 using CLIMAParameters: AbstractParameterSet
 using CLIMAParameters
