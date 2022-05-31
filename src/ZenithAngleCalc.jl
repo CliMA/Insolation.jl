@@ -1,5 +1,4 @@
 export instantaneous_zenith_angle, daily_zenith_angle
-export orbital_params
 
 # true anomaly, radians (eq 3.8)
 function true_anomaly(MA::FT, e::FT) where {FT <: Real}
@@ -14,38 +13,6 @@ function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
     _Δt = -2*e*sin(MA) + tan(γ/2)^2*sin(2*(MA + ϖ));
     return mod(_Δt+FT(π), FT(2π)) - FT(π)
 end
-
-"""
-    orbital_params(dt::FT, param_set) where {FT <: Real}
-
-This function returns the orbital parameters (ϖ, γ, e) at a given 
-`dt` number of years after the `_epoch`.
-The parameters vary due to Milankovitch cycles. 
-The dominant 10 frequencies of these cycles are used based on a
-Fourier analysis of the parameters as calculated in the
-Lasker et al. (2004) paper.
-Data from this paper are in the "src/data/INSOL.LA2004.BTL.csv" file.
-# Berger A. and Loutre M.F. (1991) paper. 
-# Data from this paper is in the "src/data/orbit91.tsv" file.
-"""
-function orbital_params(dt::FT) where {FT <: Real}
-    x = np.loadtxt("INSOL.LA2004.BTL.csv", delimiter=",", skiprows=1)
-    e = CubicSplineInterpolation(x[:,0], x[:,1])(dt)
-    γ = CubicSplineInterpolation(x[:,0], x[:,2])(dt)
-    ϖ = CubicSplineInterpolation(x[:,0], x[:,3])(dt)
-    return [ϖ, γ, e]
-end
-# function orbital_params(dt::FT, param_set) where {FT <: Real}
-#     ϖ0::FT = lon_perihelion_epoch(param_set)
-#     γ0::FT = obliq_epoch(param_set)
-#     e0::FT = eccentricity_epoch(param_set)
-
-#     ϖ = FT(mod(ϖ0 + 2π*dt/(26e3) + 2π*dt/(112e3), 2π))
-#     γ = FT(γ0 + deg2rad(1.2)*sin(2π*dt/(41e3)))
-#     e = FT(e0 + 0.02*sin(2π*dt/(405e3)) + 0.01*sin(2π*dt/(110e3)))
-#     return [ϖ, γ, e]
-# end
-
 
 # calculate the distance, declination, and hour angle (at lon=0)
 function distance_declination_hourangle(::Type{FT},
@@ -67,11 +34,13 @@ function distance_declination_hourangle(::Type{FT},
 
     # calculate orbital parameters or take values at J2000
     if milankovitch
-        ϖ, γ, e = orbital_params(dt, param_set)
+        ϖ = FT(lon_perihelion_spline(param_set)(dt));
+        γ = FT(obliq_spline(param_set)(dt));
+        e = FT(eccentricity_spline(param_set)(dt));
     else
-        ϖ::FT = lon_perihelion_epoch(param_set)
-        γ::FT = obliq_epoch(param_set)
-        e::FT = eccentricity_epoch(param_set)
+        ϖ = FT(lon_perihelion_epoch(param_set));
+        γ = FT(obliq_epoch(param_set));
+        e = FT(eccentricity_epoch(param_set));
     end
 
     # true anomaly, radians (3.8)
