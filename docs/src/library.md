@@ -6,7 +6,7 @@ Documenting the public user interface
 ```@autodocs
 Modules = [Insolation]
 Private = false
-Pages   = ["OrbitalParams.jl"]
+Pages   = ["Insolation.jl"]
 ```
 
 ## Zenith Angle

@@ -6,8 +6,8 @@ using Insolation #hide
 using Plots #hide
 
 dt = collect(-500e3:100:500e3); # years
-ϖ_spline, γ_spline, e_spline = orbital_params_spline();
-ϖ, γ, e = mod.(ϖ_spline.(dt), 2π), γ_spline.(dt), e_spline.(dt);
+y = hcat(collect.(orbital_params.(dt))...);
+ϖ, γ, e = y[1,:], y[2,:], y[3,:];
 
 p1 = plot(dt ./ (1e3), sin.(ϖ), legend=false);
 ylabel!("sin(ϖ)");
@@ -29,14 +29,10 @@ using Plots #hide
 using Dates #hide
 using Roots #hide
 using Optim #hide
+
 using CLIMAParameters #hide
-using CLIMAParameters.Planet #hide
 struct EarthParameterSet <: AbstractEarthParameterSet end #hide
 const param_set = EarthParameterSet() #hide
-ϖ_spline, γ_spline, e_spline = orbital_params_spline();
-CLIMAParameters.Planet.lon_perihelion_spline(::EarthParameterSet) = ϖ_spline;
-CLIMAParameters.Planet.obliq_spline(::EarthParameterSet) = γ_spline;
-CLIMAParameters.Planet.eccentricity_spline(::EarthParameterSet) = e_spline;
 
 # Difference in NH and SH zenith angles at time x in given year
 function zdiff(x, year)

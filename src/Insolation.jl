@@ -8,13 +8,6 @@ const APS = AbstractParameterSet
 
 export orbital_params
 
-"""
-This function reads orbital parameters from the Laskar 2004 data set and creates 
-interpolation functions for the parameters as a function of the years since the J2000 epoch.
-The functions are stored as global variables that are used inside of Insolation.jl.
-The parameters vary due to Milankovitch cycles. 
-Data from this paper are in the "src/data/INSOL.LA2004.BTL.csv" file.
-"""
 function __init__()
     datapath = joinpath(@__DIR__, "../src/data/", "INSOL.LA2004.BTL.csv");
     x, _ = readdlm(datapath,',',header=true);
@@ -30,7 +23,10 @@ end
     orbital_params(dt::FT) where {FT <: Real}
 
 This function returns the orbital parameters (ϖ, γ, e) at dt (years) since J2000 epoch.
-Data are read from file and interpolation function are created in __init__() of Insolation.jl
+Data are read from file and interpolation function are created in __init__() method.
+The functions are stored as global variables that are used inside of Insolation.jl.
+The parameters vary due to Milankovitch cycles. 
+Data from this paper are in the "src/data/INSOL.LA2004.BTL.csv" file.
 """
 function orbital_params(dt::FT) where {FT <: Real}
     return ϖ_spline(dt), γ_spline(dt), e_spline(dt)
