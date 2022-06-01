@@ -9,9 +9,13 @@ using Roots
 using Optim
 
 using CLIMAParameters
-using CLIMAParameters.Planet: orbit_semimaj, tot_solar_irrad
+using CLIMAParameters.Planet#: orbit_semimaj, tot_solar_irrad
 struct EarthParameterSet <: AbstractEarthParameterSet end
 const param_set = EarthParameterSet()
+
+@testset "Orbital Params" begin
+    include("test_orbit_param.jl")
+end
 
 @testset "Types" begin
     include("test_types.jl")
