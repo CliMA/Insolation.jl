@@ -23,7 +23,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[deps.CLIMAParameters]]
 deps = ["DocStringExtensions", "TOML", "Test"]
-path = "/Users/claresinger/Research/CLIMAParameters.jl"
+git-tree-sha1 = "5f0f64ba6492f88504b54e42394fb916b6bed2c9"
+repo-rev = "ces/milankovitch"
+repo-url = "https://github.com/CliMA/CLIMAParameters.jl.git"
 uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
 version = "0.6.0"
 
