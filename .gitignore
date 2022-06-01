@@ -15,5 +15,7 @@ docs/site/
 *.swp
 *.png
 
+*Manifest.toml
+
 src/data/*.tsv
 src/data/*.ipynb
