@@ -2,9 +2,9 @@
 These equations are from Tapio Schneiders's textbook draft chapter 3.
 
 ## Mean Anomaly (3.6)
-$M$ is the mean anomaly at current time $t$, defined by,
+The mean anomaly $M$ at current time $t$ is,
 ```math
-M &= \frac{2\pi (t - t_0)}{Y_a} + M_0,
+M = \frac{2\pi (t - t_0)}{Y_a} + M_0,
 ```
 where $t_0$ is the time at the epoch (J2000), defined as January 1, 2000 at 12hr UTC, 
 $M_0$ is the mean anomaly at the epoch, and $Y_a$ is the length of the anomalistic year.

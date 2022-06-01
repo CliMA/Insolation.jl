@@ -6,7 +6,6 @@ using Formatting
 
 using CLIMAParameters: AbstractParameterSet
 const APS = AbstractParameterSet
-# Base.broadcastable(param_set::APS) = Ref(param_set)
 
 """
     calc_day_lat_insolation(n_days::I,
