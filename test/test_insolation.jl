@@ -1,4 +1,4 @@
-atol = 1e-6
+atol = 1e-4
 rtol = 1e-2
 rtol_insol = 0.1
 

@@ -26,17 +26,17 @@ function distance_declination_hourangle(::Type{FT},
     _epoch::FT = epoch(param_set)
     M0::FT = mean_anom_epoch(param_set)
 
-    time = datetime2julian(date) * day_length # in seconds
-    dt = FT(time - _epoch) / Ya
+    t0_years = _epoch / Ya; # s --> years
+    t_years = FT(datetime2julian(date)) * (day_length / Ya); # DateTime --> years
     
     # mean anomaly given mean anomaly at epoch (3.6)
-    MA = mod(FT(2π) * dt + M0, FT(2π))
+    MA = mod(FT(2π) * (t_years - t0_years) + M0, FT(2π))
 
     # calculate orbital parameters or take values at J2000
     if milankovitch
-        ϖ = FT(ϖ_spline(dt));
-        γ = FT(γ_spline(dt));
-        e = FT(e_spline(dt));
+        ϖ = FT(ϖ_spline(t_years - t0_years));
+        γ = FT(γ_spline(t_years - t0_years));
+        e = FT(e_spline(t_years - t0_years));
     else
         ϖ = FT(lon_perihelion_epoch(param_set));
         γ = FT(obliq_epoch(param_set));
@@ -61,7 +61,8 @@ function distance_declination_hourangle(::Type{FT},
     else
         Δt = FT(0)
     end
-    η_UTC = mod(FT(2π) * FT(time + Δt) / day_length, FT(2π))
+    t0 = FT(mod(datetime2julian(date), 1.0)) * day_length; # s in this day
+    η_UTC = mod(FT(2π) * (t0 + Δt) / day_length, FT(2π));
 
     return d, δ, η_UTC
 end

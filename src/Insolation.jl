@@ -11,8 +11,7 @@ export orbital_params
 function __init__()
     datapath = joinpath(@__DIR__, "../src/data/", "INSOL.LA2004.BTL.csv");
     x, _ = readdlm(datapath,',',header=true);
-    t_step, t_units = 1, 1e3;
-    t_range = x[1,1]*t_units : t_step*t_units : x[end,1]*t_units;
+    t_range = x[1,1]*1e3 : 1e3 : x[end,1]*1e3; # array of every 1 kyr to range of years
     
     global e_spline = CubicSplineInterpolation(t_range, x[:,2], extrapolation_bc = NaN);
     global γ_spline = CubicSplineInterpolation(t_range, x[:,3], extrapolation_bc = NaN);
