@@ -34,9 +34,9 @@ function distance_declination_hourangle(::Type{FT},
 
     # calculate orbital parameters or take values at J2000
     if milankovitch
-        ϖ = FT(mod(lon_perihelion_spline(param_set)(dt), 2π));
-        γ = FT(obliq_spline(param_set)(dt));
-        e = FT(eccentricity_spline(param_set)(dt));
+        ϖ = FT(ϖ_spline(dt));
+        γ = FT(γ_spline(dt));
+        e = FT(e_spline(dt));
     else
         ϖ = FT(lon_perihelion_epoch(param_set));
         γ = FT(obliq_epoch(param_set));
