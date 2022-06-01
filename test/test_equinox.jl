@@ -1,13 +1,13 @@
 # Difference in NH and SH zenith angles at time x in given year
 function zdiff(x, year)
-    date = xtodate(x,year)
+    date = xtomarchdate(x,year)
     theta_s, dist = daily_zenith_angle(date, FT(-45), param_set)
     theta_n, dist = daily_zenith_angle(date, FT(45), param_set)
     return theta_n - theta_s
 end
 
 # x is date relative to March 1, with 1.00 representing March 1 00:00
-function xtodate(x, year)
+function xtomarchdate(x, year)
     basedate = Dates.DateTime(year, 3, 1)
     deltat = Dates.Second(round((x-1)*86400))
     return basedate + deltat
