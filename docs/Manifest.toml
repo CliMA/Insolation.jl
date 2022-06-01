@@ -42,10 +42,10 @@ uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.8+0"
 
 [[deps.CLIMAParameters]]
-deps = ["Test"]
-git-tree-sha1 = "17ece0add9940728f8120a1561fc3361be6a6f26"
+deps = ["DocStringExtensions", "TOML", "Test"]
+path = "/Users/claresinger/Research/CLIMAParameters.jl"
 uuid = "6eacf6c3-8458-43b9-ae03-caf5306d3d53"
-version = "0.4.3"
+version = "0.6.0"
 
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
