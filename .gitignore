@@ -9,7 +9,6 @@ docs/site/
 
 *.vtk
 *.dat
-*.csv
 *.vtu
 *.pvtu
 *.swp
