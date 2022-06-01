@@ -1,15 +1,3 @@
-push!(LOAD_PATH, joinpath(@__DIR__, ".."))
-
-using Insolation
-using Dates
-using Statistics
-using Optim
-
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
-
 # x is date relative to Jan 1, with 1.00 representing Jan 1 00:00
 function xtojandate(x, year)
     basedate = Dates.DateTime(year, 1, 1)

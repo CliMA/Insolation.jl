@@ -1,12 +1,3 @@
-push!(LOAD_PATH, joinpath(@__DIR__, ".."))
-
-using Dates
-using Insolation 
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
-
 for FT in (Float32, Float64)
     date = Dates.DateTime(2020, 2, 20, 11, 11, 0)
     lon, lat = [FT(80.0), FT(20.0)]

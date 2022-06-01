@@ -1,13 +1,3 @@
-push!(LOAD_PATH, joinpath(@__DIR__, ".."))
-
-using Dates
-using Insolation 
-
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
-
 rtol = 1e-2
 
 # sunrise at equator

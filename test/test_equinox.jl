@@ -1,15 +1,3 @@
-push!(LOAD_PATH, joinpath(@__DIR__, ".."))
-
-using Insolation 
-using Dates
-using Statistics
-using Roots
-
-using CLIMAParameters
-using CLIMAParameters.Planet: year_anom
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
-
 # Difference in NH and SH zenith angles at time x in given year
 function zdiff(x, year)
     date = xtodate(x,year)

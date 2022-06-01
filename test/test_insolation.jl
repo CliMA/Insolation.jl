@@ -1,14 +1,3 @@
-push!(LOAD_PATH, joinpath(@__DIR__, ".."))
-
-using Statistics
-using Dates
-using Insolation 
-
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
-
 atol = 1e-6
 rtol = 1e-2
 rtol_insol = 0.1
