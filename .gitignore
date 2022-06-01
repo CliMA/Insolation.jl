@@ -14,3 +14,6 @@ docs/site/
 *.pvtu
 *.swp
 *.png
+
+src/data/*.tsv
+src/data/*.ipynb
