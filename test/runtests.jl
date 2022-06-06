@@ -7,6 +7,7 @@ using Dates
 using Statistics
 using Roots
 using Optim
+using DelimitedFiles
 
 using CLIMAParameters
 using CLIMAParameters.Planet
@@ -25,6 +26,7 @@ end
 end
 @testset "Insolation" begin
     include("test_insolation.jl")
+    include("compare_insolation.jl")
 end
 @testset "Equinox Date" begin
     include("test_perihelion.jl")
@@ -43,6 +45,7 @@ end
 end
 @testset "Insolation" begin
     include("test_insolation.jl")
+    include("compare_insolation.jl")
 end
 @testset "Equinox Date" begin
     include("test_perihelion.jl")
