@@ -6,7 +6,6 @@ using Formatting
 
 using CLIMAParameters: AbstractParameterSet
 const APS = AbstractParameterSet
-Base.broadcastable(param_set::APS) = Ref(param_set)
 
 """
     calc_day_lat_insolation(n_days::I,
@@ -22,8 +21,8 @@ function calc_day_lat_insolation(n_days::I,
   # loop over days
   for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
-        date = Dates.DateTime(2020,1,1) + Dates.Day(d)
-        θ, dist = daily_zenith_angle(date, lat, param_set)
+        date = Dates.DateTime(2000,1,1) + Dates.Day(d)
+        θ, dist = daily_zenith_angle(date, lat, param_set, milankovitch=false)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
   end
@@ -53,12 +52,13 @@ function plot_day_lat_insolation(d_arr::Array{I},
   end
 
   p1 = contourf(d_arr, l_arr, F_arr', c=cmap, clims=(vmin,vmax), 
-    title=stitle, xlabel="Days since Jan 1 2020", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
+    title=stitle, xlabel="Days since Jan 1 2000", ylabel="Latitude", colorbar_title="ToA Insolation [W/m2]")
   meanF = mean(F_arr, dims=1)[1,:]
   x1,x2 = [floor(minimum(meanF)), ceil(maximum(meanF))]
   p2 = plot(meanF, l_arr, xlabel="Annual-mean TOA \nInsolation [W/m2]", 
     ylims=[-90,90], yticks=[-90,-60,-30,0,30,60,90], xlims=[x1,x2], legend = false)
-  plot(p1, p2, layout = grid(1,2, widths=(0.8,0.2)), size=(800,400), dpi=150)
+  plot(p1, p2, size=(800,400), layout = grid(1,2, widths=(0.8,0.2)), dpi=250,
+        left_margin=4Plots.mm, bottom_margin=6Plots.mm, right_margin=6Plots.mm)
 
   savefig(file_name)
 end

@@ -8,13 +8,13 @@ param_set is an AbstractParameterSet from CLIMAParameters.jl.
 """
 function insolation(θ::FT, d::FT, param_set::APS) where {FT <: Real}
     S0::FT = tot_solar_irrad(param_set)
-    AU::FT = astro_unit()
+    d0::FT = orbit_semimaj(param_set)
     # set max. zenith angle to π/2, insolation should not be negative
-    if θ > FT(π)/FT(2)
-        θ = FT(π)/FT(2)
+    if θ > FT(π)/2
+        θ = FT(π)/2
     end
     # weighted irradiance (3.12)
-    S = S0 * (AU / d)^2
+    S = S0 * (d0 / d)^2
     # TOA insolation (3.15)
     F = S * cos(θ)
     return F
@@ -36,16 +36,16 @@ function solar_flux_and_cos_sza(date::DateTime,
                            latitude::FT,
                            param_set::APS) where {FT <: Real}
     S0::FT = tot_solar_irrad(param_set)
-    AU::FT = astro_unit()
+    d0::FT = orbit_semimaj(param_set)
     # θ = solar zenith angle, ζ = solar azimuth angle, d = earth-sun distance
     θ, ζ, d = instantaneous_zenith_angle(date, longitude, latitude, param_set)
     # set max. zenith angle to π/2, insolation should not be negative
-    if θ > FT(π)/FT(2)
-        θ = FT(π)/FT(2)
+    if θ > FT(π)/2
+        θ = FT(π)/2
     end
     μ = cos(θ)
     # TOA solar flux (3.12)
-    S = S0 * (AU / d)^2
+    S = S0 * (d0 / d)^2
     # return inputs needed for RRTMGP.jl
     return S, μ
 end

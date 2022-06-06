@@ -7,6 +7,7 @@ pages = Any[
         "Home" => "index.md"
         "Zenith Angle Equations" => "ZenithAngleEquations.md"
         "Insolation Examples" => "InsolationExamples.md"
+        "Milankovitch Cycles" => "Milankovitch.md"
         "APIs" => "library.md"
 ]
 
