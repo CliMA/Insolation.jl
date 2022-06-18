@@ -8,12 +8,13 @@ using Statistics
 using Roots
 using Optim
 
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
-
+import CLIMAParameters as CP
+import Insolation.Parameters as IP
 FT = Float32
+
+include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
+param_set = create_insolation_parameters(FT)
+
 @testset "Orbital Params" begin
     include("test_orbit_param.jl")
 end
@@ -32,6 +33,8 @@ end
 end
 
 FT = Float64
+param_set = create_insolation_parameters(FT)
+
 @testset "Orbital Params" begin
     include("test_orbit_param.jl")
 end

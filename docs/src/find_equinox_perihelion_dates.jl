@@ -2,10 +2,11 @@ using Insolation
 using Plots
 using Dates
 
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
+import CLIMAParameters as CP
+
+FT = Float64
+include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
+param_set = create_insolation_parameters(FT)
 
 # Difference in NH and SH zenith angles at time x in given year
 function zdiff(x, year)
@@ -18,7 +19,7 @@ end
 # x is date relative to March 1, with 1.00 representing March 1 00:00
 function xtomarchdate(x, year)
     basedate = Dates.DateTime(year, 3, 1)
-    deltat = Dates.Second(round((x-1)*Planet.day(param_set)))
+    deltat = Dates.Second(round((x-1)*IP.day(param_set)))
     return basedate + deltat
 end
 
@@ -26,13 +27,13 @@ end
 function edist(x, year)
     date = xtojandate(x,year)
     _, dist = daily_zenith_angle(date, 0., param_set, milankovitch=true)
-    return dist/orbit_semimaj(param_set)
+    return dist/IP.orbit_semimaj(param_set)
 end
 
 # x is date relative to Jan 1, with 1.00 representing Jan 1 00:00
 function xtojandate(x, year)
     basedate = Dates.DateTime(year, 1, 1)
-    deltat = Dates.Second(round((x-1)*Planet.day(param_set)))
+    deltat = Dates.Second(round((x-1)*IP.day(param_set)))
     date = basedate + deltat
     return date
 end

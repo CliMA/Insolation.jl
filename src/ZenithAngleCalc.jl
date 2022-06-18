@@ -2,8 +2,8 @@ export instantaneous_zenith_angle, daily_zenith_angle
 
 # true anomaly, radians
 function true_anomaly(MA::FT, e::FT) where {FT <: Real}
-    TA = MA + (2*e - FT(1/4)*e^3)*sin(MA) 
-            + FT(5/4)*e^2*sin(2*MA) 
+    TA = MA + (2*e - FT(1/4)*e^3)*sin(MA)
+            + FT(5/4)*e^2*sin(2*MA)
             + FT(13/12)*e^3*sin(3*MA)
     return mod(TA, FT(2π))
 end
@@ -17,18 +17,18 @@ end
 # calculate the distance, declination, and hour angle (at lon=0)
 function distance_declination_hourangle(::Type{FT},
                                         date::DateTime,
-                                        param_set::APS,
+                                        param_set::IP.AIP,
                                         eot_correction::Bool,
                                         milankovitch::Bool) where {FT <: Real}
-    Ya::FT = year_anom(param_set)
-    day_length::FT = Planet.day(param_set)
-    d0::FT = orbit_semimaj(param_set)
-    M0::FT = mean_anom_epoch(param_set)
-    
+    Ya::FT = IP.year_anom(param_set)
+    day_length::FT = IP.day(param_set)
+    d0::FT = IP.orbit_semimaj(param_set)
+    M0::FT = IP.mean_anom_epoch(param_set)
+
     epoch_string = "2000-01-01T11:58:56.816"
-    # epoch_string::String = epoch(param_set)
+    # epoch_string::String = IP.epoch(param_set)
     date0 = DateTime(epoch_string,dateformat"y-m-dTHH:MM:SS.s")
-    
+
     days_per_year = Ya / day_length;
     Δt_years = FT(datetime2julian(date) - datetime2julian(date0)) / days_per_year;
 
@@ -41,9 +41,9 @@ function distance_declination_hourangle(::Type{FT},
         γ = FT(γ_spline(Δt_years));
         e = FT(e_spline(Δt_years));
     else
-        ϖ = FT(lon_perihelion_epoch(param_set));
-        γ = FT(obliq_epoch(param_set));
-        e = FT(eccentricity_epoch(param_set));
+        ϖ = FT(IP.lon_perihelion_epoch(param_set));
+        γ = FT(IP.obliq_epoch(param_set));
+        e = FT(IP.eccentricity_epoch(param_set));
     end
 
     # true anomaly, radians
@@ -74,7 +74,7 @@ end
     instantaneous_zenith_angle(date::DateTime,
                                longitude::FT,
                                latitude::FT,
-                               param_set::APS;
+                               param_set::IP.AIP;
                                eot_correction::Bool=true,
                                milankovitch::Bool=true) where {FT <: Real}
 
@@ -94,7 +94,7 @@ when set to false the orbital parameters at the J2000 epoch from CLIMAParameters
 function instantaneous_zenith_angle(date::DateTime,
                                     longitude::FT,
                                     latitude::FT,
-                                    param_set::APS; 
+                                    param_set::IP.AIP;
                                     eot_correction::Bool=true,
                                     milankovitch::Bool=true) where {FT <: Real}
     λ = deg2rad(longitude)
@@ -118,11 +118,11 @@ end
 """
     daily_zenith_angle(date::DateTime,
                        latitude::FT,
-                       param_set::APS;
+                       param_set::IP.AIP;
                        eot_correction::Bool=true,
                        milankovitch::Bool=true) where {FT <: Real}
 
-Returns the effective zenith angle corresponding to the diurnally averaged insolation 
+Returns the effective zenith angle corresponding to the diurnally averaged insolation
 and earth-sun distance at a particular latitude given the date.
 
 `param_set` is an AbstractParameterSet from CLIMAParameters.jl.
@@ -137,13 +137,13 @@ when set to false the orbital parameters at the J2000 epoch from CLIMAParameters
 """
 function daily_zenith_angle(date::DateTime,
                             latitude::FT,
-                            param_set::APS;
+                            param_set::IP.AIP;
                             eot_correction::Bool=true,
                             milankovitch::Bool=true) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
     d, δ, _ = distance_declination_hourangle(FT, date, param_set, eot_correction, milankovitch)
-    
+
     # sunrise/sunset angle
     T = tan(ϕ) * tan(δ)
     if T >= FT(1)
@@ -153,7 +153,7 @@ function daily_zenith_angle(date::DateTime,
     else
         ηd = acos(FT(-1)*T)
     end
-    
+
     # effective zenith angle to get diurnally averaged insolation (i.e., averaging cosine of zenith angle)
     daily_θ = mod(acos(FT(1/π)*(ηd*sin(ϕ)*sin(δ) + cos(ϕ)*cos(δ)*sin(ηd))), FT(2π))
 

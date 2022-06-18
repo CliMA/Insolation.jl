@@ -9,7 +9,7 @@ end
 # x is date relative to March 1, with 1.00 representing March 1 00:00
 function xtomarchdate(x, year)
     basedate = Dates.DateTime(year, 3, 1)
-    deltat = Dates.Second(round((x-1)*Planet.day(param_set)))
+    deltat = Dates.Second(round((x-1)*IP.day(param_set)))
     return basedate + deltat
 end
 
