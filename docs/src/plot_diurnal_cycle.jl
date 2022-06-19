@@ -4,13 +4,11 @@ using Dates
 using Statistics
 using Formatting
 
-using CLIMAParameters
-using CLIMAParameters.Planet
-struct EarthParameterSet <: AbstractEarthParameterSet end
-const param_set = EarthParameterSet()
+import CLIMAParameters as CP
 
-using CLIMAParameters: AbstractParameterSet
-const APS = AbstractParameterSet
+FT = Float64
+include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
+param_set = create_insolation_parameters(FT)
 
 function diurnal_cycle(lat, lon, date, timezone, filename)
     nhours = 1000

@@ -52,4 +52,4 @@ sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
 ## Test Distance
 date = Dates.DateTime(2000, 3, 22, 0, 0, 0)
 sza, azi, d = instantaneous_zenith_angle(date, lon, lat, param_set)
-@test d ≈ orbit_semimaj(param_set) rtol=rtol
+@test d ≈ IP.orbit_semimaj(param_set) rtol=rtol

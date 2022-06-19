@@ -11,7 +11,7 @@ F = insolation(sza, d, param_set)
 @test F ≈ 0.0 atol=atol
 
 S, mu = solar_flux_and_cos_sza(date, lon, lat, param_set)
-@test S ≈ tot_solar_irrad(param_set) rtol=rtol_insol
+@test S ≈ IP.tot_solar_irrad(param_set) rtol=rtol_insol
 @test mu ≈ 0.0 atol=atol
 
 # polar night NH 1
@@ -22,7 +22,7 @@ F = insolation(sza, d, param_set)
 @test F ≈ 0.0 atol=atol
 
 S, mu = solar_flux_and_cos_sza(date, lon, lat, param_set)
-@test S ≈ tot_solar_irrad(param_set) rtol=rtol_insol
+@test S ≈ IP.tot_solar_irrad(param_set) rtol=rtol_insol
 @test mu ≈ 0.0 atol=atol
 
 # polar night NH 2
@@ -32,7 +32,7 @@ F = insolation(sza, d, param_set)
 @test F ≈ 0.0 atol=atol
 
 S, mu = solar_flux_and_cos_sza(date, lon, lat, param_set)
-@test S ≈ tot_solar_irrad(param_set) rtol=rtol_insol
+@test S ≈ IP.tot_solar_irrad(param_set) rtol=rtol_insol
 @test mu ≈ 0.0 atol=atol
 
 ## Test symmetry of insolation at equinox
@@ -65,11 +65,11 @@ end
 zonal_mean_insol = mean(F_arr, dims=1)
 area_fac = abs.(cosd.(l_arr))
 global_mean_insol = sum(zonal_mean_insol * area_fac) / sum(area_fac)
-@test global_mean_insol ≈ tot_solar_irrad(param_set) / 4 rtol=rtol
+@test global_mean_insol ≈ IP.tot_solar_irrad(param_set) / 4 rtol=rtol
 
 ## Test invariance of zonal-mean insolation under rotation of ϖ
-ϖ0 = lon_perihelion_epoch(param_set)
-CLIMAParameters.Planet.lon_perihelion_epoch(::EarthParameterSet) = ϖ0 + π
+ϖ0 = IP.lon_perihelion_epoch(param_set)
+param_set = create_insolation_parameters(FT, (; lon_perihelion_epoch = ϖ0 + π))
 
 for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
@@ -82,4 +82,4 @@ end
 zonal_mean_insol_rotate = mean(F_arr, dims=1)
 @test zonal_mean_insol_rotate ≈ zonal_mean_insol rtol=rtol
 
-CLIMAParameters.Planet.lon_perihelion_epoch(::EarthParameterSet) = ϖ0
+param_set = create_insolation_parameters(FT, (; lon_perihelion_epoch = ϖ0))
