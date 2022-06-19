@@ -1,7 +1,7 @@
 name = "Insolation"
 uuid = "e98cc03f-d57e-4e3c-b70c-8d51efe9e0d8"
 authors = ["Climate Modeling Alliance"]
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
