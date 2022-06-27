@@ -4,17 +4,17 @@ using Dates
 using Statistics
 using Formatting
 
-using CLIMAParameters: AbstractParameterSet
-const APS = AbstractParameterSet
+import CLIMAParameters as CP
+import Insolation.Parameters as IP
 
 """
     calc_day_lat_insolation(n_days::I,
                             n_lats::I,
-                            param_set::APS) where {I<:Int}
+                            param_set::IP.AIP) where {I<:Int}
 """
 function calc_day_lat_insolation(n_days::I,
                                 n_lats::I,
-                                param_set::APS) where {I<:Int}
+                                param_set::IP.AIP) where {I<:Int}
   d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
   l_arr = collect(range(-90, stop = 90, length = n_lats))
   F_arr = zeros(n_days, n_lats)

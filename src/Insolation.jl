@@ -1,10 +1,10 @@
 module Insolation
 
 using Dates, DelimitedFiles, Interpolations
-using CLIMAParameters
-using CLIMAParameters.Planet
-using CLIMAParameters: AbstractParameterSet
-const APS = AbstractParameterSet
+
+include("Parameters.jl")
+import .Parameters as IP
+const AIP = IP.AbstractInsolationParams
 
 export orbital_params
 

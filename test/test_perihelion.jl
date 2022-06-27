@@ -1,7 +1,7 @@
 # x is date relative to Jan 1, with 1.00 representing Jan 1 00:00
 function xtojandate(x, year)
     basedate = Dates.DateTime(year, 1, 1)
-    deltat = Dates.Second(round((x-1)*Planet.day(param_set)))
+    deltat = Dates.Second(round((x-1)*IP.day(param_set)))
     date = basedate + deltat
     return date
 end
@@ -10,7 +10,7 @@ end
 function edist(x, year)
     date = xtojandate(x,year)
     _, dist = daily_zenith_angle(date, FT(0), param_set)
-    return dist/orbit_semimaj(param_set)
+    return dist/IP.orbit_semimaj(param_set)
 end
 
 years = 1900:2100
