@@ -25,8 +25,8 @@ function distance_declination_hourangle(::Type{FT},
     d0::FT = IP.orbit_semimaj(param_set)
     M0::FT = IP.mean_anom_epoch(param_set)
 
-    epoch_string = "2000-01-01T11:58:56.816"
-    # epoch_string::String = IP.epoch(param_set)
+    # epoch_string = "2000-01-01T11:58:56.816"
+    epoch_string::String = IP.epoch(param_set)
     date0 = DateTime(epoch_string,dateformat"y-m-dTHH:MM:SS.s")
 
     days_per_year = Ya / day_length;

@@ -8,7 +8,7 @@ Base.@kwdef struct InsolationParameters{FT} <: AbstractInsolationParams
     day::FT
     orbit_semimaj::FT
     tot_solar_irrad::FT
-    epoch::FT
+    epoch::String
     mean_anom_epoch::FT
     eccentricity_epoch::FT
     obliq_epoch::FT

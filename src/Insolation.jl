@@ -10,16 +10,16 @@ export orbital_params
 
 mock_t_range = 1.0:1.0:10.0;
 mock_x_data = rand(10);
-const e_spline_etp = Ref(CubicSplineInterpolation(mock_t_range, mock_x_data, extrapolation_bc = NaN))
-const γ_spline_etp = Ref(CubicSplineInterpolation(mock_t_range, mock_x_data, extrapolation_bc = NaN))
-const ϖ_spline_etp = Ref(CubicSplineInterpolation(mock_t_range, mock_x_data, extrapolation_bc = NaN))
+const e_spline_etp = Ref(cubic_spline_interpolation(mock_t_range, mock_x_data, extrapolation_bc = NaN))
+const γ_spline_etp = Ref(cubic_spline_interpolation(mock_t_range, mock_x_data, extrapolation_bc = NaN))
+const ϖ_spline_etp = Ref(cubic_spline_interpolation(mock_t_range, mock_x_data, extrapolation_bc = NaN))
 function __init__()
     datapath = joinpath(@__DIR__, "../src/data/", "INSOL.LA2004.BTL.csv");
     x, _ = readdlm(datapath, ',', Float64, header=true);
     t_range = x[1,1]*1e3 : 1e3 : x[end,1]*1e3; # array of every 1 kyr to range of years
-    e_spline_etp[] = CubicSplineInterpolation(t_range, x[:,2], extrapolation_bc = NaN);
-    γ_spline_etp[] = CubicSplineInterpolation(t_range, x[:,3], extrapolation_bc = NaN);
-    ϖ_spline_etp[] = CubicSplineInterpolation(t_range, x[:,4], extrapolation_bc = NaN);
+    e_spline_etp[] = cubic_spline_interpolation(t_range, x[:,2], extrapolation_bc = NaN);
+    γ_spline_etp[] = cubic_spline_interpolation(t_range, x[:,3], extrapolation_bc = NaN);
+    ϖ_spline_etp[] = cubic_spline_interpolation(t_range, x[:,4], extrapolation_bc = NaN);
 end
 function e_spline(args...)
     return e_spline_etp[](args...)
