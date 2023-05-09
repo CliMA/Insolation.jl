@@ -17,6 +17,7 @@ end
 # calculate the distance, declination, and hour angle (at lon=0)
 function distance_declination_hourangle(::Type{FT},
                                         date::DateTime,
+                                        od::OrbitalData,
                                         param_set::IP.AIP,
                                         eot_correction::Bool,
                                         milankovitch::Bool) where {FT <: Real}
@@ -37,9 +38,9 @@ function distance_declination_hourangle(::Type{FT},
 
     # calculate orbital parameters or take values at J2000
     if milankovitch
-        ϖ = FT(ϖ_spline(Δt_years));
-        γ = FT(γ_spline(Δt_years));
-        e = FT(e_spline(Δt_years));
+        ϖ = FT(ϖ_spline(od, Δt_years));
+        γ = FT(γ_spline(od, Δt_years));
+        e = FT(e_spline(od, Δt_years));
     else
         ϖ = FT(IP.lon_perihelion_epoch(param_set));
         γ = FT(IP.obliq_epoch(param_set));
@@ -72,6 +73,7 @@ end
 
 """
     instantaneous_zenith_angle(date::DateTime,
+                               od::OrbitalData,
                                longitude::FT,
                                latitude::FT,
                                param_set::IP.AIP;
@@ -92,6 +94,7 @@ when set to true the orbital parameters are calculated for the given DateTime
 when set to false the orbital parameters at the J2000 epoch from CLIMAParameters are used.
 """
 function instantaneous_zenith_angle(date::DateTime,
+                                    od::OrbitalData,
                                     longitude::FT,
                                     latitude::FT,
                                     param_set::IP.AIP;
@@ -100,7 +103,7 @@ function instantaneous_zenith_angle(date::DateTime,
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
 
-    d, δ, η_UTC = distance_declination_hourangle(FT, date, param_set, eot_correction, milankovitch)
+    d, δ, η_UTC = distance_declination_hourangle(FT, date, od, param_set, eot_correction, milankovitch)
 
     # hour angle
     η = mod(η_UTC + λ, FT(2π))
@@ -117,6 +120,7 @@ end
 
 """
     daily_zenith_angle(date::DateTime,
+                       od::OrbitalData,
                        latitude::FT,
                        param_set::IP.AIP;
                        eot_correction::Bool=true,
@@ -136,13 +140,14 @@ when set to true the orbital parameters are calculated for the given DateTime,
 when set to false the orbital parameters at the J2000 epoch from CLIMAParameters are used.
 """
 function daily_zenith_angle(date::DateTime,
+                            od::OrbitalData,
                             latitude::FT,
                             param_set::IP.AIP;
                             eot_correction::Bool=true,
                             milankovitch::Bool=true) where {FT <: Real}
     ϕ = deg2rad(latitude)
 
-    d, δ, _ = distance_declination_hourangle(FT, date, param_set, eot_correction, milankovitch)
+    d, δ, _ = distance_declination_hourangle(FT, date, od, param_set, eot_correction, milankovitch)
 
     # sunrise/sunset angle
     T = tan(ϕ) * tan(δ)

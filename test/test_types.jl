@@ -1,8 +1,11 @@
 date = Dates.DateTime(2020, 2, 20, 11, 11, 0)
 lon, lat = [FT(80.0), FT(20.0)]
 
+od = Insolation.OrbitalData()
+
 sza, azi, d = instantaneous_zenith_angle(
     date,
+    od,
     lon,
     lat,
     param_set,
@@ -17,6 +20,7 @@ F = insolation(sza, d, param_set)
 
 sza, azi, d = instantaneous_zenith_angle(
     date,
+    od,
     lon,
     lat,
     param_set,
@@ -31,6 +35,7 @@ F = insolation(sza, d, param_set)
 
 sza, azi, d = instantaneous_zenith_angle(
     date,
+    od,
     lon,
     lat,
     param_set,
@@ -45,6 +50,7 @@ F = insolation(sza, d, param_set)
 
 sza, azi, d = instantaneous_zenith_angle(
     date,
+    od,
     lon,
     lat,
     param_set,
