@@ -10,7 +10,7 @@ FT = Float64
 include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
 param_set = create_insolation_parameters(FT)
 
-function diurnal_cycle(lat, lon, date, timezone, filename)
+function diurnal_cycle(lat, lon, date, od, timezone, filename)
     nhours = 1000
     hours = collect(range(0, stop = 24, length = nhours))
     insol = zeros(nhours)
@@ -19,7 +19,7 @@ function diurnal_cycle(lat, lon, date, timezone, filename)
         h = Int(round(hr + timezone))
         m = Int(round((hr + timezone - h) * 60))
         datetime = date + Dates.Hour(h) + Dates.Minute(m)
-        S, mu = solar_flux_and_cos_sza(datetime, lon, lat, param_set)
+        S, mu = solar_flux_and_cos_sza(datetime, od, lon, lat, param_set)
         insol[i] = S*mu
         sza[i] = rad2deg(acos(mu))
     end

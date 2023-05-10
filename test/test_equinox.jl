@@ -1,8 +1,8 @@
 # Difference in NH and SH zenith angles at time x in given year
-function zdiff(x, year)
+function zdiff(x, year, od)
     date = xtomarchdate(x,year)
-    theta_s, dist = daily_zenith_angle(date, FT(-45), param_set)
-    theta_n, dist = daily_zenith_angle(date, FT(45), param_set)
+    theta_s, dist = daily_zenith_angle(date, od, FT(-45), param_set)
+    theta_n, dist = daily_zenith_angle(date, od, FT(45), param_set)
     return theta_n - theta_s
 end
 
@@ -13,9 +13,10 @@ function xtomarchdate(x, year)
     return basedate + deltat
 end
 
+od = Insolation.OrbitalData()
 days = zeros(length(1900:2100))
 for (i,year) in enumerate(1900:2100)
-    f = (x -> zdiff(x, year))
+    f = (x -> zdiff(x, year, od))
     days[i] = find_zeros(f,1.,30)[1]
 end
 

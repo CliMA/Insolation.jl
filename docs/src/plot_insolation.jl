@@ -8,11 +8,12 @@ import CLIMAParameters as CP
 import Insolation.Parameters as IP
 
 """
-    calc_day_lat_insolation(n_days::I,
+    calc_day_lat_insolation(od::Insolation.OrbitalData,
+                            n_days::I,
                             n_lats::I,
                             param_set::IP.AIP) where {I<:Int}
 """
-function calc_day_lat_insolation(n_days::I,
+function calc_day_lat_insolation(od, n_days::I,
                                 n_lats::I,
                                 param_set::IP.AIP) where {I<:Int}
   d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
@@ -22,7 +23,7 @@ function calc_day_lat_insolation(n_days::I,
   for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
         date = Dates.DateTime(2000,1,1) + Dates.Day(d)
-        θ, dist = daily_zenith_angle(date, lat, param_set, milankovitch=false)
+        θ, dist = daily_zenith_angle(date, od, lat, param_set, milankovitch=false)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
   end
