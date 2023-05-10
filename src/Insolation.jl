@@ -49,6 +49,8 @@ struct OrbitalData{E, G, O}
     end
 end
 
+Base.broadcastable(x::OrbitalData) = tuple(x)
+
 e_spline(od, args...) = od.e_spline_etp(args...)
 γ_spline(od, args...) = od.γ_spline_etp(args...)
 ϖ_spline(od, args...) = od.ϖ_spline_etp(args...)

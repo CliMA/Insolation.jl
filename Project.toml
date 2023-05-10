@@ -1,7 +1,7 @@
 name = "Insolation"
 uuid = "e98cc03f-d57e-4e3c-b70c-8d51efe9e0d8"
 authors = ["Climate Modeling Alliance"]
-version = "0.4.0"
+version = "0.4.1"
 
 [deps]
 ArtifactWrappers = "a14bc488-3040-4b00-9dc1-f6467924858a"
