@@ -5,8 +5,9 @@
 using Insolation
 using Plots
 
+od = Insolation.OrbitalData()
 dt = collect(-500e3:100:500e3); # years
-y = hcat(collect.(orbital_params.(dt))...);
+y = hcat(collect.(orbital_params.(Ref(od), dt))...);
 ϖ, γ, e = y[1,:], y[2,:], y[3,:];
 
 p1 = plot(dt ./ (1e3), sin.(ϖ), legend=false);
@@ -31,11 +32,12 @@ include("find_equinox_perihelion_dates.jl")
 years = 1800:2200;
 days_eq = zeros(length(years));
 days_per = zeros(length(years));
+od = Insolation.OrbitalData()
 for (i,year) in enumerate(years)
-    f = (x -> zdiff(x, year))
+    f = (x -> zdiff(x, year, od))
     days_eq[i] = find_zeros(f,-30,60)[1]
 
-    f = (x -> edist(x, year))
+    f = (x -> edist(x, year, od))
     res = optimize(f,-50,50)
     days_per[i] = Optim.minimizer(res)[1]
 end
@@ -60,11 +62,11 @@ The Gregorian calendar was introduced (with leap years and leap centuries) preci
 ```@example
 using Roots
 include("find_equinox_perihelion_dates.jl")
-
+od = Insolation.OrbitalData()
 years = -50e3:100:30e3 
 days_eq = zeros(length(years)) 
 for (i,year) in enumerate(years) 
-    f = (x -> zdiff(x, year)) 
+    f = (x -> zdiff(x, year, od)) 
     days_eq[i] = find_zeros(f,-100,100)[1] 
 end 
 
