@@ -9,6 +9,10 @@ Private = false
 Pages   = ["Insolation.jl"]
 ```
 
+```@docs
+Insolation.OrbitalData
+```
+
 ## Zenith Angle
 ```@autodocs
 Modules = [Insolation]

@@ -7,16 +7,17 @@ function xtojandate(x, year)
 end
 
 # Earth-Sun distance
-function edist(x, year)
+function edist(x, year, od)
     date = xtojandate(x,year)
-    _, dist = daily_zenith_angle(date, FT(0), param_set)
+    _, dist = daily_zenith_angle(date, od, FT(0), param_set)
     return dist/IP.orbit_semimaj(param_set)
 end
 
 years = 1900:2100
 days = zeros(length(years))
+od = Insolation.OrbitalData()
 for (i,year) in enumerate(years)
-    f = (x -> edist(x, year))
+    f = (x -> edist(x, year, od))
     res = optimize(f,1.,30)
     days[i] = Optim.minimizer(res)[1]
 end

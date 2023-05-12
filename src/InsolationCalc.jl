@@ -22,6 +22,7 @@ end
 
 """
     solar_flux_and_cos_sza(date::DateTime,
+                      od::OrbitalData,
                       longitude::FT,
                       latitude::FT,
                       param_set::IP.AIP) where {FT <: Real}
@@ -32,13 +33,14 @@ and cos(solar zenith angle) for input to RRTMGP.jl
 param_set is an AbstractParameterSet from CLIMAParameters.jl.
 """
 function solar_flux_and_cos_sza(date::DateTime,
+                           od::OrbitalData,
                            longitude::FT,
                            latitude::FT,
                            param_set::IP.AIP) where {FT <: Real}
     S0::FT = IP.tot_solar_irrad(param_set)
     d0::FT = IP.orbit_semimaj(param_set)
     # θ = solar zenith angle, ζ = solar azimuth angle, d = earth-sun distance
-    θ, ζ, d = instantaneous_zenith_angle(date, longitude, latitude, param_set)
+    θ, ζ, d = instantaneous_zenith_angle(date, od, longitude, latitude, param_set)
     # set max. zenith angle to π/2, insolation should not be negative
     if θ > FT(π)/2
         θ = FT(π)/2

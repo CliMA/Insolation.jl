@@ -9,10 +9,10 @@ include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
 param_set = create_insolation_parameters(FT)
 
 # Difference in NH and SH zenith angles at time x in given year
-function zdiff(x, year)
+function zdiff(x, year, od)
     date = xtomarchdate(x,year)
-    theta_s, dist = daily_zenith_angle(date, -45., param_set, milankovitch=true)
-    theta_n, dist = daily_zenith_angle(date, 45., param_set, milankovitch=true)
+    theta_s, dist = daily_zenith_angle(date, od, -45., param_set, milankovitch=true)
+    theta_n, dist = daily_zenith_angle(date, od, 45., param_set, milankovitch=true)
     return theta_n - theta_s
 end
 
@@ -24,9 +24,9 @@ function xtomarchdate(x, year)
 end
 
 # Earth-Sun distance
-function edist(x, year)
+function edist(x, year, od)
     date = xtojandate(x,year)
-    _, dist = daily_zenith_angle(date, 0., param_set, milankovitch=true)
+    _, dist = daily_zenith_angle(date, od, 0., param_set, milankovitch=true)
     return dist/IP.orbit_semimaj(param_set)
 end
 
