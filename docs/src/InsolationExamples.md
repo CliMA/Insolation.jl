@@ -10,7 +10,7 @@ include("plot_diurnal_cycle.jl")
 lat, lon = [34.15, -118.14]
 date = DateTime(2020, 01, 10)
 timezone = +8 # Pacific Standard Time
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 diurnal_cycle(lat, lon, date, od, timezone, "Pasadena_January.png")
 
 # Finland in June
@@ -37,7 +37,7 @@ include("plot_insolation.jl")
 γ0 = IP.obliq_epoch(param_set)
 ϖ0 = IP.lon_perihelion_epoch(param_set)
 e0 = IP.eccentricity_epoch(param_set)
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 
 days, lats, F0 = calc_day_lat_insolation(od, 365, 180, param_set)
 title = format("γ = {:.2f}°, ϖ = {:.2f}°, e = {:.2f}", rad2deg(γ0), rad2deg(ϖ0), e0) #hide
@@ -58,7 +58,7 @@ include("plot_insolation.jl") # hide
 γ0 = IP.obliq_epoch(param_set) # hide
 ϖ0 = IP.lon_perihelion_epoch(param_set) # hide
 e0 = IP.eccentricity_epoch(param_set) # hide
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 days, lats, F0 = calc_day_lat_insolation(od, 365, 180, param_set) # hide
 
 # decrease γ to 20.0°
@@ -87,7 +87,7 @@ include("plot_insolation.jl") # hide
 γ0 = IP.obliq_epoch(param_set) # hide
 ϖ0 = IP.lon_perihelion_epoch(param_set) # hide
 e0 = IP.eccentricity_epoch(param_set) # hide
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 days, lats, F0 = calc_day_lat_insolation(od, 365, 180, param_set) # hide
 
 # now change obliquity to 97.86°

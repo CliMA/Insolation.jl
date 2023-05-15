@@ -15,7 +15,7 @@ end
 
 years = 1900:2100
 days = zeros(length(years))
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 for (i,year) in enumerate(years)
     f = (x -> edist(x, year, od))
     res = optimize(f,1.,30)

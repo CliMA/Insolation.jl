@@ -9,16 +9,19 @@ const AIP = IP.AbstractInsolationParams
 
 export orbital_params
 
-function orbital_parameters_dataset_path()
-    era_dataset = AW.ArtifactWrapper(
-        @__DIR__,
-        "era-global",
+#= For test/docs use only =#
+datadir() = joinpath(dirname(@__DIR__), "data")
+
+function orbital_parameters_dataset_path(artifact_dir)
+    orb_params_dataset = AW.ArtifactWrapper(
+        artifact_dir,
+        "orb_params_dataset",
         AW.ArtifactFile[AW.ArtifactFile(
             url = "https://caltech.box.com/shared/static/3y02smnlxhgwednm3eho7lve2xhq1n7r.csv",
             filename = "INSOL.LA2004.BTL.csv",
         ),],
     )
-    return AW.get_data_folder(era_dataset)
+    return AW.get_data_folder(orb_params_dataset)
 end
 
 """
@@ -28,14 +31,16 @@ The parameters vary due to Milankovitch cycles.
 
 Orbital parameters from the Laskar 2004 paper are
 lazily downloaded from Caltech Box to the
-`orbital_parameters_dataset_path()` path.
+`orbital_parameters_dataset_path(artifact_dir)` path
+where `artifact_dir` is the path and filename to save
+the artifacts toml file.
 """
 struct OrbitalData{E, G, O}
     e_spline_etp::E
     γ_spline_etp::G
     ϖ_spline_etp::O
-    function OrbitalData()
-        datapath = joinpath(orbital_parameters_dataset_path(), "INSOL.LA2004.BTL.csv");
+    function OrbitalData(artifact_dir)
+        datapath = joinpath(orbital_parameters_dataset_path(artifact_dir), "INSOL.LA2004.BTL.csv");
         x, _ = readdlm(datapath, ',', Float64, header=true);
         t_range = x[1,1]*1e3 : 1e3 : x[end,1]*1e3; # array of every 1 kyr to range of years
         e_spline_etp = CubicSplineInterpolation(t_range, x[:,2], extrapolation_bc = NaN);

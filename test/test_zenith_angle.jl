@@ -1,5 +1,5 @@
 rtol = 1e-2
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 # sunrise at equator
 date = Dates.DateTime(2020, 2, 20, 6, 11, 0)
 lon, lat = [FT(0.0), FT(0.0)]
