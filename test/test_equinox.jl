@@ -13,7 +13,7 @@ function xtomarchdate(x, year)
     return basedate + deltat
 end
 
-od = Insolation.OrbitalData()
+od = Insolation.OrbitalData(Insolation.datadir())
 days = zeros(length(1900:2100))
 for (i,year) in enumerate(1900:2100)
     f = (x -> zdiff(x, year, od))
