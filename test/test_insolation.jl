@@ -2,7 +2,7 @@ atol = 1e-4
 rtol = 1e-2
 rtol_insol = 0.1
 
-od = Insolation.OrbitalData(Insolation.datadir())
+od = Insolation.OrbitalData()
 ## Test zero insolation at night
 # sunrise at equator
 date = Dates.DateTime(2020, 1, 1, 6, 0, 0)
