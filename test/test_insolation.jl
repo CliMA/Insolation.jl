@@ -9,32 +9,32 @@ date = Dates.DateTime(2020, 1, 1, 6, 0, 0)
 lon, lat = [FT(0.0), FT(0.0)]
 sza, azi, d = instantaneous_zenith_angle(date, od, lon, lat, param_set)
 F = insolation(sza, d, param_set)
-@test F ≈ 0.0 atol=atol
+@test F ≈ 0.0 atol = atol
 
 S, mu = solar_flux_and_cos_sza(date, od, lon, lat, param_set)
-@test S ≈ IP.tot_solar_irrad(param_set) rtol=rtol_insol
-@test mu ≈ 0.0 atol=atol
+@test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
+@test mu ≈ 0.0 atol = atol
 
 # polar night NH 1
 date = Dates.DateTime(2020, 12, 20, 11, 0, 0)
 lon, lat = [FT(0.0), FT(80.0)]
 sza, azi, d = instantaneous_zenith_angle(date, od, lon, lat, param_set)
 F = insolation(sza, d, param_set)
-@test F ≈ 0.0 atol=atol
+@test F ≈ 0.0 atol = atol
 
 S, mu = solar_flux_and_cos_sza(date, od, lon, lat, param_set)
-@test S ≈ IP.tot_solar_irrad(param_set) rtol=rtol_insol
-@test mu ≈ 0.0 atol=atol
+@test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
+@test mu ≈ 0.0 atol = atol
 
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
 sza, azi, d = instantaneous_zenith_angle(date, od, lon, lat, param_set)
 F = insolation(sza, d, param_set)
-@test F ≈ 0.0 atol=atol
+@test F ≈ 0.0 atol = atol
 
 S, mu = solar_flux_and_cos_sza(date, od, lon, lat, param_set)
-@test S ≈ IP.tot_solar_irrad(param_set) rtol=rtol_insol
-@test mu ≈ 0.0 atol=atol
+@test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
+@test mu ≈ 0.0 atol = atol
 
 ## Test symmetry of insolation at equinox
 nlats = 181
@@ -47,7 +47,7 @@ for (i, lat) in enumerate(l_arr)
 end
 F_NH = sort(F_arr[l_arr .>= 0])
 F_SH = sort(F_arr[l_arr .<= 0])
-@test F_NH ≈ F_SH rtol=rtol
+@test F_NH ≈ F_SH rtol = rtol
 
 ## Test globally averaged insolation ≈ TSI
 ndays, nlats = [365, 361]
@@ -57,16 +57,16 @@ F_arr = zeros(ndays, nlats)
 
 for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
-        datei = Dates.DateTime(2000,1,1) + Dates.Day(d)
+        datei = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
         θ, dist = daily_zenith_angle(datei, od, lat, param_set)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
 end
 
-zonal_mean_insol = mean(F_arr, dims=1)
+zonal_mean_insol = mean(F_arr, dims = 1)
 area_fac = abs.(cosd.(l_arr))
 global_mean_insol = sum(zonal_mean_insol * area_fac) / sum(area_fac)
-@test global_mean_insol ≈ IP.tot_solar_irrad(param_set) / 4 rtol=rtol
+@test global_mean_insol ≈ IP.tot_solar_irrad(param_set) / 4 rtol = rtol
 
 ## Test invariance of zonal-mean insolation under rotation of ϖ
 ϖ0 = IP.lon_perihelion_epoch(param_set)
@@ -74,13 +74,13 @@ param_set = create_insolation_parameters(FT, (; lon_perihelion_epoch = ϖ0 + π)
 
 for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
-        datei = Dates.DateTime(2000,1,1) + Dates.Day(d)
+        datei = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
         θ, dist = daily_zenith_angle(datei, od, lat, param_set)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
 end
 
-zonal_mean_insol_rotate = mean(F_arr, dims=1)
-@test zonal_mean_insol_rotate ≈ zonal_mean_insol rtol=rtol
+zonal_mean_insol_rotate = mean(F_arr, dims = 1)
+@test zonal_mean_insol_rotate ≈ zonal_mean_insol rtol = rtol
 
 param_set = create_insolation_parameters(FT, (; lon_perihelion_epoch = ϖ0))
