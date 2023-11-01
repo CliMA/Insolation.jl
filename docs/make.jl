@@ -20,7 +20,6 @@ makedocs(
     sitename = "Insolation.jl",
     format = format,
     clean = true,
-    strict = true,
     modules = [Insolation],
     pages = pages,
 )
