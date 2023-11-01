@@ -8,8 +8,8 @@ sza, azi, d = instantaneous_zenith_angle(
     lon,
     lat,
     param_set,
-    eot_correction=false,
-    )
+    eot_correction = false,
+)
 
 
 F = insolation(sza, d, param_set)
@@ -24,8 +24,8 @@ sza, azi, d = instantaneous_zenith_angle(
     lon,
     lat,
     param_set,
-    eot_correction=false,
-    )
+    eot_correction = false,
+)
 
 F = insolation(sza, d, param_set)
 @test typeof(sza) == FT
@@ -33,13 +33,8 @@ F = insolation(sza, d, param_set)
 @test typeof(d) == FT
 @test typeof(F) == FT
 
-sza, azi, d = instantaneous_zenith_angle(
-    date,
-    lon,
-    lat,
-    param_set,
-    eot_correction=true,
-    )
+sza, azi, d =
+    instantaneous_zenith_angle(date, lon, lat, param_set, eot_correction = true)
 
 F = insolation(sza, d, param_set)
 @test typeof(sza) == FT
@@ -53,8 +48,8 @@ sza, azi, d = instantaneous_zenith_angle(
     lon,
     lat,
     param_set,
-    eot_correction=true,
-    )
+    eot_correction = true,
+)
 
 
 F = insolation(sza, d, param_set)
