@@ -24,23 +24,23 @@ struct OrbitalData{E, G, O}
     e_spline_etp::E
     γ_spline_etp::G
     ϖ_spline_etp::O
-    function OrbitalData()
-        datapath =
-            joinpath(artifact"orb_params_dataset", "INSOL.LA2004.BTL.csv")
-        x, _ = readdlm(datapath, ',', Float64, header = true)
-        t_range = (x[1, 1] * 1e3):1e3:(x[end, 1] * 1e3) # array of every 1 kyr to range of years
-        e_spline_etp =
-            CubicSplineInterpolation(t_range, x[:, 2], extrapolation_bc = NaN)
-        γ_spline_etp =
-            CubicSplineInterpolation(t_range, x[:, 3], extrapolation_bc = NaN)
-        ϖ_spline_etp =
-            CubicSplineInterpolation(t_range, x[:, 4], extrapolation_bc = NaN)
+end
 
-        E = typeof(e_spline_etp)
-        G = typeof(γ_spline_etp)
-        O = typeof(ϖ_spline_etp)
-        return new{E, G, O}(e_spline_etp, γ_spline_etp, ϖ_spline_etp)
-    end
+function OrbitalData()
+    datapath = joinpath(artifact"orb_params_dataset", "INSOL.LA2004.BTL.csv")
+    x, _ = readdlm(datapath, ',', Float64, header = true)
+    t_range = (x[1, 1] * 1e3):1e3:(x[end, 1] * 1e3) # array of every 1 kyr to range of years
+    e_spline_etp =
+        CubicSplineInterpolation(t_range, x[:, 2], extrapolation_bc = NaN)
+    γ_spline_etp =
+        CubicSplineInterpolation(t_range, x[:, 3], extrapolation_bc = NaN)
+    ϖ_spline_etp =
+        CubicSplineInterpolation(t_range, x[:, 4], extrapolation_bc = NaN)
+
+    E = typeof(e_spline_etp)
+    G = typeof(γ_spline_etp)
+    O = typeof(ϖ_spline_etp)
+    return OrbitalData{E, G, O}(e_spline_etp, γ_spline_etp, ϖ_spline_etp)
 end
 
 Base.broadcastable(x::OrbitalData) = tuple(x)
