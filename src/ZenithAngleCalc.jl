@@ -84,28 +84,6 @@ function distance_declination_hourangle(
     return d, δ, η_UTC
 end
 
-"""
-    instantaneous_zenith_angle(date::DateTime,
-                               od::OrbitalData,
-                               longitude::FT,
-                               latitude::FT,
-                               param_set::IP.AIP;
-                               eot_correction::Bool=true,
-                               milankovitch::Bool=true) where {FT <: Real}
-
-Returns the zenith angle and earth-sun distance
-at a particular longitude and latitude on the given date (and time UTC)
-given orbital parameters: obliquity, longitude of perihelion, and eccentricity
-param_set is an AbstractParameterSet from CLIMAParameters.jl.
-
-`eot_correction` is an optional Boolean keyword argument that defaults to true
-when set to true the equation of time correction is turned on.
-This switch functionality is implemented for easy comparisons with reanalyses.
-
-`milankovitch` is an optional Boolean keyword argument that defaults to true
-when set to true the orbital parameters are calculated for the given DateTime
-when set to false the orbital parameters at the J2000 epoch from CLIMAParameters are used.
-"""
 function instantaneous_zenith_angle(
     date::DateTime,
     epoch_string,
@@ -143,6 +121,26 @@ function instantaneous_zenith_angle(
     return θ, ζ, d
 end
 
+"""
+    instantaneous_zenith_angle(date::DateTime,
+                               od::OrbitalData,
+                               longitude::FT,
+                               latitude::FT,
+                               param_set::IP.AIP;
+                               eot_correction::Bool=true,
+                               ) where {FT}
+
+Returns the zenith angle and earth-sun distance
+at a particular longitude and latitude on the given date (and time UTC)
+given orbital parameters: obliquity, longitude of perihelion, and eccentricity
+param_set is an AbstractParameterSet from CLIMAParameters.jl.
+
+`eot_correction` is an optional Boolean keyword argument that defaults to true
+when set to true the equation of time correction is turned on.
+This switch functionality is implemented for easy comparisons with reanalyses.
+
+Orbital parameters are computed using the `Milankovitch` method.
+"""
 function instantaneous_zenith_angle(
     date::DateTime,
     od::OrbitalData,
@@ -166,6 +164,25 @@ function instantaneous_zenith_angle(
     )
 end
 
+"""
+    instantaneous_zenith_angle(date::DateTime,
+                               longitude::FT,
+                               latitude::FT,
+                               param_set::IP.AIP;
+                               eot_correction::Bool=true,
+                               ) where {FT}
+
+Returns the zenith angle and earth-sun distance
+at a particular longitude and latitude on the given date (and time UTC)
+given orbital parameters: obliquity, longitude of perihelion, and eccentricity
+param_set is an AbstractParameterSet from CLIMAParameters.jl.
+
+`eot_correction` is an optional Boolean keyword argument that defaults to true
+when set to true the equation of time correction is turned on.
+This switch functionality is implemented for easy comparisons with reanalyses.
+
+Orbital parameters at the J2000 epoch from CLIMAParameters are used.
+"""
 function instantaneous_zenith_angle(
     date::DateTime,
     longitude::FT,
