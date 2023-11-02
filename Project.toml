@@ -10,8 +10,8 @@ DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 
 [compat]
-Artifacts = "<2.0"
-Dates = "<2.0"
-DelimitedFiles = "<2.0"
+Artifacts = "<0.0.1, 1"
+Dates = "<0.0.1, 1"
+DelimitedFiles = "<0.0.1, 1"
 Interpolations = "0.13, 0.14"
 julia = "1.7, 1.8, 1.9"
