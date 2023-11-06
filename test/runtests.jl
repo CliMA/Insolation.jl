@@ -15,6 +15,9 @@ FT = Float32
 include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
 param_set = create_insolation_parameters(FT)
 
+epoch_string = "2000-01-01T11:58:56.816"
+date0 = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+
 @testset "Orbital Params" begin
     include("test_orbit_param.jl")
 end
