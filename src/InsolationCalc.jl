@@ -22,6 +22,7 @@ end
 
 """
     solar_flux_and_cos_sza(date::DateTime,
+                      date0::DateTime,
                       od::OrbitalData,
                       longitude::FT,
                       latitude::FT,
@@ -34,6 +35,7 @@ param_set is an AbstractParameterSet from CLIMAParameters.jl.
 """
 function solar_flux_and_cos_sza(
     date::DateTime,
+    date0::DateTime,
     od::OrbitalData,
     longitude::FT,
     latitude::FT,
@@ -41,9 +43,18 @@ function solar_flux_and_cos_sza(
 ) where {FT <: Real}
     S0::FT = IP.tot_solar_irrad(param_set)
     d0::FT = IP.orbit_semimaj(param_set)
+    args = (
+        Insolation.helper_instantaneous_zenith_angle(
+            date,
+            date0,
+            od,
+            param_set,
+        )...,
+        longitude,
+        latitude,
+    )
     # θ = solar zenith angle, ζ = solar azimuth angle, d = earth-sun distance
-    θ, ζ, d =
-        instantaneous_zenith_angle(date, od, longitude, latitude, param_set)
+    θ, ζ, d = instantaneous_zenith_angle(args...)
     # set max. zenith angle to π/2, insolation should not be negative
     if θ > FT(π) / 2
         θ = FT(π) / 2

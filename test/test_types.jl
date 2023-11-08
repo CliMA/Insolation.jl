@@ -3,14 +3,17 @@ lon, lat = [FT(80.0), FT(20.0)]
 
 od = Insolation.OrbitalData()
 
-sza, azi, d = instantaneous_zenith_angle(
-    date,
+args = (
+    Insolation.helper_instantaneous_zenith_angle(
+        date,
+        date0,
+        param_set,
+        eot_correction = false,
+    )...,
     lon,
     lat,
-    param_set,
-    eot_correction = false,
 )
-
+sza, azi, d = instantaneous_zenith_angle(args...)
 
 F = insolation(sza, d, param_set)
 @test typeof(sza) == FT
@@ -18,14 +21,18 @@ F = insolation(sza, d, param_set)
 @test typeof(d) == FT
 @test typeof(F) == FT
 
-sza, azi, d = instantaneous_zenith_angle(
-    date,
-    od,
+args = (
+    Insolation.helper_instantaneous_zenith_angle(
+        date,
+        date0,
+        od,
+        param_set,
+        eot_correction = false,
+    )...,
     lon,
     lat,
-    param_set,
-    eot_correction = false,
 )
+sza, azi, d = instantaneous_zenith_angle(args...)
 
 F = insolation(sza, d, param_set)
 @test typeof(sza) == FT
@@ -33,8 +40,17 @@ F = insolation(sza, d, param_set)
 @test typeof(d) == FT
 @test typeof(F) == FT
 
-sza, azi, d =
-    instantaneous_zenith_angle(date, lon, lat, param_set, eot_correction = true)
+args = (
+    Insolation.helper_instantaneous_zenith_angle(
+        date,
+        date0,
+        param_set,
+        eot_correction = true,
+    )...,
+    lon,
+    lat,
+)
+sza, azi, d = instantaneous_zenith_angle(args...)
 
 F = insolation(sza, d, param_set)
 @test typeof(sza) == FT
@@ -42,15 +58,18 @@ F = insolation(sza, d, param_set)
 @test typeof(d) == FT
 @test typeof(F) == FT
 
-sza, azi, d = instantaneous_zenith_angle(
-    date,
-    od,
+args = (
+    Insolation.helper_instantaneous_zenith_angle(
+        date,
+        date0,
+        od,
+        param_set,
+        eot_correction = true,
+    )...,
     lon,
     lat,
-    param_set,
-    eot_correction = true,
 )
-
+sza, azi, d = instantaneous_zenith_angle(args...)
 
 F = insolation(sza, d, param_set)
 @test typeof(sza) == FT
