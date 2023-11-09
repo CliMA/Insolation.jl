@@ -22,12 +22,14 @@ function calc_day_lat_insolation(
     d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
     l_arr = collect(range(-90, stop = 90, length = n_lats))
     F_arr = zeros(n_days, n_lats)
+    date0 = DateTime("2000-01-01T11:58:56.816")
     # loop over days
     for (i, d) in enumerate(d_arr)
         for (j, lat) in enumerate(l_arr)
             date = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
             θ, dist = daily_zenith_angle(
                 date,
+                date0,
                 od,
                 lat,
                 param_set,

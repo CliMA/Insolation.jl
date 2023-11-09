@@ -10,10 +10,14 @@ using Optim
 
 import CLIMAParameters as CP
 import Insolation.Parameters as IP
+const AIP = IP.AbstractInsolationParams
+import Insolation.OrbitalData
 FT = Float32
 
 include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
 param_set = create_insolation_parameters(FT)
+
+date0 = DateTime("2000-01-01T11:58:56.816")
 
 @testset "Orbital Params" begin
     include("test_orbit_param.jl")

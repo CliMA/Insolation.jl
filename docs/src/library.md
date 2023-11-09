@@ -16,7 +16,7 @@ Insolation.OrbitalData
 ## Zenith Angle
 ```@autodocs
 Modules = [Insolation]
-Private = false
+Private = true
 Pages   = ["ZenithAngleCalc.jl"]
 ```
 
