@@ -12,7 +12,7 @@ export orbital_params
 """
     OrbitalData
 
-The parameters vary due to Milankovitch cycles. 
+The parameters vary due to Milankovitch cycles.
 
 Orbital parameters from the Laskar 2004 paper are
 lazily downloaded from Caltech Box to the
@@ -31,11 +31,11 @@ function OrbitalData()
     x, _ = readdlm(datapath, ',', Float64, header = true)
     t_range = (x[1, 1] * 1e3):1e3:(x[end, 1] * 1e3) # array of every 1 kyr to range of years
     e_spline_etp =
-        CubicSplineInterpolation(t_range, x[:, 2], extrapolation_bc = NaN)
+        cubic_spline_interpolation(t_range, x[:, 2], extrapolation_bc = NaN)
     γ_spline_etp =
-        CubicSplineInterpolation(t_range, x[:, 3], extrapolation_bc = NaN)
+        cubic_spline_interpolation(t_range, x[:, 3], extrapolation_bc = NaN)
     ϖ_spline_etp =
-        CubicSplineInterpolation(t_range, x[:, 4], extrapolation_bc = NaN)
+        cubic_spline_interpolation(t_range, x[:, 4], extrapolation_bc = NaN)
 
     E = typeof(e_spline_etp)
     G = typeof(γ_spline_etp)
