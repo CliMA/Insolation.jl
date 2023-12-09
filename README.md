@@ -1,6 +1,6 @@
 # Insolation.jl
 
-Julia code to calculate solar zenith angle and solar insolation. Defaults to Earth, applicable for any planet. Built for climate science applications and use in RRTMGP.jl.
+Julia code to calculate solar zenith angle and solar insolation. Defaults to Earth, applicable for any planet. Built for climate science applications and use in [RRTMGP.jl](https://github.com/CliMA/RRTMGP.jl).
 
 |||
 |---------------------:|:----------------------------------------------|
@@ -8,7 +8,6 @@ Julia code to calculate solar zenith angle and solar insolation. Defaults to Ear
 | **Documentation**    | [![dev][docs-dev-img]][docs-dev-url]          |
 | **Code Coverage**    | [![codecov][codecov-img]][codecov-url]        |
 | **GHA CI**           | [![gha ci][gha-ci-img]][gha-ci-url]           |
-| **Bors**             | [![Bors enabled][bors-img]][bors-url]         |
 
 [docs-bld-img]: https://github.com/CliMA/Insolation.jl/workflows/Documentation/badge.svg
 [docs-bld-url]: https://github.com/CliMA/Insolation.jl/actions?query=workflow%3ADocumentation
@@ -21,6 +20,3 @@ Julia code to calculate solar zenith angle and solar insolation. Defaults to Ear
 
 [gha-ci-img]: https://github.com/CliMA/Insolation.jl/workflows/ci/badge.svg
 [gha-ci-url]: https://github.com/CliMA/Insolation.jl/actions?query=workflow%3Aci
-
-[bors-img]: https://bors.tech/images/badge_small.svg
-[bors-url]: https://app.bors.tech/repositories/27166
