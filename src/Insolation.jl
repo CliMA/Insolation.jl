@@ -27,7 +27,7 @@ struct OrbitalData{E, G, O}
 end
 
 function OrbitalData()
-    datapath = joinpath(artifact"orb_params_dataset", "INSOL.LA2004.BTL.csv")
+    datapath = joinpath(artifact"laskar2004", "INSOL.LA2004.BTL.csv")
     x, _ = readdlm(datapath, ',', Float64, header = true)
     t_range = (x[1, 1] * 1e3):1e3:(x[end, 1] * 1e3) # array of every 1 kyr to range of years
     e_spline_etp =
