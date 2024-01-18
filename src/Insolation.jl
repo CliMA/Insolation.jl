@@ -64,4 +64,9 @@ end
 include("ZenithAngleCalc.jl")
 include("InsolationCalc.jl")
 
+# For backwards compatibility with package extensions
+if !isdefined(Base, :get_extension)
+    include(joinpath("..", "ext", "CreateParametersExt.jl"))
+end
+
 end # module

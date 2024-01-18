@@ -1,21 +1,19 @@
 using Test
 
 push!(LOAD_PATH, joinpath(@__DIR__, ".."))
-using Insolation
 
 using Dates
 using Statistics
 using Roots
 using Optim
 
-import CLIMAParameters as CP
+using Insolation
 import Insolation.Parameters as IP
-const AIP = IP.AbstractInsolationParams
 import Insolation.OrbitalData
-FT = Float32
+import CLIMAParameters as CP
 
-include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
-param_set = create_insolation_parameters(FT)
+FT = Float32
+param_set = IP.InsolationParameters(FT)
 
 date0 = DateTime("2000-01-01T11:58:56.816")
 
@@ -37,7 +35,7 @@ end
 end
 
 FT = Float64
-param_set = create_insolation_parameters(FT)
+param_set = IP.InsolationParameters(FT)
 
 @testset "Orbital Params" begin
     include("test_orbit_param.jl")

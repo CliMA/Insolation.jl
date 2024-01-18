@@ -1,14 +1,14 @@
-using Insolation
 using Plots
 using Dates
 using Statistics
 using Formatting
 
+using Insolation
+import Insolation.Parameters as IP
 import CLIMAParameters as CP
 
 FT = Float64
-include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
-param_set = create_insolation_parameters(FT)
+param_set = IP.InsolationParameters(FT)
 
 function diurnal_cycle(lat, lon, date, od, timezone, filename)
     nhours = 1000
