@@ -1,15 +1,19 @@
 using Downloads, Pkg.Artifacts
 using Printf
 
-insoln_file = Downloads.download("http://vo.imcce.fr/insola/earth/online/earth/La2004/INSOLN.LA2004.BTL.ASC")
-insolp_file = Downloads.download("http://vo.imcce.fr/insola/earth/online/earth/La2004/INSOLP.LA2004.BTL.ASC")
+insoln_file = Downloads.download(
+    "http://vo.imcce.fr/insola/earth/online/earth/La2004/INSOLN.LA2004.BTL.ASC",
+)
+insolp_file = Downloads.download(
+    "http://vo.imcce.fr/insola/earth/online/earth/La2004/INSOLP.LA2004.BTL.ASC",
+)
 
 artifact_tree_sha1 = create_artifact() do dir
 
     insoln_lines = reverse(readlines(insoln_file)) # stored in reverse order
     insolp_lines = readlines(insolp_file)[2:end]   # 0 is duplicated in both files 
 
-    open(joinpath(dir, "INSOL.LA2004.BTL.csv"); write=true) do f
+    open(joinpath(dir, "INSOL.LA2004.BTL.csv"); write = true) do f
         println(f, "# t (kyr from J2000), ecc, obliq (rad), varpi (rad)")
         varpi_offset = Float64(pi)
         varpi_rad_prev = 1.0 + varpi_offset
@@ -28,8 +32,15 @@ artifact_tree_sha1 = create_artifact() do dir
             end
             varpi_rad += varpi_offset
             varpi_rad_prev = varpi_rad
-            @printf(f, "%.3f,%.16e,%.16e,%.16e\n", kyr, ecc, obliq_rad, varpi_rad)
-        end    
+            @printf(
+                f,
+                "%.3f,%.16e,%.16e,%.16e\n",
+                kyr,
+                ecc,
+                obliq_rad,
+                varpi_rad
+            )
+        end
     end
 
     # add README

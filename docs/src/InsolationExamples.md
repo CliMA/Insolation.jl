@@ -27,10 +27,10 @@ diurnal_cycle(lat, lon, date, od, timezone, "Finland_June.png")
 ```@example
 import Insolation
 import Insolation.Parameters as IP
+import CLIMAParameters as CP
 
 FT = Float64
-include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
-param_set = create_insolation_parameters(FT)
+param_set = IP.InsolationParameters(FT)
 
 include("plot_insolation.jl")
 
@@ -49,10 +49,10 @@ plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
 ```@example
 import Insolation
 import Insolation.Parameters as IP
+import CLIMAParameters as CP
 
 FT = Float64
-include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
-param_set = create_insolation_parameters(FT)
+param_set = IP.InsolationParameters(FT)
 
 include("plot_insolation.jl") # hide
 γ0 = IP.obliq_epoch(param_set) # hide
@@ -62,7 +62,7 @@ od = Insolation.OrbitalData()
 days, lats, F0 = calc_day_lat_insolation(od, 365, 180, param_set) # hide
 
 # decrease γ to 20.0°
-param_set = create_insolation_parameters(FT, (;obliq_epoch = deg2rad(20.0)))
+param_set = IP.InsolationParameters(FT, (; obliq_epoch = deg2rad(20.0)))
 γ1 = IP.obliq_epoch(param_set)
 days, lats, F2 = calc_day_lat_insolation(od, 365, 180, param_set)
 
@@ -78,10 +78,10 @@ plot_day_lat_insolation(days, lats, F2-F0, "PRGn", title, "insol_example2b.png")
 ```@example
 import Insolation
 import Insolation.Parameters as IP
+import CLIMAParameters as CP
 
 FT = Float64
-include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
-param_set = create_insolation_parameters(FT)
+param_set = IP.InsolationParameters(FT)
 
 include("plot_insolation.jl") # hide
 γ0 = IP.obliq_epoch(param_set) # hide
@@ -91,7 +91,7 @@ od = Insolation.OrbitalData()
 days, lats, F0 = calc_day_lat_insolation(od, 365, 180, param_set) # hide
 
 # now change obliquity to 97.86°
-param_set = create_insolation_parameters(FT, (;obliq_epoch = deg2rad(97.86)))
+param_set = IP.InsolationParameters(FT, (;obliq_epoch = deg2rad(97.86)))
 γ4 = IP.obliq_epoch(param_set)
 days, lats, F5 = calc_day_lat_insolation(od, 365, 180, param_set)
 

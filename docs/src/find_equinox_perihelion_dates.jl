@@ -1,12 +1,12 @@
-using Insolation
 using Plots
 using Dates
 
+using Insolation
+import Insolation.Parameters as IP
 import CLIMAParameters as CP
 
 FT = Float64
-include(joinpath(pkgdir(Insolation), "parameters", "create_parameters.jl"))
-param_set = create_insolation_parameters(FT)
+param_set = IP.InsolationParameters(FT)
 
 date0 = DateTime("2000-01-01T11:58:56.816")
 

@@ -85,7 +85,7 @@ global_mean_insol = sum(zonal_mean_insol * area_fac) / sum(area_fac)
 
 ## Test invariance of zonal-mean insolation under rotation of ϖ
 ϖ0 = IP.lon_perihelion_epoch(param_set)
-param_set = create_insolation_parameters(FT, (; lon_perihelion_epoch = ϖ0 + π))
+param_set = IP.InsolationParameters(FT, (; lon_perihelion_epoch = ϖ0 + π))
 
 for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
@@ -98,4 +98,4 @@ end
 zonal_mean_insol_rotate = mean(F_arr, dims = 1)
 @test zonal_mean_insol_rotate ≈ zonal_mean_insol rtol = rtol
 
-param_set = create_insolation_parameters(FT, (; lon_perihelion_epoch = ϖ0))
+param_set = IP.InsolationParameters(FT, (; lon_perihelion_epoch = ϖ0))
