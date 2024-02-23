@@ -27,7 +27,7 @@ diurnal_cycle(lat, lon, date, od, timezone, "Finland_June.png")
 ```@example
 import Insolation
 import Insolation.Parameters as IP
-import CLIMAParameters as CP
+import ClimaParams as CP
 
 FT = Float64
 param_set = IP.InsolationParameters(FT)
@@ -49,7 +49,7 @@ plot_day_lat_insolation(days, lats, F0, "YlOrRd", title, "insol_example1.png")
 ```@example
 import Insolation
 import Insolation.Parameters as IP
-import CLIMAParameters as CP
+import ClimaParams as CP
 
 FT = Float64
 param_set = IP.InsolationParameters(FT)
@@ -78,7 +78,7 @@ plot_day_lat_insolation(days, lats, F2-F0, "PRGn", title, "insol_example2b.png")
 ```@example
 import Insolation
 import Insolation.Parameters as IP
-import CLIMAParameters as CP
+import ClimaParams as CP
 
 FT = Float64
 param_set = IP.InsolationParameters(FT)

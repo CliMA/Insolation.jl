@@ -10,7 +10,7 @@ using Optim
 using Insolation
 import Insolation.Parameters as IP
 import Insolation.OrbitalData
-import CLIMAParameters as CP
+import ClimaParams as CP
 
 FT = Float32
 param_set = IP.InsolationParameters(FT)

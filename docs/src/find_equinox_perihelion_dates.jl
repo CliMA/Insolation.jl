@@ -3,7 +3,7 @@ using Dates
 
 using Insolation
 import Insolation.Parameters as IP
-import CLIMAParameters as CP
+import ClimaParams as CP
 
 FT = Float64
 param_set = IP.InsolationParameters(FT)
