@@ -4,7 +4,7 @@ using Dates
 using Statistics
 using Formatting
 
-import CLIMAParameters as CP
+import ClimaParams as CP
 import Insolation.Parameters as IP
 
 """

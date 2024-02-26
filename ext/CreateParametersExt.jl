@@ -2,7 +2,7 @@ module CreateParametersExt
 
 import Insolation.Parameters.InsolationParameters
 
-import CLIMAParameters as CP
+import ClimaParams as CP
 
 InsolationParameters(
     ::Type{FT},
