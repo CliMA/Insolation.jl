@@ -1,7 +1,7 @@
 module Insolation
 
+using ClimaComms
 using Dates, DelimitedFiles, Interpolations
-using Artifacts
 
 include("Parameters.jl")
 import .Parameters as IP
@@ -15,7 +15,7 @@ export orbital_params
 The parameters vary due to Milankovitch cycles.
 
 Orbital parameters from the Laskar 2004 paper are
-lazily downloaded from Caltech Box to the
+lazily downloaded from Caltech Data Archive to the
 `orbital_parameters_dataset_path(artifact_dir)` path
 where `artifact_dir` is the path and filename to save
 the artifacts toml file.
@@ -27,7 +27,7 @@ struct OrbitalData{E, G, O}
 end
 
 function OrbitalData()
-    datapath = joinpath(artifact"laskar2004", "INSOL.LA2004.BTL.csv")
+    datapath = joinpath(@clima_artifact("laskar2004"), "INSOL.LA2004.BTL.csv")
     x, _ = readdlm(datapath, ',', Float64, header = true)
     t_range = (x[1, 1] * 1e3):1e3:(x[end, 1] * 1e3) # array of every 1 kyr to range of years
     e_spline_etp =
