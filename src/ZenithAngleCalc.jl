@@ -122,7 +122,10 @@ function instantaneous_zenith_angle(
     η = mod(η_UTC + λ, FT(2π))
 
     # zenith angle, radians
-    θ = mod(acos(cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ)), FT(2π))
+    θ = mod(
+        acos(max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ)))), 
+        FT(2π),
+    )
 
     # solar azimuth angle, ζ = 0 when due E and increasing CCW
     # ζ = 3π/2 (due S) when η=0 at local solar noon
