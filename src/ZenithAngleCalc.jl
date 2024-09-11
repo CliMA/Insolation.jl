@@ -123,7 +123,9 @@ function instantaneous_zenith_angle(
 
     # zenith angle, radians
     θ = mod(
-        acos(max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ)))), 
+        acos(
+            max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ))),
+        ),
         FT(2π),
     )
 
