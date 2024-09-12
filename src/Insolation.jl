@@ -28,14 +28,16 @@ end
 
 function OrbitalData()
     datapath = joinpath(artifact"laskar2004", "INSOL.LA2004.BTL.csv")
-    x, _ = readdlm(datapath, ',', Float64, header = true)
-    t_range = (x[1, 1] * 1e3):1e3:(x[end, 1] * 1e3) # array of every 1 kyr to range of years
+    # We add type annotations here to fix some inference failures.
+    Tx = Tuple{Matrix{Float64}, Matrix{AbstractString}}
+    x, _ = readdlm(datapath, ',', Float64, header = true)::Tx
+    t_range = ((x[1, 1] * 1000):1000:(x[end, 1] * 1000)) # array of every 1 kyr to range of years
     e_spline_etp =
-        cubic_spline_interpolation(t_range, x[:, 2], extrapolation_bc = NaN)
+        cubic_spline_interpolation(t_range, x[:, 2]; extrapolation_bc = NaN)
     γ_spline_etp =
-        cubic_spline_interpolation(t_range, x[:, 3], extrapolation_bc = NaN)
+        cubic_spline_interpolation(t_range, x[:, 3]; extrapolation_bc = NaN)
     ϖ_spline_etp =
-        cubic_spline_interpolation(t_range, x[:, 4], extrapolation_bc = NaN)
+        cubic_spline_interpolation(t_range, x[:, 4]; extrapolation_bc = NaN)
 
     E = typeof(e_spline_etp)
     G = typeof(γ_spline_etp)
