@@ -9,7 +9,7 @@ end
 # Earth-Sun distance
 function edist(x, year, od)
     date = xtojandate(x, year)
-    _, dist = daily_zenith_angle(date, date0, od, FT(0), param_set)
+    _, dist = daily_zenith_angle(date, od, FT(0), param_set)
     return dist / IP.orbit_semimaj(param_set)
 end
 

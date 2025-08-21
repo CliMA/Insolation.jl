@@ -1,8 +1,8 @@
 # Difference in NH and SH zenith angles at time x in given year
 function zdiff(x, year, od)
     date = xtomarchdate(x, year)
-    theta_s, dist = daily_zenith_angle(date, date0, od, FT(-45), param_set)
-    theta_n, dist = daily_zenith_angle(date, date0, od, FT(45), param_set)
+    theta_s, dist = daily_zenith_angle(date, od, FT(-45), param_set)
+    theta_n, dist = daily_zenith_angle(date, od, FT(45), param_set)
     return theta_n - theta_s
 end
 

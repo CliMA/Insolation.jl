@@ -22,7 +22,6 @@ end
 
 """
     solar_flux_and_cos_sza(date::DateTime,
-                      date0::DateTime,
                       od::OrbitalData,
                       longitude::FT,
                       latitude::FT,
@@ -35,7 +34,6 @@ param_set is an AbstractParameterSet from ClimaParams.jl.
 """
 function solar_flux_and_cos_sza(
     date::DateTime,
-    date0::DateTime,
     od::OrbitalData,
     longitude::FT,
     latitude::FT,
@@ -44,12 +42,7 @@ function solar_flux_and_cos_sza(
     S0::FT = IP.tot_solar_irrad(param_set)
     d0::FT = IP.orbit_semimaj(param_set)
     args = (
-        Insolation.helper_instantaneous_zenith_angle(
-            date,
-            date0,
-            od,
-            param_set,
-        )...,
+        Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
         longitude,
         latitude,
     )

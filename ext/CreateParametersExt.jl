@@ -22,14 +22,14 @@ function InsolationParameters(
         :orbit_eccentricity_at_epoch => :eccentricity_epoch,
         :total_solar_irradiance => :tot_solar_irrad,
         :orbit_obliquity_at_epoch => :obliq_epoch,
-        :mean_anomalistic_at_epoch => :mean_anom_epoch,
+        :mean_anomaly_at_epoch => :mean_anom_epoch,
         :longitude_perihelion_at_epoch => :lon_perihelion_epoch,
     )
 
     parameters = CP.get_parameter_values(toml_dict, name_map, "Insolation")
     parameters = merge(parameters, overrides)
     FT = CP.float_type(toml_dict)
-    return InsolationParameters{FT}(; parameters...)
+    return InsolationParameters{FT, String}(; parameters...)
 end
 
 end

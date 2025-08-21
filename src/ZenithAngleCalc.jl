@@ -30,17 +30,18 @@ compute_orbital_parameters(param_set) = (
 function get_Δt_years(
     param_set::IP.InsolationParameters{FT},
     date::DateTime,
-    date0::DateTime,
+    time_of_epoch::DateTime,
 ) where {FT}
     (; year_anom, day) = param_set
     days_per_year = year_anom / day
-    return FT(datetime2julian(date) - datetime2julian(date0)) / days_per_year
+    return FT(datetime2julian(date) - datetime2julian(time_of_epoch)) /
+           days_per_year
 end
 
 """
     distance_declination_hourangle(
         date::DateTime,
-        date0::DateTime,
+        time_of_epoch::DateTime,
         (ϖ, γ, e)::Tuple{FT, FT, FT},
         param_set::IP.AIP,
         eot_correction::Bool,
@@ -54,7 +55,7 @@ and `eot_correction`.
 """
 function distance_declination_hourangle(
     date::DateTime,
-    date0::DateTime,
+    time_of_epoch::DateTime,
     (ϖ, γ, e)::Tuple{FT, FT, FT},
     param_set::IP.AIP,
     eot_correction::Bool,
@@ -66,7 +67,8 @@ function distance_declination_hourangle(
 
     days_per_year = Ya / day_length
     Δt_years =
-        FT(datetime2julian(date) - datetime2julian(date0)) / days_per_year
+        FT(datetime2julian(date) - datetime2julian(time_of_epoch)) /
+        days_per_year
 
     # mean anomaly given mean anomaly at epoch
     MA = mod(FT(2π) * (Δt_years) + M0, FT(2π))
@@ -141,38 +143,41 @@ end
 
 function helper_instantaneous_zenith_angle(
     date::DateTime,
-    date0::DateTime,
     od::OrbitalData,
     param_set::AIP;
     eot_correction = true,
 )
-    Δt_years = get_Δt_years(param_set, date, date0)
+    epoch_string = IP.epoch(param_set)
+    time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+    Δt_years = get_Δt_years(param_set, date, time_of_epoch)
     return distance_declination_hourangle(
         date,
-        date0,
+        time_of_epoch,
         Insolation.compute_orbital_parameters(od, Δt_years),
         param_set,
         eot_correction,
     )
 end
 
-helper_instantaneous_zenith_angle(
+function helper_instantaneous_zenith_angle(
     date::DateTime,
-    date0::DateTime,
     param_set::AIP;
     eot_correction = true,
-) = distance_declination_hourangle(
-    date,
-    date0,
-    Insolation.compute_orbital_parameters(param_set),
-    param_set,
-    eot_correction,
 )
+    epoch_string = IP.epoch(param_set)
+    time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+    return distance_declination_hourangle(
+        date,
+        time_of_epoch,
+        Insolation.compute_orbital_parameters(param_set),
+        param_set,
+        eot_correction,
+    )
+end
 
 
 """
     daily_zenith_angle(date::DateTime,
-                       data0::DateTime,
                        od::OrbitalData,
                        latitude::FT,
                        param_set::IP.AIP;
@@ -194,16 +199,17 @@ when set to false the orbital parameters at the J2000 epoch from ClimaParams are
 """
 function daily_zenith_angle(
     date::DateTime,
-    date0::DateTime,
     od::OrbitalData,
     latitude::FT,
     param_set::IP.AIP;
     eot_correction::Bool = true,
     milankovitch::Bool = true,
 ) where {FT}
+    epoch_string = IP.epoch(param_set)
+    time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
     ϕ = deg2rad(latitude)
 
-    Δt_years = get_Δt_years(param_set, date, date0)
+    Δt_years = get_Δt_years(param_set, date, time_of_epoch)
 
     # calculate orbital parameters or take values at J2000
     (ϖ, γ, e) =
@@ -212,7 +218,7 @@ function daily_zenith_angle(
 
     d, δ, _ = distance_declination_hourangle(
         date,
-        date0,
+        time_of_epoch,
         (ϖ, γ, e),
         param_set,
         eot_correction,

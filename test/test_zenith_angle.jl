@@ -5,7 +5,7 @@ od = Insolation.OrbitalData()
 date = Dates.DateTime(2020, 2, 20, 6, 11, 0)
 lon, lat = [FT(0.0), FT(0.0)]
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -15,7 +15,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 # solar noon at equator
 date = Dates.DateTime(2020, 2, 20, 12, 14, 0)
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -25,7 +25,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 # sunset at equator
 date = Dates.DateTime(2020, 2, 20, 18, 17, 0)
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -37,7 +37,6 @@ date = Dates.DateTime(2020, 2, 20, 12, 0, 0)
 args = (
     Insolation.helper_instantaneous_zenith_angle(
         date,
-        date0,
         od,
         param_set,
         eot_correction = false,
@@ -53,7 +52,6 @@ date = Dates.DateTime(2020, 2, 20, 18, 0, 0)
 args = (
     Insolation.helper_instantaneous_zenith_angle(
         date,
-        date0,
         od,
         param_set,
         eot_correction = false,
@@ -69,7 +67,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 date = Dates.DateTime(2020, 12, 20, 11, 0, 0)
 lon, lat = [FT(0.0), FT(80.0)]
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -79,7 +77,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -90,7 +88,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 date = Dates.DateTime(2020, 6, 20, 11, 0, 0)
 lon, lat = [FT(0.0), FT(-80.0)]
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -100,7 +98,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 # polar night SH 2
 date = Dates.DateTime(2020, 6, 20, 23, 0, 0)
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -110,7 +108,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 ## Test Distance
 date = Dates.DateTime(2000, 3, 22, 0, 0, 0)
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
