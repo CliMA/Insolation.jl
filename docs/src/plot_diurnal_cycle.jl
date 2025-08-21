@@ -15,13 +15,12 @@ function diurnal_cycle(lat, lon, date, od, timezone, filename)
     hours = collect(range(0, stop = 24, length = nhours))
     insol = zeros(nhours)
     sza = zeros(nhours)
-    date0 = DateTime("2000-01-01T11:58:56.816")
 
     for (i, hr) in enumerate(hours)
         h = Int(round(hr + timezone))
         m = Int(round((hr + timezone - h) * 60))
         datetime = date + Dates.Hour(h) + Dates.Minute(m)
-        S, mu = solar_flux_and_cos_sza(datetime, date0, od, lon, lat, param_set)
+        S, mu = solar_flux_and_cos_sza(datetime, od, lon, lat, param_set)
         insol[i] = S * mu
         sza[i] = rad2deg(acos(mu))
     end

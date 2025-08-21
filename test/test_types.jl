@@ -6,7 +6,6 @@ od = Insolation.OrbitalData()
 args = (
     Insolation.helper_instantaneous_zenith_angle(
         date,
-        date0,
         param_set,
         eot_correction = false,
     )...,
@@ -24,7 +23,6 @@ F = insolation(sza, d, param_set)
 args = (
     Insolation.helper_instantaneous_zenith_angle(
         date,
-        date0,
         od,
         param_set,
         eot_correction = false,
@@ -43,7 +41,6 @@ F = insolation(sza, d, param_set)
 args = (
     Insolation.helper_instantaneous_zenith_angle(
         date,
-        date0,
         param_set,
         eot_correction = true,
     )...,
@@ -61,7 +58,6 @@ F = insolation(sza, d, param_set)
 args = (
     Insolation.helper_instantaneous_zenith_angle(
         date,
-        date0,
         od,
         param_set,
         eot_correction = true,

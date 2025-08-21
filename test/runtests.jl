@@ -15,8 +15,6 @@ import ClimaParams as CP
 FT = Float32
 param_set = IP.InsolationParameters(FT)
 
-date0 = DateTime("2000-01-01T11:58:56.816")
-
 @testset "Orbital Params" begin
     include("test_orbit_param.jl")
 end

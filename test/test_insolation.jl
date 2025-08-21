@@ -8,7 +8,7 @@ od = Insolation.OrbitalData()
 date = Dates.DateTime(2020, 1, 1, 6, 0, 0)
 lon, lat = [FT(0.0), FT(0.0)]
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -16,7 +16,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 F = insolation(sza, d, param_set)
 @test F ≈ 0.0 atol = atol
 
-S, mu = solar_flux_and_cos_sza(date, date0, od, lon, lat, param_set)
+S, mu = solar_flux_and_cos_sza(date, od, lon, lat, param_set)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test mu ≈ 0.0 atol = atol
 
@@ -24,7 +24,7 @@ S, mu = solar_flux_and_cos_sza(date, date0, od, lon, lat, param_set)
 date = Dates.DateTime(2020, 12, 20, 11, 0, 0)
 lon, lat = [FT(0.0), FT(80.0)]
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -32,14 +32,14 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 F = insolation(sza, d, param_set)
 @test F ≈ 0.0 atol = atol
 
-S, mu = solar_flux_and_cos_sza(date, date0, od, lon, lat, param_set)
+S, mu = solar_flux_and_cos_sza(date, od, lon, lat, param_set)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test mu ≈ 0.0 atol = atol
 
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
 args = (
-    Insolation.helper_instantaneous_zenith_angle(date, date0, od, param_set)...,
+    Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
     lon,
     lat,
 )
@@ -47,7 +47,7 @@ sza, azi, d = instantaneous_zenith_angle(args...)
 F = insolation(sza, d, param_set)
 @test F ≈ 0.0 atol = atol
 
-S, mu = solar_flux_and_cos_sza(date, date0, od, lon, lat, param_set)
+S, mu = solar_flux_and_cos_sza(date, od, lon, lat, param_set)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test mu ≈ 0.0 atol = atol
 
@@ -57,7 +57,7 @@ date = Dates.DateTime(2021, 3, 20, 9, 37, 0) # vernal equinox 2021
 l_arr = FT.(collect(range(-90, stop = 90, length = nlats)))
 F_arr = zeros(nlats)
 for (i, lat) in enumerate(l_arr)
-    θ, dist = daily_zenith_angle(date, date0, od, lat, param_set)
+    θ, dist = daily_zenith_angle(date, od, lat, param_set)
     F_arr[i] = insolation(θ, dist, param_set)
 end
 F_NH = sort(F_arr[l_arr .>= 0])
@@ -73,7 +73,7 @@ F_arr = zeros(ndays, nlats)
 for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
         datei = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
-        θ, dist = daily_zenith_angle(datei, date0, od, lat, param_set)
+        θ, dist = daily_zenith_angle(datei, od, lat, param_set)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
 end
@@ -90,7 +90,7 @@ param_set = IP.InsolationParameters(FT, (; lon_perihelion_epoch = ϖ0 + π))
 for (i, d) in enumerate(d_arr)
     for (j, lat) in enumerate(l_arr)
         datei = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
-        θ, dist = daily_zenith_angle(datei, date0, od, lat, param_set)
+        θ, dist = daily_zenith_angle(datei, od, lat, param_set)
         F_arr[i, j] = insolation(θ, dist, param_set)
     end
 end
