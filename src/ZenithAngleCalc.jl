@@ -147,8 +147,7 @@ function helper_instantaneous_zenith_angle(
     param_set::AIP;
     eot_correction = true,
 )
-    epoch_string = IP.epoch(param_set)
-    time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+    time_of_epoch = IP.epoch(param_set)
     Δt_years = get_Δt_years(param_set, date, time_of_epoch)
     return distance_declination_hourangle(
         date,
@@ -164,8 +163,7 @@ function helper_instantaneous_zenith_angle(
     param_set::AIP;
     eot_correction = true,
 )
-    epoch_string = IP.epoch(param_set)
-    time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+    time_of_epoch = IP.epoch(param_set)
     return distance_declination_hourangle(
         date,
         time_of_epoch,
@@ -205,8 +203,7 @@ function daily_zenith_angle(
     eot_correction::Bool = true,
     milankovitch::Bool = true,
 ) where {FT}
-    epoch_string = IP.epoch(param_set)
-    time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+    time_of_epoch = IP.epoch(param_set)
     ϕ = deg2rad(latitude)
 
     Δt_years = get_Δt_years(param_set, date, time_of_epoch)
