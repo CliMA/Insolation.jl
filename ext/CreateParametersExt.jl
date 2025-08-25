@@ -29,7 +29,7 @@ function InsolationParameters(
     parameters = CP.get_parameter_values(toml_dict, name_map, "Insolation")
     parameters = merge(parameters, overrides)
     FT = CP.float_type(toml_dict)
-    return InsolationParameters{FT, String}(; parameters...)
+    return InsolationParameters{FT}(; parameters...)
 end
 
 end
