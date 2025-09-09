@@ -11,9 +11,9 @@ InsolationParameters(
     InsolationParameters(CP.create_toml_dict(FT), overrides)
 
 function InsolationParameters(
-    toml_dict::CP.AbstractTOMLDict,
+    toml_dict::CP.ParamDict{FT},
     overrides = NamedTuple(),
-)
+) where {FT}
     name_map = (;
         :epoch_time => :epoch,
         :day => :day,
@@ -28,7 +28,6 @@ function InsolationParameters(
 
     parameters = CP.get_parameter_values(toml_dict, name_map, "Insolation")
     parameters = merge(parameters, overrides)
-    FT = CP.float_type(toml_dict)
     return InsolationParameters{FT}(; parameters...)
 end
 
