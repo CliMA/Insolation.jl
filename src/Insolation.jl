@@ -35,6 +35,10 @@ export orbital_params,
 A container struct that holds cubic spline interpolators for Earth's
 orbital parameters, based on the Laskar 2004 dataset.
 
+The orbital parameters are lazily downloaded from the 
+`orbital_parameters_dataset_path(artifact_dir)` path where `artifact_dir` is 
+the path and filename to save the artifacts toml file.
+
 The splines are functions of time (in years since J2000 epoch).
 """
 struct OrbitalData{E, G, O}

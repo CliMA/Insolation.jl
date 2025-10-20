@@ -1,6 +1,6 @@
 export instantaneous_zenith_angle, daily_zenith_angle
 
-# true anomaly: angular distance from perihelion (radians), accurate to 
+# true anomaly: angular distance from perihelion [radians], accurate to 
 # O(e^4) where e is the eccentricity (see Fitzpatrick (2012), appendix A.10))
 function true_anomaly(MA::FT, e::FT) where {FT <: Real}
     # Series expansion for true anomaly
@@ -10,7 +10,7 @@ function true_anomaly(MA::FT, e::FT) where {FT <: Real}
     return mod(TA, FT(2π))
 end
 
-# equation of time (radians); this value can be scaled by `day_length / (2π)` 
+# equation of time [radians]; this value can be scaled by `day_length / (2π)` 
 # to get a time correction in seconds.
 function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
     _Δt = -2 * e * sin(MA) + tan(γ / 2)^2 * sin(2 * (MA + ϖ))
@@ -69,16 +69,16 @@ function _compute_distance_and_declination(
     # mean anomaly given mean anomaly at epoch M0
     MA = mod(FT(2π) * (Δt_years) + M0, FT(2π))
 
-    # true anomaly (radians)
+    # true anomaly [radians]
     TA = true_anomaly(MA, e)
 
-    # true longitude (radians)
+    # true longitude [radians]
     TL = mod(TA + ϖ, FT(2π))
 
-    # declination (radians)
+    # declination [radians]
     δ = mod(asin(sin(γ) * sin(TL)), FT(2π))
 
-    # earth-sun distance (m) 
+    # earth-sun distance [m] 
     d = d0 * (1 - e^2) / (1 + e * cos(TA))
 
     return d, δ, MA
