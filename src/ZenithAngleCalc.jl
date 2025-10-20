@@ -1,14 +1,17 @@
 export instantaneous_zenith_angle, daily_zenith_angle
 
-# true anomaly, radians
+# true anomaly: angular distance from perihelion (radians), accurate to 
+# O(e^4) where e is the eccentricity (see Fitzpatrick (2012), appendix A.10))
 function true_anomaly(MA::FT, e::FT) where {FT <: Real}
+    # Series expansion for true anomaly
     TA = MA + (2 * e - FT(1 / 4) * e^3) * sin(MA)
-    +FT(5 / 4) * e^2 * sin(2 * MA)
-    +FT(13 / 12) * e^3 * sin(3 * MA)
+    + FT(5 / 4) * e^2 * sin(2 * MA)
+    + FT(13 / 12) * e^3 * sin(3 * MA)
     return mod(TA, FT(2π))
 end
 
-# equation of time, radians
+# equation of time (radians); this value can be scaled by `day_length / (2π)` 
+# to get a time correction in seconds.
 function equation_of_time(e::FT, MA::FT, γ::FT, ϖ::FT) where {FT <: Real}
     _Δt = -2 * e * sin(MA) + tan(γ / 2)^2 * sin(2 * (MA + ϖ))
     return mod(_Δt + FT(π), FT(2π)) - FT(π)
@@ -39,7 +42,51 @@ function get_Δt_years(
 end
 
 """
+    _compute_distance_and_declination(
+        Δt_years::FT,
+        (ϖ, γ, e)::Tuple{FT, FT, FT},
+        param_set::IP.AIP,
+    ) where {FT}
+
+Internal helper to compute Earth-Sun distance and declination angle.
+This is called by both daily and instantaneous calculations.
+
+Returns tuple `(d, δ, MA)`:
+- `d`: Earth-Sun distance [m]
+- `δ`: Declination angle [radians]
+- `MA`: Mean anomaly [radians] (needed for hour angle)
+"""
+function _compute_distance_and_declination(
+    Δt_years::FT,
+    (ϖ, γ, e)::Tuple{FT, FT, FT},
+    param_set::IP.AIP,
+) where {FT}
+    Ya = IP.year_anom(param_set)
+    day_length = IP.day(param_set)
+    d0 = IP.orbit_semimaj(param_set)
+    M0 = IP.mean_anom_epoch(param_set)
+
+    # mean anomaly given mean anomaly at epoch M0
+    MA = mod(FT(2π) * (Δt_years) + M0, FT(2π))
+
+    # true anomaly (radians)
+    TA = true_anomaly(MA, e)
+
+    # true longitude (radians)
+    TL = mod(TA + ϖ, FT(2π))
+
+    # declination (radians)
+    δ = mod(asin(sin(γ) * sin(TL)), FT(2π))
+
+    # earth-sun distance (m) 
+    d = d0 * (1 - e^2) / (1 + e * cos(TA))
+
+    return d, δ, MA
+end
+
+"""
     distance_declination_hourangle(
+        Δt_years::FT,
         date::DateTime,
         time_of_epoch::DateTime,
         (ϖ, γ, e)::Tuple{FT, FT, FT},
@@ -47,13 +94,13 @@ end
         eot_correction::Bool,
     ) where {FT}
 
-Returns the earth-sun distance (m), declination angle (radians) and hour angle 
-(radians), at 0ᵒ longitude, given the current datetime, epoch datetime, 
-`longitude of the perihelion at epoch`, `obliquity at epoch`, `eccentricity at epoch`, 
-and `eot_correction`.
+Returns the Earth-Sun distance [m], declination angle [radians] and
+hour angle [radians] at 0° longitude.
 
+Used for instantaneous calculations.
 """
 function distance_declination_hourangle(
+    Δt_years::FT,
     date::DateTime,
     time_of_epoch::DateTime,
     (ϖ, γ, e)::Tuple{FT, FT, FT},
@@ -62,32 +109,14 @@ function distance_declination_hourangle(
 ) where {FT}
     Ya = IP.year_anom(param_set)
     day_length = IP.day(param_set)
-    d0 = IP.orbit_semimaj(param_set)
-    M0 = IP.mean_anom_epoch(param_set)
-
     days_per_year = Ya / day_length
-    Δt_years =
-        FT(datetime2julian(date) - datetime2julian(time_of_epoch)) /
-        days_per_year
+    
+    d, δ, MA = _compute_distance_and_declination(Δt_years, (ϖ, γ, e), param_set)
 
-    # mean anomaly given mean anomaly at epoch
-    MA = mod(FT(2π) * (Δt_years) + M0, FT(2π))
-
-    # true anomaly, radians
-    TA = true_anomaly(MA, e)
-
-    # true longitude, radians
-    TL = mod(TA + ϖ, FT(2π))
-
-    # declination, radians
-    δ = mod(asin(sin(γ) * sin(TL)), FT(2π))
-
-    # earth-sun distance
-    d = d0 * (1 - e^2) / (1 + e * cos(TA))
-
-    # hour angle, zero at local solar noon, radians
+    # hour angle, zero at local solar noon [radians]
     if eot_correction
-        Δt = equation_of_time(e, MA, γ, ϖ) / FT(2π) * day_length # radians to seconds
+        # radians to seconds
+        Δt = equation_of_time(e, MA, γ, ϖ) / FT(2π) * day_length
     else
         Δt = FT(0)
     end
@@ -106,10 +135,20 @@ end
         latitude::FT,
     ) where {FT}
 
-Returns the zenith angle (radians), azimuthal angle (radians) and Earth-Sun distance (m)
-at a particular longitude (degrees) and latitude (degrees) given Earth-Sun distance (m), 
-declination angle (radians), and hour angle (radians) at 0ᵒ longitude.
+Returns the zenith angle, azimuthal angle, and Earth-Sun distance
+at a particular longitude and latitude.
 
+# Arguments
+- `d::FT`: Earth-Sun distance [m]
+- `δ::FT`: Declination angle [radians]
+- `η_UTC::FT`: Hour angle at 0° longitude [radians]
+- `longitude::FT`: Longitude [degrees]
+- `latitude::FT`: Latitude [degrees]
+
+# Returns
+- `θ`: Solar zenith angle [radians]
+- `ζ`: Solar azimuth angle [radians], 0 = due East, increasing CCW
+- `d`: Earth-Sun distance [m]
 """
 function instantaneous_zenith_angle(
     d::FT,
@@ -120,10 +159,10 @@ function instantaneous_zenith_angle(
 ) where {FT}
     λ = deg2rad(longitude)
     ϕ = deg2rad(latitude)
-    # hour angle
+    # hour angle at longitude
     η = mod(η_UTC + λ, FT(2π))
 
-    # zenith angle, radians
+    # zenith angle [radians]
     θ = mod(
         acos(
             max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ))),
@@ -138,6 +177,8 @@ function instantaneous_zenith_angle(
         FT(2π),
     )
 
+    # NOTE: d is returned here for API compatibility with InsolationCalc.jl,
+    # even though it was passed in as an argument.
     return θ, ζ, d
 end
 
@@ -149,8 +190,10 @@ function helper_instantaneous_zenith_angle(
 )
     epoch_string = IP.epoch(param_set)
     time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+    
     Δt_years = get_Δt_years(param_set, date, time_of_epoch)
     return distance_declination_hourangle(
+        Δt_years, 
         date,
         time_of_epoch,
         Insolation.compute_orbital_parameters(od, Δt_years),
@@ -166,7 +209,10 @@ function helper_instantaneous_zenith_angle(
 )
     epoch_string = IP.epoch(param_set)
     time_of_epoch = DateTime(epoch_string, dateformat"y-m-dTHH:MM:SS.s")
+
+    Δt_years = get_Δt_years(param_set, date, time_of_epoch)
     return distance_declination_hourangle(
+        Δt_years, 
         date,
         time_of_epoch,
         Insolation.compute_orbital_parameters(param_set),
@@ -175,27 +221,27 @@ function helper_instantaneous_zenith_angle(
     )
 end
 
-
 """
-    daily_zenith_angle(date::DateTime,
-                       od::OrbitalData,
-                       latitude::FT,
-                       param_set::IP.AIP;
-                       eot_correction::Bool=true,
-                       milankovitch::Bool=true) where {FT <: Real}
+    daily_zenith_angle(
+        date::DateTime,
+        od::OrbitalData,
+        latitude::FT,
+        param_set::IP.AIP;
+        eot_correction::Bool = true,
+        milankovitch::Bool = true
+    ) where {FT <: Real}
 
-Returns the effective zenith angle corresponding to the diurnally averaged insolation
-and earth-sun distance at a particular latitude given the date.
+Returns the effective zenith angle corresponding to the diurnally
+averaged insolation, and the Earth-Sun distance.
 
-`param_set` is an AbstractParameterSet from ClimaParams.jl.
-
-`eot_correction` is an optional Boolean keyword argument that defaults to true
-when set to true the equation of time correction is turned on.
-This switch functionality is implemented for easy comparisons with reanalyses.
-
-`milankovitch` is an optional Boolean keyword argument that defaults to true
-when set to true the orbital parameters are calculated for the given DateTime,
-when set to false the orbital parameters at the J2000 epoch from ClimaParams are used.
+# Arguments
+- `date::DateTime`: Current date
+- `od::OrbitalData`: Struct with orbital parameter splines
+- `latitude::FT`: Latitude [degrees]
+- `param_set::IP.AIP`: Parameter struct
+- `eot_correction::Bool`: (default true) Apply Equation of Time correction.
+- `milankovitch::Bool`: (default true) Use Milankovitch cycles. If false,
+                         uses fixed epoch parameters.
 """
 function daily_zenith_angle(
     date::DateTime,
@@ -216,25 +262,21 @@ function daily_zenith_angle(
         milankovitch ? compute_orbital_parameters(od, Δt_years) :
         compute_orbital_parameters(param_set)
 
-    d, δ, _ = distance_declination_hourangle(
-        date,
-        time_of_epoch,
-        (ϖ, γ, e),
-        param_set,
-        eot_correction,
-    )
+    # Get distance and declination
+    d, δ, _ = _compute_distance_and_declination(Δt_years, (ϖ, γ, e), param_set)
 
-    # sunrise/sunset angle
+    # sunrise/sunset hour angle
     T = tan(ϕ) * tan(δ)
     if T >= FT(1)
-        ηd = FT(π)
+        ηd = FT(π) # polar day
     elseif T <= FT(-1)
-        ηd = FT(0)
+        ηd = FT(0) # polar night
     else
         ηd = acos(FT(-1) * T)
     end
 
-    # effective zenith angle to get diurnally averaged insolation (i.e., averaging cosine of zenith angle)
+    # effective zenith angle to get diurnally averaged insolation
+    # (i.e., averaging cosine of zenith angle)
     daily_θ = mod(
         acos(FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd))),
         FT(2π),
