@@ -25,8 +25,8 @@ end
 Returns the top-of-atmosphere (TOA) insolation given the solar zenith
 angle `θ` and Earth-Sun distance `d`.
 
-Implements $F = S \cos(\theta)$. Insolation is set to 0 at night 
-(when $\cos(\theta) < 0$).
+Implements ``F = S \\cos(\\theta)``. Insolation is set to 0 at night 
+(when ``\\cos(\\theta) < 0``).
 
 # Arguments
 - `θ::FT`: Solar zenith angle [radians]

@@ -19,9 +19,9 @@ end
 
 # calculate orbital parameters (Milankovitch)
 compute_orbital_parameters(od, Δt_years::FT) where {FT} = (
-    FT(ϖ_spline(od, Δt_years)),
-    FT(γ_spline(od, Δt_years)),
-    FT(e_spline(od, Δt_years)),
+    FT(od.ϖ_spline(Δt_years)),
+    FT(od.γ_spline(Δt_years)),
+    FT(od.e_spline(Δt_years)),
 )
 
 compute_orbital_parameters(param_set) = (
@@ -227,7 +227,6 @@ end
         od::OrbitalData,
         latitude::FT,
         param_set::IP.AIP;
-        eot_correction::Bool = true,
         milankovitch::Bool = true
     ) where {FT <: Real}
 
@@ -239,7 +238,6 @@ averaged insolation, and the Earth-Sun distance.
 - `od::OrbitalData`: Struct with orbital parameter splines
 - `latitude::FT`: Latitude [degrees]
 - `param_set::IP.AIP`: Parameter struct
-- `eot_correction::Bool`: (default true) Apply Equation of Time correction.
 - `milankovitch::Bool`: (default true) Use Milankovitch cycles. If false,
                          uses fixed epoch parameters.
 """
@@ -248,7 +246,6 @@ function daily_zenith_angle(
     od::OrbitalData,
     latitude::FT,
     param_set::IP.AIP;
-    eot_correction::Bool = true,
     milankovitch::Bool = true,
 ) where {FT}
     epoch_string = IP.epoch(param_set)
