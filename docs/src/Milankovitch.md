@@ -105,7 +105,7 @@ nothing # hide
 
 ### Millennial Timescales (50,000 BCE - 30,000 CE)
 
-On longer timescales, precession causes dramatic shifts in the timing of the vernal equinox within the Gregorian calendar year.
+On longer timescales, precession causes substantial shifts in the timing of the vernal equinox within the Gregorian calendar year.
 
 ```@example equinox_long
 using Insolation
