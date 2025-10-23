@@ -78,5 +78,5 @@ For more detailed examples and API documentation, see the [documentation](https:
 [codecov-img]: https://codecov.io/gh/CliMA/Insolation.jl/branch/main/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/CliMA/Insolation.jl
 
-[downloads-img]: https://img.shields.io/badge/dynamic/json?url=http%3A%2F%2Fjuliapkgstats.com%2Fapi%2Fv1%2Fmonthly_downloads%2FInsolation&query=total_requests&suffix=%2Fmonth&label=Downloads
+[downloads-img]: https://img.shields.io/badge/dynamic/json?url=http%3A%2F%2Fjuliapkgstats.com%2Fapi%2Fv1%2Ftotal_downloads%2FInsolation&query=total_requests&label=Downloads
 [downloads-url]: https://juliapkgstats.com/pkg/Insolation
