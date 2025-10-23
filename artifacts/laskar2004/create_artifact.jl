@@ -15,7 +15,7 @@ artifact_tree_sha1 = create_artifact() do dir
 
     open(joinpath(dir, "INSOL.LA2004.BTL.csv"); write = true) do f
         println(f, "# t (kyr from J2000), ecc, obliq (rad), varpi (rad)")
-        varpi_offset = Float64(pi)
+        varpi_offset = Float64(pi)  # Convert to geocentric longitude of the Sun at perihelion (perihelion relative to vernal equinox)
         varpi_rad_prev = 1.0 + varpi_offset
         for line in vcat(insoln_lines, insolp_lines)
             kyr_s, ecc_s, obliq_rad_s, varpi_rad_s = split(line)

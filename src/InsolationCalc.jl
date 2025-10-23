@@ -1,60 +1,264 @@
-export insolation, solar_flux_and_cos_sza
+export insolation, daily_insolation
+
+"""
+    solar_flux(d::FT, param_set::IP.AIP) where {FT <: Real}
+
+Calculates the solar radiative energy flux at the top of the atmosphere
+(TOA) based on the planet-star distance and the inverse square law.
+
+# Arguments
+- `d::FT`: Planet-star distance [m]
+- `param_set::IP.AIP`: Struct containing `tot_solar_irrad` [W m⁻²] and `orbit_semimaj` [m]
+"""
+function solar_flux(d::FT, param_set::IP.AIP) where {FT <: Real}
+    S0::FT = IP.tot_solar_irrad(param_set)
+    d0::FT = IP.orbit_semimaj(param_set)
+
+    # Solar radiative energy flux 
+    S = S0 * (d0 / d)^2
+    return S
+end
 
 """
     insolation(θ::FT, d::FT, param_set::IP.AIP) where {FT <: Real}
 
-Returns the insolation given the zenith angle and earth-sun distance
-param_set is an AbstractParameterSet from ClimaParams.jl.
+Calculates top-of-atmosphere (TOA) insolation and cosine of solar zenith angle.
+
+Implements ``F = S \\cos(\\theta)`` where S is the solar flux at the given
+planet-star distance. Insolation is set to 0 at night (when ``\\cos(\\theta) < 0``).
+
+# Arguments
+- `θ::FT`: Solar zenith angle [radians]
+- `d::FT`: Planet-star distance [m]
+- `param_set::IP.AIP`: Parameter struct
+
+# Returns
+- `F`: TOA insolation [W m⁻²]
+- `S`: Solar flux at the given planet-star distance [W m⁻²]
+- `μ`: Cosine of solar zenith angle [unitless], clamped to [0, 1]
 """
 function insolation(θ::FT, d::FT, param_set::IP.AIP) where {FT <: Real}
-    S0::FT = IP.tot_solar_irrad(param_set)
-    d0::FT = IP.orbit_semimaj(param_set)
-    # set max. zenith angle to π/2, insolation should not be negative
-    if θ > FT(π) / 2
-        θ = FT(π) / 2
-    end
-    # weighted irradiance (3.12)
-    S = S0 * (d0 / d)^2
-    # TOA insolation (3.15)
-    F = S * cos(θ)
-    return F
+    # Calculate solar radiative energy flux (W m⁻²)
+    S = solar_flux(d, param_set)
+
+    # Cosine of solar zenith angle (set to 0 at night) 
+    μ = max(FT(0), cos(θ))
+
+    # TOA insolation
+    F = S * μ
+
+    return F, S, μ
 end
 
 """
-    solar_flux_and_cos_sza(date::DateTime,
-                      od::OrbitalData,
-                      longitude::FT,
-                      latitude::FT,
-                      param_set::IP.AIP) where {FT <: Real}
+    insolation(
+        date::DateTime,
+        latitude::FT,
+        longitude::FT,
+        param_set::IP.AIP,
+        orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
+        milankovitch::Bool = false,
+        solar_variability::Bool = false,
+        eot_correction::Bool = true,
+    ) where {FT <: Real}
 
-Returns the top-of-atmosphere (TOA) solar flux, i.e. 
-the total solar irradiance (TSI) weighted by the earth-sun distance
-and cos(solar zenith angle) for input to RRTMGP.jl
-param_set is an AbstractParameterSet from ClimaParams.jl.
+Calculates instantaneous TOA insolation with optional long-term variations
+in Earth's orbital parameters (Milankovitch cycles) and solar luminosity.
+
+# Arguments
+- `date::DateTime`: Current date and time
+- `latitude::FT`: Latitude [degrees]
+- `longitude::FT`: Longitude [degrees]
+- `param_set::IP.AIP`: Parameter struct
+- `orbital_data::Union{OrbitalDataSplines, Nothing}`: (default nothing) Orbital parameter splines.
+  **Required** when `milankovitch=true` for GPU compatibility.
+- `milankovitch::Bool`: (default false) Use time-varying orbital parameters (Milankovitch cycles)
+- `solar_variability::Bool`: (default false) Use time-varying solar luminosity
+- `eot_correction::Bool`: (default true) Apply equation of time correction
+
+# Returns
+- `F`: TOA insolation [W m⁻²]
+- `S`: Solar flux [W m⁻²]
+- `μ`: Cosine of solar zenith angle [unitless]
+- `ζ`: Solar azimuth angle [radians], 0 = due East, increasing counterclockwise
+
+# Examples
+```julia
+# Modern climate (fixed epoch parameters)
+F, S, μ, ζ = insolation(date, lat, lon, param_set)
+
+# Paleoclimate with Milankovitch cycles 
+od = OrbitalDataSplines()  # Load once
+F, S, μ, ζ = insolation(date, lat, lon, param_set, od; milankovitch=true)
+
+# Without equation of time correction
+F, S, μ, ζ = insolation(date, lat, lon, param_set; eot_correction=false)
+```
+
+# GPU Usage
+For GPU execution, create orbital data on CPU and transfer to GPU using Adapt.jl:
+```julia
+using CUDA, Adapt
+cpu_od = OrbitalDataSplines()  # Create on CPU
+gpu_od = adapt(CuArray, cpu_od)  # Transfer to GPU
+# In GPU kernel:
+F, S, μ, ζ = insolation(date, lat, lon, param_set, gpu_od; milankovitch=true)
+```
 """
-function solar_flux_and_cos_sza(
+function insolation(
     date::DateTime,
-    od::OrbitalData,
+    latitude::FT,
     longitude::FT,
+    param_set::IP.AIP,
+    orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
+    milankovitch::Bool = false,
+    solar_variability::Bool = false,
+    eot_correction::Bool = true,
+) where {FT <: Real}
+    # Get orbital parameters using helper function
+    orb_params =
+        get_orbital_parameters(date, param_set, orbital_data, milankovitch, FT)
+
+    # Get solar geometry
+    d, θ, ζ = Insolation.solar_geometry(
+        date,
+        latitude,
+        longitude,
+        orb_params,
+        param_set;
+        eot_correction,
+    )
+
+    # Calculate insolation
+    # Note: solar_variability is a placeholder for future solar luminosity variations
+    F, S, μ = insolation(θ, d, param_set)
+
+    return F, S, μ, ζ
+end
+
+"""
+    daily_insolation(
+        date::DateTime,
+        latitude::FT,
+        param_set::IP.AIP,
+        orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
+        milankovitch::Bool = false,
+        solar_variability::Bool = false,
+    ) where {FT <: Real}
+
+Calculates diurnally averaged TOA insolation with optional long-term variations
+in orbital parameters (Milankovitch cycles) and solar luminosity. The insolation is 
+averaged over a full day.
+
+# Arguments
+- `date::DateTime`: Current date
+- `latitude::FT`: Latitude [degrees]
+- `param_set::IP.AIP`: Parameter struct
+- `orbital_data::Union{OrbitalDataSplines, Nothing}`: (default nothing) Orbital parameter splines.
+  **Required** when `milankovitch=true` for GPU compatibility.
+- `milankovitch::Bool`: (default false) Use time-varying orbital parameters (Milankovitch cycles)
+- `solar_variability::Bool`: (default false) Use time-varying solar luminosity (placeholder for future)
+
+# Returns
+- `F`: Daily averaged TOA insolation [W m⁻²]
+- `S`: Solar flux [W m⁻²]
+- `μ`: Daily averaged cosine of solar zenith angle [unitless]
+
+# Examples
+```julia
+# Modern climate (fixed epoch parameters)
+F, S, μ = daily_insolation(date, lat, param_set)
+
+# Paleoclimate with Milankovitch cycles
+od = OrbitalDataSplines()  # Load once 
+F, S, μ = daily_insolation(date, lat, param_set, od; milankovitch=true)
+```
+
+# GPU Usage
+For GPU execution, create orbital data on CPU and transfer to GPU using Adapt.jl:
+```julia
+using CUDA, Adapt
+cpu_od = OrbitalDataSplines()  # Create on CPU
+gpu_od = adapt(CuArray, cpu_od)  # Transfer to GPU
+# In GPU kernel:
+F, S, μ = daily_insolation(date, lat, param_set, gpu_od; milankovitch=true)
+```
+"""
+function daily_insolation(
+    date::DateTime,
     latitude::FT,
     param_set::IP.AIP,
+    orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
+    milankovitch::Bool = false,
+    solar_variability::Bool = false,
 ) where {FT <: Real}
-    S0::FT = IP.tot_solar_irrad(param_set)
-    d0::FT = IP.orbit_semimaj(param_set)
-    args = (
-        Insolation.helper_instantaneous_zenith_angle(date, od, param_set)...,
-        longitude,
+    # Get orbital parameters using helper function
+    orb_params =
+        get_orbital_parameters(date, param_set, orbital_data, milankovitch, FT)
+
+    # Get effective zenith angle and distance for daily averaged insolation
+    daily_θ, d = Insolation.daily_distance_zenith_angle(
+        date,
         latitude,
+        orb_params,
+        param_set,
     )
-    # θ = solar zenith angle, ζ = solar azimuth angle, d = earth-sun distance
-    θ, ζ, d = instantaneous_zenith_angle(args...)
-    # set max. zenith angle to π/2, insolation should not be negative
-    if θ > FT(π) / 2
-        θ = FT(π) / 2
+
+    # Calculate daily averaged insolation
+    # Note: solar_variability is a placeholder for future solar luminosity variations
+    F, S, μ = insolation(daily_θ, d, param_set)
+
+    return F, S, μ
+end
+
+"""
+    get_orbital_parameters(
+        date::DateTime,
+        param_set::IP.AIP,
+        orbital_data::Union{OrbitalDataSplines, Nothing},
+        milankovitch::Bool,
+        ::Type{FT},
+    ) where {FT <: Real}
+
+Helper function to get orbital parameters with optional Milankovitch cycles.
+
+Returns a tuple (ϖ, γ, e) of orbital parameters, selecting between epoch values
+and time-varying Milankovitch values based on the `milankovitch` flag.
+
+# Arguments
+- `date::DateTime`: Current date
+- `param_set::IP.AIP`: Parameter struct
+- `orbital_data::Union{OrbitalDataSplines, Nothing}`: Pre-loaded orbital data
+- `milankovitch::Bool`: Whether to use time-varying parameters
+- `FT::Type`: Floating-point type
+
+# Returns
+- `(ϖ, γ, e)::Tuple{FT, FT, FT}`: Orbital parameters
+"""
+function get_orbital_parameters(
+    date::DateTime,
+    param_set::IP.AIP,
+    orbital_data::Union{OrbitalDataSplines, Nothing},
+    milankovitch::Bool,
+    ::Type{FT},
+) where {FT <: Real}
+    # Compute time-varying parameters if needed
+    if milankovitch
+        # Require pre-loaded orbital data for GPU compatibility
+        if isnothing(orbital_data)
+            error(
+                "Spline interpolator orbital_data must be provided when milankovitch=true for GPU compatibility. " *
+                "Load OrbitalDataSplines: od = OrbitalDataSplines(); " *
+                "Transfer to GPU: gpu_od = adapt(CuArray, od); " *
+                "Then call: insolation(date, lat, lon, param_set, gpu_od; milankovitch=true)",
+            )
+        end
+        Δt_years = Insolation.years_since_epoch(param_set, date)
+        ϖ, γ, e = Insolation.orbital_params(orbital_data, Δt_years)
+    else
+        # Compute epoch parameters 
+        ϖ, γ, e = Insolation.orbital_params(param_set)
     end
-    μ = cos(θ)
-    # TOA solar flux (3.12)
-    S = S0 * (d0 / d)^2
-    # return inputs needed for RRTMGP.jl
-    return S, μ
+
+    return (FT(ϖ), FT(γ), FT(e))
 end

@@ -20,8 +20,10 @@ function diurnal_cycle(lat, lon, date, od, timezone, filename)
         h = Int(round(hr + timezone))
         m = Int(round((hr + timezone - h) * 60))
         datetime = date + Dates.Hour(h) + Dates.Minute(m)
-        S, mu = solar_flux_and_cos_sza(datetime, od, lon, lat, param_set)
-        insol[i] = S * mu
+
+        F, S, mu, _ =
+            insolation(datetime, lat, lon, param_set, od; milankovitch = false)
+        insol[i] = F  # F is already S * mu
         sza[i] = rad2deg(acos(mu))
     end
     plot(
@@ -30,6 +32,7 @@ function diurnal_cycle(lat, lon, date, od, timezone, filename)
         color = :blue,
         lw = 2,
         label = "",
+        xlabel = "Local Time",
         ylabel = "Insolation [W/m2]",
         yguidefontcolor = :blue,
         dpi = 200,
@@ -46,6 +49,5 @@ function diurnal_cycle(lat, lon, date, od, timezone, filename)
         ylabel = "SZA [deg]",
         yguidefontcolor = :red,
     )
-    xlabel!("Local Time")
     savefig(filename)
 end
