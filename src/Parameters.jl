@@ -1,39 +1,52 @@
 module Parameters
 
+"""
+    AbstractInsolationParams
+
+Abstract base type for insolation parameter sets.
+
+All parameter structs used in `Insolation.jl` should inherit from this type.
+The main concrete implementation is `InsolationParameters`.
+
+This type hierarchy allows for flexible parameter management and enables
+package extensions to provide alternative parameter implementations while
+maintaining API compatibility.
+"""
 abstract type AbstractInsolationParams end
 const AIP = AbstractInsolationParams
 
-"""
-    InsolationParameters
+import Dates: DateTime
 
-A struct to hold orbital and solar parameters for insolation calculations.
-These parameters are typically fixed for a specific epoch (e.g., J2000).
-"""
-Base.@kwdef struct InsolationParameters{FT, S <: AbstractString} <: AbstractInsolationParams
+Base.@kwdef struct InsolationParameters{FT} <: AbstractInsolationParams
     # Orbital periods
     "Anomalistic year (perihelion to perihelion) [seconds]"
     year_anom::FT
     "Length of a solar day [seconds]"
     day::FT
-    
+
     # Orbital geometry
-    "Orbit semi-major axis (mean Earth-Sun distance) [m]"
+    "Orbit semi-major axis (mean planet-star distance) [m]"
     orbit_semimaj::FT
     "Eccentricity at epoch [unitless]"
     eccentricity_epoch::FT
     "Obliquity at epoch [radians]"
     obliq_epoch::FT
-    "Heliocentric longitude of perihelion at epoch [radians]"
+    "Longitude of perihelion (geocentric longitude of the Sun at perihelion relative to vernal equinox) at epoch [radians]"
     lon_perihelion_epoch::FT
 
     # Solar and Epoch parameters
     "Total Solar Irradiance at 1 au [W m⁻²]"
     tot_solar_irrad::FT
-     "Reference epoch time string (e.g., \"2000-01-01T11:58:55.8\")"
+    "Reference epoch time [DateTime]"
     epoch::DateTime
     "Mean anomaly at epoch [radians]"
     mean_anom_epoch::FT
 end
+
+# Make InsolationParameters behave as a scalar in broadcasting operations
+# This allows users to write: insolation.(dates, lats, lons, params)
+# instead of: insolation.(dates, lats, lons, Ref(params))
+Base.broadcastable(x::InsolationParameters) = tuple(x)
 
 # Method wrappers
 # This loop creates getter functions for each field, e.g.:

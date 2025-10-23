@@ -1,4 +1,5 @@
 [deps]
+Insolation = "e98cc03f-d57e-4e3c-b70c-8d51efe9e0d8"
 JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 
 [compat]

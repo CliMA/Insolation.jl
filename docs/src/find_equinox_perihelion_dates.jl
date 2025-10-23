@@ -11,10 +11,25 @@ param_set = IP.InsolationParameters(FT)
 # Difference in NH and SH zenith angles at time x in given year
 function zdiff(x, year, od)
     date = xtomarchdate(x, year)
-    theta_s, dist =
-        daily_zenith_angle(date, od, -45.0, param_set, milankovitch = true)
-    theta_n, dist =
-        daily_zenith_angle(date, od, 45.0, param_set, milankovitch = true)
+
+    # Get orbital parameters for this time
+    Δt_years = Insolation.years_since_epoch(param_set, date)
+    orb_params = Insolation.orbital_params(od, Δt_years)
+
+    # Calculate zenith angles for Southern and Northern mid-latitudes
+    theta_s, _ = Insolation.daily_distance_zenith_angle(
+        date,
+        -45.0,
+        orb_params,
+        param_set,
+    )
+    theta_n, _ = Insolation.daily_distance_zenith_angle(
+        date,
+        45.0,
+        orb_params,
+        param_set,
+    )
+
     return theta_n - theta_s
 end
 
@@ -25,10 +40,18 @@ function xtomarchdate(x, year)
     return basedate + deltat
 end
 
-# Earth-Sun distance
+# Planet-star distance
 function edist(x, year, od)
     date = xtojandate(x, year)
-    _, dist = daily_zenith_angle(date, od, 0.0, param_set, milankovitch = true)
+
+    # Get orbital parameters for this time
+    Δt_years = Insolation.years_since_epoch(param_set, date)
+    orb_params = Insolation.orbital_params(od, Δt_years)
+
+    # Calculate distance
+    _, dist =
+        Insolation.daily_distance_zenith_angle(date, 0.0, orb_params, param_set)
+
     return dist / IP.orbit_semimaj(param_set)
 end
 

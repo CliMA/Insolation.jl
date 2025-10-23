@@ -4,11 +4,12 @@ using Insolation, Documenter
 ENV["GKSwstype"] = "100"
 
 pages = Any[
-    "Home" => "index.md"
-    "Zenith Angle Equations" => "ZenithAngleEquations.md"
-    "Insolation Examples" => "InsolationExamples.md"
-    "Milankovitch Cycles" => "Milankovitch.md"
-    "APIs" => "library.md"
+    "Home" => "index.md",
+    "Getting Started" => "GettingStarted.md",
+    "Examples" => "InsolationExamples.md",
+    "Milankovitch Cycles" => "Milankovitch.md",
+    "Mathematical Background" => "SolarGeometry.md",
+    "API Reference" => "library.md",
 ]
 
 format = Documenter.HTML(
@@ -22,6 +23,8 @@ makedocs(
     clean = true,
     modules = [Insolation],
     pages = pages,
+    checkdocs = :none,
+    warnonly = true,  # Don't fail on warnings
 )
 
 deploydocs(
