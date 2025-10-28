@@ -1,4 +1,5 @@
 [deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 ClimaParams = "5c42b081-d73a-476f-9059-fd94b934656c"
 Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
