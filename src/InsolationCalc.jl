@@ -257,10 +257,10 @@ function get_orbital_parameters(
         # Require pre-loaded orbital data for GPU compatibility
         if isnothing(orbital_data)
             error(
-                "Spline interpolator orbital_data must be provided when milankovitch=true for GPU compatibility. " *
-                "Load OrbitalDataSplines: od = OrbitalDataSplines(); " *
-                "Transfer to GPU: gpu_od = adapt(CuArray, od); " *
-                "Then call: insolation(date, lat, lon, param_set, gpu_od; milankovitch=true)",
+                "Spline interpolator orbital_data must be provided when milankovitch=true for GPU compatibility.\n
+                Load OrbitalDataSplines: od = OrbitalDataSplines();\n
+                Transfer to GPU: gpu_od = adapt(CuArray, od);\n
+                Then call: insolation(date, lat, lon, param_set, gpu_od; milankovitch=true)\n",
             )
         end
         Δt_years = Insolation.years_since_epoch(param_set, date)
