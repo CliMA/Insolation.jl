@@ -35,7 +35,7 @@ if CUDA_AVAILABLE
                     lon_gpu = CuArray([lon_cpu])
 
                     # Run on GPU (milankovitch=false, no orbital_data needed)
-                    result = insolation.(Ref(date), lat_gpu, lon_gpu, Ref(params))
+                    result = insolation.(date, lat_gpu, lon_gpu, params)
 
                     # Bring back to CPU for comparison
                     F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
@@ -54,14 +54,14 @@ if CUDA_AVAILABLE
                     lons_cpu = FT.(range(-180, 180, length = n))
 
                     # Compute on CPU
-                    results_cpu = insolation.(Ref(date), lats_cpu, lons_cpu, Ref(params))
+                    results_cpu = insolation.(date, lats_cpu, lons_cpu, params)
 
                     # Transfer to GPU
                     lats_gpu = CuArray(lats_cpu)
                     lons_gpu = CuArray(lons_cpu)
 
                     # Compute on GPU
-                    results_gpu = insolation.(Ref(date), lats_gpu, lons_gpu, Ref(params))
+                    results_gpu = insolation.(date, lats_gpu, lons_gpu, params)
 
                     # Bring back to CPU
                     results_gpu_cpu = Array(results_gpu)
@@ -87,7 +87,7 @@ if CUDA_AVAILABLE
                         daily_insolation(date, lat_cpu, params)
 
                     # Run on GPU
-                    result = daily_insolation.(Ref(date), lat_gpu, Ref(params))
+                    result = daily_insolation.(date, lat_gpu, params)
 
                     # Bring back to CPU
                     F_daily_gpu, S_daily_gpu, μ_daily_gpu = Array(result)[1]
@@ -110,7 +110,7 @@ if CUDA_AVAILABLE
                     lons = FT.([0.0, 0.0, 180.0, 0.0])
 
                     # CPU computation
-                    results_cpu = insolation.(dates, lats, lons, Ref(params))
+                    results_cpu = insolation.(dates, lats, lons, params)
 
                     # GPU computation
                     lats_gpu = CuArray(lats)
@@ -141,12 +141,13 @@ if CUDA_AVAILABLE
                         FT(0.0),
                         params,
                     )
-                    result_gpu = insolation.(
-                        Ref(DateTime(2024, 12, 21, 12, 0, 0)),
-                        CuArray([FT(80.0)]),
-                        CuArray([FT(0.0)]),
-                        Ref(params),
-                    )
+                    result_gpu =
+                        insolation.(
+                            DateTime(2024, 12, 21, 12, 0, 0),
+                            CuArray([FT(80.0)]),
+                            CuArray([FT(0.0)]),
+                            params,
+                        )
                     result_gpu_cpu = Array(result_gpu)[1]
 
                     @test result_gpu_cpu[1] ≈ result_cpu[1] rtol = 1e-5  # F
