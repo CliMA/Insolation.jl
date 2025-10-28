@@ -1,6 +1,7 @@
 using Test
 using Insolation
 using Dates
+using ClimaParams
 
 # Check if CUDA is available
 const CUDA_AVAILABLE = Sys.isunix() && try
