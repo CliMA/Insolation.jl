@@ -1,4 +1,5 @@
 [deps]
+Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 ClimaParams = "5c42b081-d73a-476f-9059-fd94b934656c"
 Insolation = "e98cc03f-d57e-4e3c-b70c-8d51efe9e0d8"
