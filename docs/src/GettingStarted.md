@@ -128,10 +128,11 @@ date = DateTime(2000, 1, 1)  # Reference date (day of year matters)
 params = InsolationParameters(Float64)
 
 # Use Milankovitch cycles
+milankovitch = true
 F, S, μ, ζ = insolation(
     date, lat, lon, params,
-    orbital_data;
-    milankovitch = true
+    orbital_data,
+    milankovitch,
 )
 
 # Get orbital parameters at specific time
@@ -158,7 +159,8 @@ cpu_od = OrbitalDataSplines()
 gpu_od = adapt(CuArray, cpu_od)
 
 # Use in GPU kernels (positional argument required for GPU compatibility)
-F, S, μ, ζ = insolation(date, lat, lon, params, gpu_od; milankovitch=true)
+milankovitch = true
+F, S, μ, ζ = insolation(date, lat, lon, params, gpu_od, milankovitch)
 ```
 
 **Design Note**: The constructor creates data on CPU; users explicitly transfer to GPU using `adapt()`. This gives explicit control over data placement and follows Julia GPU ecosystem conventions.
@@ -173,7 +175,10 @@ date = DateTime(2000, 1, 1, 13, 0, 0)
 lat = 40.0
 lon = 15.0
 
-F, S, μ, ζ = insolation(date, lat, lon, params; eot_correction=false)
+milankovitch = false
+solar_variability = false
+eot_correction = false
+F, S, μ, ζ = insolation(date, lat, lon, params, milankovitch, solar_variability, eot_correction)
 ```
 
 ### Custom Orbital Parameters
@@ -260,4 +265,3 @@ plot(dates, daily_insol,
 - See [Insolation Examples](@ref) for visualization and more complex use cases
 - Learn about [Milankovitch Cycles](@ref) for paleoclimate applications  
 - Check the [API Reference](@ref) for complete function documentation
-

@@ -21,7 +21,9 @@ function diurnal_cycle(lat, lon, date, od, timezone, filename)
         m = Int(round((hr + timezone - h) * 60))
         datetime = date + Dates.Hour(h) + Dates.Minute(m)
 
-        F, S, mu, _ = insolation(datetime, lat, lon, param_set, od; milankovitch = false)
+        milankovitch = false
+        F, S, mu, _ =
+            insolation(datetime, lat, lon, param_set, od, milankovitch)
         insol[i] = F  # F is already S * mu
         sza[i] = rad2deg(acos(mu))
     end

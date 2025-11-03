@@ -16,7 +16,8 @@ F, S, μ = insolation(θ, d, param_set)
 @test F ≈ 0.0 atol = atol
 
 # Test using high-level insolation API
-F, S, μ, ζ = insolation(date, lat, lon, param_set, od; milankovitch = true)
+milankovitch = true
+F, S, μ, ζ = insolation(date, lat, lon, param_set, od, milankovitch)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test μ ≈ 0.0 atol = atol
 
@@ -31,14 +32,16 @@ F, S, μ = insolation(θ, d, param_set)
 @test F ≈ 0.0 atol = atol
 
 # Test using high-level insolation API
-F, S, μ, ζ = insolation(date, lat, lon, param_set, od; milankovitch = true)
+milankovitch = true
+F, S, μ, ζ = insolation(date, lat, lon, param_set, od, milankovitch)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test μ ≈ 0.0 atol = atol
 
-# Test equivalence of mixed lat/lon types 
-@test insolation(date, lat, Int(lon), param_set, od; milankovitch = true) == (F, S, μ, ζ)
-@test insolation(date, Int(lat), lon, param_set, od; milankovitch = true) == (F, S, μ, ζ)
-@test insolation(date, Int(lat), Int(lon), param_set, od; milankovitch = true) ==
+# Test equivalence of mixed lat/lon types
+milankovitch = true
+@test insolation(date, lat, Int(lon), param_set, od, milankovitch) == (F, S, μ, ζ)
+@test insolation(date, Int(lat), lon, param_set, od, milankovitch) == (F, S, μ, ζ)
+@test insolation(date, Int(lat), Int(lon), param_set, od, milankovitch) ==
       (F, S, μ, ζ)
 
 # polar night NH 2
@@ -51,7 +54,8 @@ F, S, μ = insolation(θ, d, param_set)
 @test F ≈ 0.0 atol = atol
 
 # Test using high-level insolation API
-F, S, μ, ζ = insolation(date, lat, lon, param_set, od; milankovitch = true)
+milankovitch = true
+F, S, μ, ζ = insolation(date, lat, lon, param_set, od, milankovitch)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test μ ≈ 0.0 atol = atol
 
@@ -131,8 +135,9 @@ F_simple, S_simple, μ_simple, ζ_simple = insolation(date, lat, lon, param_set)
 @test μ_simple <= 1.0
 
 # Test full method with OrbitalDataSplines
+milankovitch = true
 F_full, S_full, μ_full, ζ_full =
-    insolation(date, lat, lon, param_set, od; milankovitch = true)
+    insolation(date, lat, lon, param_set, od, milankovitch)
 
 # For year 2000 (near epoch), both methods should give very similar results
 @test S_simple ≈ S_full rtol = 0.01
@@ -150,11 +155,12 @@ F_eq, S_eq, μ_eq, ζ_eq = insolation(date_equinox, lat_eq, lon_eq, param_set)
 @test μ_eq > 0.95  # Sun nearly overhead at equator during equinox noon
 
 # Test error when milankovitch=true but orbital_data is nothing
+milankovitch = true
 @test_throws ErrorException insolation(
     date,
     lat,
     lon,
     param_set,
-    nothing;
-    milankovitch = true,
+    nothing,
+    milankovitch,
 )

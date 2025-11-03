@@ -65,8 +65,9 @@ end
 
     # Far past
     date_past = Dates.DateTime(1900, 6, 21, 12, 0, 0)
+    milankovitch = true
     F_past, S_past, μ_past, ζ_past =
-        insolation(date_past, lat, lon, param_set, od; milankovitch = true)
+        insolation(date_past, lat, lon, param_set, od, milankovitch)
 
     @test all(isfinite.([F_past, S_past, μ_past, ζ_past]))
     @test F_past > 0
@@ -75,8 +76,9 @@ end
 
     # Far future
     date_future = Dates.DateTime(2100, 6, 21, 12, 0, 0)
+    milankovitch = true
     F_future, S_future, μ_future, ζ_future =
-        insolation(date_future, lat, lon, param_set, od; milankovitch = true)
+        insolation(date_future, lat, lon, param_set, od, milankovitch)
 
     @test all(isfinite.([F_future, S_future, μ_future, ζ_future]))
     @test F_future > 0

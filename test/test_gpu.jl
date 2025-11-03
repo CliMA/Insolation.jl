@@ -53,13 +53,14 @@ if CUDA_AVAILABLE
                     @test ζ_gpu ≈ ζ_cpu rtol = 1e-4
 
                     # Compute with orbital_data and milankovitch = true
+                    milankovitch = true
                     F_cpu, S_cpu, μ_cpu, ζ_cpu = insolation(
                         date,
                         lat_cpu,
                         lon_cpu,
                         params,
                         od_cpu,
-                        milankovitch = true,
+                        milankovitch,
                     )
                     result =
                         insolation.(
@@ -68,7 +69,7 @@ if CUDA_AVAILABLE
                             lon_gpu,
                             params,
                             od_gpu,
-                            milankovitch = true,
+                            milankovitch,
                         )
                     F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
 
@@ -97,7 +98,7 @@ if CUDA_AVAILABLE
                                 lats_cpu,
                                 lons_cpu,
                                 params,
-                                maybe_od_cpu;
+                                maybe_od_cpu,
                                 milankovitch,
                             )
 
@@ -112,7 +113,7 @@ if CUDA_AVAILABLE
                                 lats_gpu,
                                 lons_gpu,
                                 params,
-                                maybe_od_gpu;
+                                maybe_od_gpu,
                                 milankovitch,
                             )
 
@@ -144,7 +145,7 @@ if CUDA_AVAILABLE
                                 date,
                                 lat_cpu,
                                 params,
-                                maybe_od_cpu;
+                                maybe_od_cpu,
                                 milankovitch,
                             )
 
@@ -154,7 +155,7 @@ if CUDA_AVAILABLE
                                 date,
                                 lat_gpu,
                                 params,
-                                maybe_od_gpu;
+                                maybe_od_gpu,
                                 milankovitch,
                             )
 
@@ -188,7 +189,7 @@ if CUDA_AVAILABLE
                                 lats,
                                 lons,
                                 params,
-                                maybe_od_cpu;
+                                maybe_od_cpu,
                                 milankovitch,
                             )
 
@@ -202,7 +203,7 @@ if CUDA_AVAILABLE
                                 lats_gpu,
                                 lons_gpu,
                                 params,
-                                maybe_od_gpu;
+                                maybe_od_gpu,
                                 milankovitch,
                             )
 
@@ -230,7 +231,7 @@ if CUDA_AVAILABLE
                             FT(80.0),
                             FT(0.0),
                             params,
-                            maybe_od_cpu;
+                            maybe_od_cpu,
                             milankovitch,
                         )
                         result_gpu =
@@ -239,7 +240,7 @@ if CUDA_AVAILABLE
                                 CuArray([FT(80.0)]),
                                 CuArray([FT(0.0)]),
                                 params,
-                                maybe_od_gpu;
+                                maybe_od_gpu,
                                 milankovitch,
                             )
                         result_gpu_cpu = Array(result_gpu)[1]
