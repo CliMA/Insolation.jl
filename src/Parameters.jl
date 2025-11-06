@@ -48,6 +48,9 @@ end
 # instead of: insolation.(dates, lats, lons, Ref(params))
 Base.broadcastable(x::InsolationParameters) = tuple(x)
 
+# Allows inference of parameter type 
+Base.eltype(::InsolationParameters{FT}) where {FT} = FT
+
 # Method wrappers
 # This loop creates getter functions for each field, e.g.:
 # `year_anom(ps::AIP) = ps.year_anom`
