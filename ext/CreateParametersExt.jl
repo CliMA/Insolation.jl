@@ -45,10 +45,7 @@ params = InsolationParameters(Float64)
 params = InsolationParameters(Float64, (; tot_solar_irrad = 1365.0))
 ```
 """
-InsolationParameters(
-    ::Type{FT},
-    overrides = NamedTuple(),
-) where {FT <: AbstractFloat} =
+InsolationParameters(::Type{FT}, overrides = NamedTuple()) where {FT<:AbstractFloat} =
     InsolationParameters(CP.create_toml_dict(FT), overrides)
 
 """

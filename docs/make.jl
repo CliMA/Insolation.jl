@@ -4,18 +4,15 @@ using Insolation, Documenter
 ENV["GKSwstype"] = "100"
 
 pages = Any[
-    "Home" => "index.md",
-    "Getting Started" => "GettingStarted.md",
-    "Examples" => "InsolationExamples.md",
-    "Milankovitch Cycles" => "Milankovitch.md",
-    "Mathematical Background" => "SolarGeometry.md",
-    "API Reference" => "library.md",
+    "Home"=>"index.md",
+    "Getting Started"=>"GettingStarted.md",
+    "Examples"=>"InsolationExamples.md",
+    "Milankovitch Cycles"=>"Milankovitch.md",
+    "Mathematical Background"=>"SolarGeometry.md",
+    "API Reference"=>"library.md",
 ]
 
-format = Documenter.HTML(
-    prettyurls = get(ENV, "CI", nothing) == "true",
-    collapselevel = 1,
-)
+format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true", collapselevel = 1)
 
 makedocs(
     sitename = "Insolation.jl",

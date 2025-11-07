@@ -22,8 +22,7 @@ od = Insolation.OrbitalDataSplines()
     @test 0 <= μ <= 1
 
     # Test without Milankovitch cycles (epoch parameters)
-    F_epoch, S_epoch, μ_epoch =
-        daily_insolation(date, lat, param_set; milankovitch = false)
+    F_epoch, S_epoch, μ_epoch = daily_insolation(date, lat, param_set; milankovitch = false)
 
     @test typeof(F_epoch) == FT
     @test typeof(S_epoch) == FT
@@ -77,8 +76,7 @@ end
     # North pole during polar day (summer) - use latitude below pole to avoid singularity
     date_summer = Dates.DateTime(2000, 6, 21)
     lat_np = FT(85.0)  # Near pole but not exactly at it
-    F_np_summer, _, μ_np_summer =
-        daily_insolation(date_summer, lat_np, param_set)
+    F_np_summer, _, μ_np_summer = daily_insolation(date_summer, lat_np, param_set)
 
     # Should have positive insolation during polar day
     @test F_np_summer > 0
@@ -86,8 +84,7 @@ end
 
     # North pole during polar night (winter)
     date_winter = Dates.DateTime(2000, 12, 21)
-    F_np_winter, _, μ_np_winter =
-        daily_insolation(date_winter, lat_np, param_set)
+    F_np_winter, _, μ_np_winter = daily_insolation(date_winter, lat_np, param_set)
 
     # Should have zero or near-zero insolation during polar night
     @test F_np_winter ≈ 0 atol = 1.0  # Small numerical tolerance
@@ -95,10 +92,8 @@ end
 
     # South pole - opposite pattern
     lat_sp = FT(-85.0)  # Near pole but not exactly at it
-    F_sp_summer, _, μ_sp_summer =
-        daily_insolation(date_summer, lat_sp, param_set)
-    F_sp_winter, _, μ_sp_winter =
-        daily_insolation(date_winter, lat_sp, param_set)
+    F_sp_summer, _, μ_sp_summer = daily_insolation(date_summer, lat_sp, param_set)
+    F_sp_winter, _, μ_sp_winter = daily_insolation(date_winter, lat_sp, param_set)
 
     # SH winter when NH summer
     @test F_sp_summer ≈ 0 atol = 1.0
@@ -166,8 +161,7 @@ end
     # Using low-level functions manually
     Δt_years = Insolation.years_since_epoch(param_set, date)
     orb_params = Insolation.orbital_params(param_set)
-    daily_θ, d =
-        Insolation.daily_distance_zenith_angle(date, lat, orb_params, param_set)
+    daily_θ, d = Insolation.daily_distance_zenith_angle(date, lat, orb_params, param_set)
     F_low, S_low, μ_low = insolation(daily_θ, d, param_set)
 
     # Should match exactly

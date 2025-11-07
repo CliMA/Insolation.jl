@@ -37,7 +37,7 @@ O(e⁴) where e is the eccentricity (see Fitzpatrick (2012), Appendix A.10).
 # Returns
 - `TA`: True anomaly [radians]
 """
-function true_anomaly(MA::FT, e::FT) where {FT <: Real}
+function true_anomaly(MA::FT, e::FT) where {FT<:Real}
     # Series expansion for true anomaly
     TA =
         MA +
@@ -63,7 +63,7 @@ path, measured from vernal equinox. It is the sum of the true anomaly
 # Returns
 - `SL`: Solar longitude [radians]
 """
-function solar_longitude(TA::FT, ϖ::FT) where {FT <: Real}
+function solar_longitude(TA::FT, ϖ::FT) where {FT<:Real}
     SL = mod(TA + ϖ, FT(2π))
     return SL
 end
@@ -100,7 +100,7 @@ function hour_angle(
     date::DateTime,
     λ::FT,
     MA::FT,
-    (ϖ, γ, e)::Tuple{FT, FT, FT};
+    (ϖ, γ, e)::Tuple{FT,FT,FT};
     eot_correction::Bool = true,
 ) where {FT}
     # Equation of time correction 
@@ -138,10 +138,7 @@ two effects:
 # Returns
 - `Δη`: Hour angle correction [radians]
 """
-function equation_of_time(
-    MA::FT,
-    (ϖ, γ, e)::Tuple{FT, FT, FT},
-) where {FT <: Real}
+function equation_of_time(MA::FT, (ϖ, γ, e)::Tuple{FT,FT,FT}) where {FT<:Real}
     Δη = -2 * e * sin(MA) + tan(γ / 2)^2 * sin(2 * (MA + ϖ))
     return mod(Δη + FT(π), FT(2π)) - FT(π)
 end
@@ -164,11 +161,7 @@ for an ellipse.
 # Returns
 - `d`: Planet-star distance [m]
 """
-function planet_star_distance(
-    TA::FT,
-    e::FT,
-    param_set::IP.AIP,
-) where {FT <: Real}
+function planet_star_distance(TA::FT, e::FT, param_set::IP.AIP) where {FT<:Real}
     d0 = IP.orbit_semimaj(param_set)
     d = d0 * (1 - e^2) / (1 + e * cos(TA))
     return d
@@ -231,7 +224,7 @@ hour angle calculations.
 """
 function distance_declination_mean_anomaly(
     Δt_years::FT,
-    (ϖ, γ, e)::Tuple{FT, FT, FT},
+    (ϖ, γ, e)::Tuple{FT,FT,FT},
     param_set::IP.AIP,
 ) where {FT}
     # Mean anomaly at current time
@@ -288,7 +281,7 @@ function solar_geometry(
     date::DateTime,
     latitude::Real,
     longitude::Real,
-    (ϖ, γ, e)::Tuple{FT, FT, FT},
+    (ϖ, γ, e)::Tuple{FT,FT,FT},
     param_set::AIP;
     eot_correction = true,
 ) where {FT}
@@ -306,18 +299,13 @@ function solar_geometry(
 
     # Solar zenith angle [radians]
     θ = mod(
-        acos(
-            max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ))),
-        ),
+        acos(max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ)))),
         FT(2π),
     )
 
     # Solar azimuth angle: ζ = 0 when due E and increasing CCW
     # ζ = 3π/2 (due S) when η=0 at local solar noon
-    ζ = mod(
-        FT(3π / 2) - atan(sin(η), cos(η) * sin(ϕ) - tan(δ) * cos(ϕ)),
-        FT(2π),
-    )
+    ζ = mod(FT(3π / 2) - atan(sin(η), cos(η) * sin(ϕ) - tan(δ) * cos(ϕ)), FT(2π))
 
     return d, θ, ζ
 end
@@ -353,7 +341,7 @@ the planet-star distance for a given date and latitude.
 function daily_distance_zenith_angle(
     date::DateTime,
     latitude::FT,
-    (ϖ, γ, e)::Tuple{FT, FT, FT},
+    (ϖ, γ, e)::Tuple{FT,FT,FT},
     param_set::IP.AIP;
 ) where {FT}
     ϕ = deg2rad(latitude)
@@ -373,10 +361,8 @@ function daily_distance_zenith_angle(
 
     # Effective zenith angle to get diurnally averaged insolation
     # (i.e., averaging cosine of zenith angle)
-    daily_θ = mod(
-        acos(FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd))),
-        FT(2π),
-    )
+    daily_θ =
+        mod(acos(FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd))), FT(2π))
 
     return daily_θ, d
 end

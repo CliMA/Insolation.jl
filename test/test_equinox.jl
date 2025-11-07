@@ -5,18 +5,10 @@
         Δt_years = Insolation.years_since_epoch(param_set, date)
         ϖ, γ, e = orbital_params(od, Δt_years)
         orb_params = (FT(ϖ), FT(γ), FT(e))
-        theta_s, dist = Insolation.daily_distance_zenith_angle(
-            date,
-            FT(-45),
-            orb_params,
-            param_set,
-        )
-        theta_n, dist = Insolation.daily_distance_zenith_angle(
-            date,
-            FT(45),
-            orb_params,
-            param_set,
-        )
+        theta_s, dist =
+            Insolation.daily_distance_zenith_angle(date, FT(-45), orb_params, param_set)
+        theta_n, dist =
+            Insolation.daily_distance_zenith_angle(date, FT(45), orb_params, param_set)
         return theta_n - theta_s
     end
 

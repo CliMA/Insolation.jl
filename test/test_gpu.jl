@@ -26,8 +26,7 @@ if CUDA_AVAILABLE
                 lon_cpu = FT(-105.0)
 
                 # Compute reference on CPU
-                F_cpu, S_cpu, μ_cpu, ζ_cpu =
-                    insolation(date, lat_cpu, lon_cpu, params)
+                F_cpu, S_cpu, μ_cpu, ζ_cpu = insolation(date, lat_cpu, lon_cpu, params)
 
                 # Test single value on GPU
                 @testset "Single value computation" begin
@@ -35,8 +34,7 @@ if CUDA_AVAILABLE
                     lon_gpu = CuArray([lon_cpu])
 
                     # Run on GPU (milankovitch=false, no orbital_data needed)
-                    result =
-                        insolation.(Ref(date), lat_gpu, lon_gpu, Ref(params))
+                    result = insolation.(Ref(date), lat_gpu, lon_gpu, Ref(params))
 
                     # Bring back to CPU for comparison
                     F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
@@ -55,22 +53,20 @@ if CUDA_AVAILABLE
                     lons_cpu = FT.(range(-180, 180, length = n))
 
                     # Compute on CPU
-                    results_cpu =
-                        insolation.(Ref(date), lats_cpu, lons_cpu, Ref(params))
+                    results_cpu = insolation.(Ref(date), lats_cpu, lons_cpu, Ref(params))
 
                     # Transfer to GPU
                     lats_gpu = CuArray(lats_cpu)
                     lons_gpu = CuArray(lons_cpu)
 
                     # Compute on GPU
-                    results_gpu =
-                        insolation.(Ref(date), lats_gpu, lons_gpu, Ref(params))
+                    results_gpu = insolation.(Ref(date), lats_gpu, lons_gpu, Ref(params))
 
                     # Bring back to CPU
                     results_gpu_cpu = Array(results_gpu)
 
                     # Check all results match
-                    for i in 1:n
+                    for i = 1:n
                         F_cpu, S_cpu, μ_cpu, ζ_cpu = results_cpu[i]
                         F_gpu, S_gpu, μ_gpu, ζ_gpu = results_gpu_cpu[i]
 
@@ -118,12 +114,11 @@ if CUDA_AVAILABLE
                     # GPU computation
                     lats_gpu = CuArray(lats)
                     lons_gpu = CuArray(lons)
-                    results_gpu =
-                        insolation.(dates, lats_gpu, lons_gpu, Ref(params))
+                    results_gpu = insolation.(dates, lats_gpu, lons_gpu, Ref(params))
 
                     # Compare
                     results_gpu_cpu = Array(results_gpu)
-                    for i in 1:length(dates)
+                    for i = 1:length(dates)
                         F_cpu, S_cpu, μ_cpu, ζ_cpu = results_cpu[i]
                         F_gpu, S_gpu, μ_gpu, ζ_gpu = results_gpu_cpu[i]
 
@@ -143,13 +138,12 @@ if CUDA_AVAILABLE
                         FT(0.0),
                         params,
                     )
-                    result_gpu =
-                        insolation.(
-                            Ref(DateTime(2024, 12, 21, 12, 0, 0)),
-                            CuArray([FT(80.0)]),
-                            CuArray([FT(0.0)]),
-                            Ref(params),
-                        )
+                    result_gpu = insolation.(
+                        Ref(DateTime(2024, 12, 21, 12, 0, 0)),
+                        CuArray([FT(80.0)]),
+                        CuArray([FT(0.0)]),
+                        Ref(params),
+                    )
                     result_gpu_cpu = Array(result_gpu)[1]
 
                     @test result_gpu_cpu[1] ≈ result_cpu[1] rtol = 1e-5  # F

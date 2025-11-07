@@ -13,12 +13,7 @@ import Insolation.Parameters as IP
                             n_lats::I,
                             param_set::IP.AIP) where {I<:Int}
 """
-function calc_day_lat_insolation(
-    od,
-    n_days::I,
-    n_lats::I,
-    param_set::IP.AIP,
-) where {I <: Int}
+function calc_day_lat_insolation(od, n_days::I, n_lats::I, param_set::IP.AIP) where {I<:Int}
     d_arr = Array{I}(round.(collect(range(0, stop = 365, length = n_days))))
     l_arr = collect(range(-90, stop = 90, length = n_lats))
     F_arr = zeros(n_days, n_lats)
@@ -27,8 +22,7 @@ function calc_day_lat_insolation(
         for (j, lat) in enumerate(l_arr)
             date = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
             # Use daily_insolation API
-            F, _, _ =
-                daily_insolation(date, lat, param_set, od; milankovitch = false)
+            F, _, _ = daily_insolation(date, lat, param_set, od; milankovitch = false)
             F_arr[i, j] = F
         end
     end
@@ -50,14 +44,14 @@ function plot_day_lat_insolation(
     scmap,
     stitle,
     file_name,
-) where {FT <: AbstractFloat, I <: Int}
+) where {FT<:AbstractFloat,I<:Int}
     if scmap == "YlOrRd"
         cmap = :YlOrRd
         vmin, vmax = 0, ceil(max(F_arr...) / 100) * 100
     elseif scmap == "PRGn"
         cmap = :PRGn
-        vmin, vmax = ceil(max(abs.(F_arr)...) / 10) * -10,
-        ceil(max(abs.(F_arr)...) / 10) * 10
+        vmin, vmax =
+            ceil(max(abs.(F_arr)...) / 10) * -10, ceil(max(abs.(F_arr)...) / 10) * 10
     end
 
     p1 = contourf(

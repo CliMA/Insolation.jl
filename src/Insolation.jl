@@ -50,7 +50,7 @@ cpu_od = OrbitalDataSplines()  # Create on CPU
 gpu_od = adapt(CuArray, cpu_od)  # Transfer to GPU
 ```
 """
-struct OrbitalDataSplines{E, G, O}
+struct OrbitalDataSplines{E,G,O}
     "Spline for eccentricity (e) [unitless]"
     e_spline::E
     "Spline for obliquity (γ) [radians]"
@@ -66,32 +66,23 @@ Adapt.@adapt_structure OrbitalDataSplines
 
 function OrbitalDataSplines()
     datapath = joinpath(artifact"laskar2004", "INSOL.LA2004.BTL.csv")
-    Tx = Tuple{Matrix{Float64}, Matrix{AbstractString}}
+    Tx = Tuple{Matrix{Float64},Matrix{AbstractString}}
     laskar_data, _ = readdlm(datapath, ',', Float64, header = true)::Tx
 
     # Create a time range in years, with a 1000-year (1 kyr) step
-    t_range = ((laskar_data[1, 1] * 1000):1000:(laskar_data[end, 1] * 1000))
+    t_range = ((laskar_data[1, 1]*1000):1000:(laskar_data[end, 1]*1000))
 
-    e_spline = cubic_spline_interpolation(
-        t_range,
-        laskar_data[:, 2];
-        extrapolation_bc = NaN,
-    )
-    γ_spline = cubic_spline_interpolation(
-        t_range,
-        laskar_data[:, 3];
-        extrapolation_bc = NaN,
-    )
-    ϖ_spline = cubic_spline_interpolation(
-        t_range,
-        laskar_data[:, 4];
-        extrapolation_bc = NaN,
-    )
+    e_spline =
+        cubic_spline_interpolation(t_range, laskar_data[:, 2]; extrapolation_bc = NaN)
+    γ_spline =
+        cubic_spline_interpolation(t_range, laskar_data[:, 3]; extrapolation_bc = NaN)
+    ϖ_spline =
+        cubic_spline_interpolation(t_range, laskar_data[:, 4]; extrapolation_bc = NaN)
 
     E = typeof(e_spline)
     G = typeof(γ_spline)
     O = typeof(ϖ_spline)
-    return OrbitalDataSplines{E, G, O}(e_spline, γ_spline, ϖ_spline)
+    return OrbitalDataSplines{E,G,O}(e_spline, γ_spline, ϖ_spline)
 end
 
 Base.broadcastable(x::OrbitalDataSplines) = tuple(x)
@@ -114,7 +105,7 @@ paleoclimate studies. The parameters vary over geological timescales.
   - `γ`: Obliquity (axial tilt) [radians]
   - `e`: Orbital eccentricity [unitless]
 """
-function orbital_params(od::OrbitalDataSplines, dt::FT) where {FT <: Real}
+function orbital_params(od::OrbitalDataSplines, dt::FT) where {FT<:Real}
     # Call the spline fields directly
     ϖ = od.ϖ_spline(dt)
     γ = od.γ_spline(dt)

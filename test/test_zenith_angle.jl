@@ -31,14 +31,8 @@ date = Dates.DateTime(2020, 2, 20, 12, 0, 0)
 Δt_years = Insolation.years_since_epoch(param_set, date)
 ϖ, γ, e = orbital_params(od, Δt_years)
 orb_params = (FT(ϖ), FT(γ), FT(e))
-d, θ, ζ = Insolation.solar_geometry(
-    date,
-    lat,
-    lon,
-    orb_params,
-    param_set,
-    eot_correction = false,
-)
+d, θ, ζ =
+    Insolation.solar_geometry(date, lat, lon, orb_params, param_set, eot_correction = false)
 @test ζ ≈ 3π / 2 rtol = rtol
 
 # sunset at equator, eot correction = false
@@ -46,14 +40,8 @@ date = Dates.DateTime(2020, 2, 20, 18, 0, 0)
 Δt_years = Insolation.years_since_epoch(param_set, date)
 ϖ, γ, e = orbital_params(od, Δt_years)
 orb_params = (FT(ϖ), FT(γ), FT(e))
-d, θ, ζ = Insolation.solar_geometry(
-    date,
-    lat,
-    lon,
-    orb_params,
-    param_set,
-    eot_correction = false,
-)
+d, θ, ζ =
+    Insolation.solar_geometry(date, lat, lon, orb_params, param_set, eot_correction = false)
 @test θ ≈ π / 2 rtol = rtol
 
 ## Test Polar Night

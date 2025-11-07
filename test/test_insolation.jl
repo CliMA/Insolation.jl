@@ -36,18 +36,10 @@ F, S, μ, ζ = insolation(date, lat, lon, param_set, od; milankovitch = true)
 @test μ ≈ 0.0 atol = atol
 
 # Test equivalence of mixed lat/lon types 
-@test insolation(date, lat, Int(lon), param_set, od; milankovitch = true) ==
+@test insolation(date, lat, Int(lon), param_set, od; milankovitch = true) == (F, S, μ, ζ)
+@test insolation(date, Int(lat), lon, param_set, od; milankovitch = true) == (F, S, μ, ζ)
+@test insolation(date, Int(lat), Int(lon), param_set, od; milankovitch = true) ==
       (F, S, μ, ζ)
-@test insolation(date, Int(lat), lon, param_set, od; milankovitch = true) ==
-      (F, S, μ, ζ)
-@test insolation(
-    date,
-    Int(lat),
-    Int(lon),
-    param_set,
-    od;
-    milankovitch = true,
-) == (F, S, μ, ζ)
 
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
@@ -93,12 +85,8 @@ for (i, d) in enumerate(d_arr)
         local Δt_years = Insolation.years_since_epoch(param_set, datei)
         local ϖ, γ, e = orbital_params(od, Δt_years)
         local orb_params = (FT(ϖ), FT(γ), FT(e))
-        local daily_θ, dist = Insolation.daily_distance_zenith_angle(
-            datei,
-            lat,
-            orb_params,
-            param_set,
-        )
+        local daily_θ, dist =
+            Insolation.daily_distance_zenith_angle(datei, lat, orb_params, param_set)
         local F, S, μ = insolation(daily_θ, dist, param_set)
         F_arr[i, j] = F
     end
@@ -119,12 +107,8 @@ for (i, d) in enumerate(d_arr)
         local Δt_years = Insolation.years_since_epoch(param_set, datei)
         local ϖ, γ, e = orbital_params(od, Δt_years)
         local orb_params = (FT(ϖ), FT(γ), FT(e))
-        local daily_θ, dist = Insolation.daily_distance_zenith_angle(
-            datei,
-            lat,
-            orb_params,
-            param_set,
-        )
+        local daily_θ, dist =
+            Insolation.daily_distance_zenith_angle(datei, lat, orb_params, param_set)
         local F, S, μ = insolation(daily_θ, dist, param_set)
         F_arr[i, j] = F
     end
