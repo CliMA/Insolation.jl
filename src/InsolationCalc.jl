@@ -53,22 +53,22 @@ end
 """
     insolation(
         date::DateTime,
-        latitude::FT,
-        longitude::FT,
+        latitude::FT1,
+        longitude::FT2,
         param_set::IP.AIP,
         orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
         milankovitch::Bool = false,
         solar_variability::Bool = false,
         eot_correction::Bool = true,
-    ) where {FT <: Real}
+    ) where {FT1 <: Real, FT2 <: Real}
 
 Calculates instantaneous TOA insolation with optional long-term variations
 in Earth's orbital parameters (Milankovitch cycles) and solar luminosity.
 
 # Arguments
 - `date::DateTime`: Current date and time
-- `latitude::FT`: Latitude [degrees]
-- `longitude::FT`: Longitude [degrees]
+- `latitude::FT1`: Latitude [degrees]
+- `longitude::FT2`: Longitude [degrees]
 - `param_set::IP.AIP`: Parameter struct
 - `orbital_data::Union{OrbitalDataSplines, Nothing}`: (default nothing) Orbital parameter splines.
   **Required** when `milankovitch=true` for GPU compatibility.
@@ -107,17 +107,22 @@ F, S, μ, ζ = insolation(date, lat, lon, param_set, gpu_od; milankovitch=true)
 """
 function insolation(
     date::DateTime,
-    latitude::FT,
-    longitude::FT,
+    latitude::FT1,
+    longitude::FT2,
     param_set::IP.AIP,
     orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
     milankovitch::Bool = false,
     solar_variability::Bool = false,
     eot_correction::Bool = true,
-) where {FT <: Real}
+) where {FT1 <: Real, FT2 <: Real}
     # Get orbital parameters using helper function
-    orb_params =
-        get_orbital_parameters(date, param_set, orbital_data, milankovitch, FT)
+    orb_params = get_orbital_parameters(
+        date,
+        param_set,
+        orbital_data,
+        milankovitch,
+        eltype(param_set),
+    )
 
     # Get solar geometry
     d, θ, ζ = Insolation.solar_geometry(
@@ -139,12 +144,12 @@ end
 """
     daily_insolation(
         date::DateTime,
-        latitude::FT,
+        latitude::Real,
         param_set::IP.AIP,
         orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
         milankovitch::Bool = false,
         solar_variability::Bool = false,
-    ) where {FT <: Real}
+    )
 
 Calculates diurnally averaged TOA insolation with optional long-term variations
 in orbital parameters (Milankovitch cycles) and solar luminosity. The insolation is 
@@ -186,20 +191,25 @@ F, S, μ = daily_insolation(date, lat, param_set, gpu_od; milankovitch=true)
 """
 function daily_insolation(
     date::DateTime,
-    latitude::FT,
+    latitude::Real,
     param_set::IP.AIP,
     orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
     milankovitch::Bool = false,
     solar_variability::Bool = false,
-) where {FT <: Real}
+)
     # Get orbital parameters using helper function
-    orb_params =
-        get_orbital_parameters(date, param_set, orbital_data, milankovitch, FT)
+    orb_params = get_orbital_parameters(
+        date,
+        param_set,
+        orbital_data,
+        milankovitch,
+        eltype(param_set),
+    )
 
     # Get effective zenith angle and distance for daily averaged insolation
     daily_θ, d = Insolation.daily_distance_zenith_angle(
         date,
-        latitude,
+        eltype(param_set)(latitude),
         orb_params,
         param_set,
     )
@@ -218,7 +228,7 @@ end
         orbital_data::Union{OrbitalDataSplines, Nothing},
         milankovitch::Bool,
         ::Type{FT},
-    ) where {FT <: Real}
+    ) where {FT <: AbstractFloat}
 
 Helper function to get orbital parameters with optional Milankovitch cycles.
 
@@ -241,7 +251,7 @@ function get_orbital_parameters(
     orbital_data::Union{OrbitalDataSplines, Nothing},
     milankovitch::Bool,
     ::Type{FT},
-) where {FT <: Real}
+) where {FT <: AbstractFloat}
     # Compute time-varying parameters if needed
     if milankovitch
         # Require pre-loaded orbital data for GPU compatibility

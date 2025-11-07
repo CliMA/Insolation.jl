@@ -255,8 +255,8 @@ end
 """
     solar_geometry(
         date::DateTime,
-        latitude::FT,
-        longitude::FT,
+        latitude::Real,
+        longitude::Real,
         (ϖ, γ, e)::Tuple{FT, FT, FT},
         param_set::AIP;
         eot_correction::Bool = true,
@@ -270,8 +270,8 @@ at a specific time and location.
 
 # Arguments
 - `date::DateTime`: Current date and time
-- `latitude::FT`: Latitude [degrees]
-- `longitude::FT`: Longitude [degrees]
+- `latitude::Real`: Latitude [degrees]
+- `longitude::Real`: Longitude [degrees]
 - `(ϖ, γ, e)::Tuple{FT, FT, FT}`: Orbital parameters tuple containing:
   - `ϖ`: Longitude of perihelion [radians]
   - `γ`: Obliquity (axial tilt) [radians]
@@ -286,14 +286,14 @@ at a specific time and location.
 """
 function solar_geometry(
     date::DateTime,
-    latitude::FT,
-    longitude::FT,
+    latitude::Real,
+    longitude::Real,
     (ϖ, γ, e)::Tuple{FT, FT, FT},
     param_set::AIP;
     eot_correction = true,
 ) where {FT}
-    ϕ = deg2rad(latitude)
-    λ = deg2rad(longitude)
+    ϕ = eltype(param_set)(deg2rad(latitude))
+    λ = eltype(param_set)(deg2rad(longitude))
 
     # Get time since epoch in anomalistic years
     Δt_years = years_since_epoch(param_set, date)

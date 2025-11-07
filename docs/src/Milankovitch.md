@@ -140,6 +140,7 @@ To use time-varying orbital parameters in your insolation calculations:
 ```julia
 using Insolation
 using Dates
+using ClimaParams
 
 # Load orbital data (do this once, it's computationally expensive)
 orbital_data = OrbitalDataSplines()

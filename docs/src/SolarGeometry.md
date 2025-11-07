@@ -32,7 +32,7 @@ The **true anomaly** $A$ is the actual angular position of the planet in its ell
 
 The true anomaly is computed from the mean anomaly using a series expansion,
 ```math
-A = M + \left( 2e - \frac{1}{4}e^{3} \right) \sin(M) + \frac{5}{4} e^2 \sin(2M) + \frac{13}{12} e^3 \sin(3M),
+A = M + \left( 2e - \frac{1}{4}e^{3} \right) \sin(M) + \frac{5}{4} e^2 \sin(2M) + \frac{13}{12} e^3 \sin(3M) + \mathcal{O}(e^4),
 ```
 where $e$ is the orbital eccentricity. This series approximation is accurate to order $e^3$ and is sufficient for Earth's relatively circular orbit ($e \approx 0.017$).
 
@@ -42,7 +42,7 @@ The **solar longitude** $L_s$ (also called ecliptic longitude or true longitude)
 ```math
 L_s = A + \varpi.
 ```
-For Earth, $\varpi$ varies slowly due to precession (period $\sim$21,000 years).
+For Earth, $\varpi$ varies slowly due to precession (period $\sim 21{,}000$ years).
 
 ## Declination
 

@@ -35,6 +35,20 @@ F, S, μ, ζ = insolation(date, lat, lon, param_set, od; milankovitch = true)
 @test S ≈ IP.tot_solar_irrad(param_set) rtol = rtol_insol
 @test μ ≈ 0.0 atol = atol
 
+# Test equivalence of mixed lat/lon types 
+@test insolation(date, lat, Int(lon), param_set, od; milankovitch = true) ==
+      (F, S, μ, ζ)
+@test insolation(date, Int(lat), lon, param_set, od; milankovitch = true) ==
+      (F, S, μ, ζ)
+@test insolation(
+    date,
+    Int(lat),
+    Int(lon),
+    param_set,
+    od;
+    milankovitch = true,
+) == (F, S, μ, ζ)
+
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
 Δt_years = Insolation.years_since_epoch(param_set, date)
