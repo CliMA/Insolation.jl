@@ -10,7 +10,7 @@ Calculates the solar radiative energy flux at the top of the atmosphere
 - `d::FT`: Planet-star distance [m]
 - `param_set::IP.AIP`: Struct containing `tot_solar_irrad` [W m⁻²] and `orbit_semimaj` [m]
 """
-function solar_flux(d::FT, param_set::IP.AIP) where {FT <: Real}
+function solar_flux(d::FT, param_set::IP.AIP) where {FT<:Real}
     S0::FT = IP.tot_solar_irrad(param_set)
     d0::FT = IP.orbit_semimaj(param_set)
 
@@ -37,7 +37,7 @@ planet-star distance. Insolation is set to 0 at night (when ``\\cos(\\theta) < 0
 - `S`: Solar flux at the given planet-star distance [W m⁻²]
 - `μ`: Cosine of solar zenith angle [unitless], clamped to [0, 1]
 """
-function insolation(θ::FT, d::FT, param_set::IP.AIP) where {FT <: Real}
+function insolation(θ::FT, d::FT, param_set::IP.AIP) where {FT<:Real}
     # Calculate solar radiative energy flux (W m⁻²)
     S = solar_flux(d, param_set)
 
@@ -110,11 +110,11 @@ function insolation(
     latitude::FT1,
     longitude::FT2,
     param_set::IP.AIP,
-    orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
+    orbital_data::Union{OrbitalDataSplines,Nothing} = nothing;
     milankovitch::Bool = false,
     solar_variability::Bool = false,
     eot_correction::Bool = true,
-) where {FT1 <: Real, FT2 <: Real}
+) where {FT1<:Real,FT2<:Real}
     # Get orbital parameters using helper function
     orb_params = get_orbital_parameters(
         date,
@@ -193,7 +193,7 @@ function daily_insolation(
     date::DateTime,
     latitude::Real,
     param_set::IP.AIP,
-    orbital_data::Union{OrbitalDataSplines, Nothing} = nothing;
+    orbital_data::Union{OrbitalDataSplines,Nothing} = nothing;
     milankovitch::Bool = false,
     solar_variability::Bool = false,
 )
@@ -248,10 +248,10 @@ and time-varying Milankovitch values based on the `milankovitch` flag.
 function get_orbital_parameters(
     date::DateTime,
     param_set::IP.AIP,
-    orbital_data::Union{OrbitalDataSplines, Nothing},
+    orbital_data::Union{OrbitalDataSplines,Nothing},
     milankovitch::Bool,
     ::Type{FT},
-) where {FT <: AbstractFloat}
+) where {FT<:AbstractFloat}
     # Compute time-varying parameters if needed
     if milankovitch
         # Require pre-loaded orbital data for GPU compatibility

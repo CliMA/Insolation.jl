@@ -17,18 +17,8 @@ function zdiff(x, year, od)
     orb_params = Insolation.orbital_params(od, Δt_years)
 
     # Calculate zenith angles for Southern and Northern mid-latitudes
-    theta_s, _ = Insolation.daily_distance_zenith_angle(
-        date,
-        -45.0,
-        orb_params,
-        param_set,
-    )
-    theta_n, _ = Insolation.daily_distance_zenith_angle(
-        date,
-        45.0,
-        orb_params,
-        param_set,
-    )
+    theta_s, _ = Insolation.daily_distance_zenith_angle(date, -45.0, orb_params, param_set)
+    theta_n, _ = Insolation.daily_distance_zenith_angle(date, 45.0, orb_params, param_set)
 
     return theta_n - theta_s
 end
@@ -49,8 +39,7 @@ function edist(x, year, od)
     orb_params = Insolation.orbital_params(od, Δt_years)
 
     # Calculate distance
-    _, dist =
-        Insolation.daily_distance_zenith_angle(date, 0.0, orb_params, param_set)
+    _, dist = Insolation.daily_distance_zenith_angle(date, 0.0, orb_params, param_set)
 
     return dist / IP.orbit_semimaj(param_set)
 end

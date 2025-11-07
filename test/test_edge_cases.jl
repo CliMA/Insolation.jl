@@ -15,10 +15,8 @@ od = Insolation.OrbitalDataSplines()
     lat_np = FT(90.0)
 
     # Should not error
-    F_np_s, S_np_s, μ_np_s, ζ_np_s =
-        insolation(date_summer, lat_np, lon, param_set)
-    F_np_w, S_np_w, μ_np_w, ζ_np_w =
-        insolation(date_winter, lat_np, lon, param_set)
+    F_np_s, S_np_s, μ_np_s, ζ_np_s = insolation(date_summer, lat_np, lon, param_set)
+    F_np_w, S_np_w, μ_np_w, ζ_np_w = insolation(date_winter, lat_np, lon, param_set)
 
     @test all(isfinite.([F_np_s, S_np_s, μ_np_s, ζ_np_s]))
     @test all(isfinite.([F_np_w, S_np_w, μ_np_w, ζ_np_w]))
@@ -30,10 +28,8 @@ od = Insolation.OrbitalDataSplines()
     # South Pole
     lat_sp = FT(-90.0)
 
-    F_sp_s, S_sp_s, μ_sp_s, ζ_sp_s =
-        insolation(date_summer, lat_sp, lon, param_set)
-    F_sp_w, S_sp_w, μ_sp_w, ζ_sp_w =
-        insolation(date_winter, lat_sp, lon, param_set)
+    F_sp_s, S_sp_s, μ_sp_s, ζ_sp_s = insolation(date_summer, lat_sp, lon, param_set)
+    F_sp_w, S_sp_w, μ_sp_w, ζ_sp_w = insolation(date_winter, lat_sp, lon, param_set)
 
     @test all(isfinite.([F_sp_s, S_sp_s, μ_sp_s, ζ_sp_s]))
     @test all(isfinite.([F_sp_w, S_sp_w, μ_sp_w, ζ_sp_w]))
@@ -132,16 +128,14 @@ end
     lat_toc = FT(rad2deg(IP.obliq_epoch(param_set)))
     lon = FT(0.0)
 
-    F_summer, _, μ_summer, _ =
-        insolation(solstice_summer, lat_toc, lon, param_set)
+    F_summer, _, μ_summer, _ = insolation(solstice_summer, lat_toc, lon, param_set)
 
     # Sun should be nearly overhead at summer solstice on Tropic of Cancer
     @test μ_summer > 0.98
 
     # At Tropic of Capricorn
     lat_toc_s = FT(-rad2deg(IP.obliq_epoch(param_set)))
-    F_winter, _, μ_winter, _ =
-        insolation(solstice_winter, lat_toc_s, lon, param_set)
+    F_winter, _, μ_winter, _ = insolation(solstice_winter, lat_toc_s, lon, param_set)
 
     # Sun should be nearly overhead at winter solstice on Tropic of Capricorn
     @test μ_winter > 0.98

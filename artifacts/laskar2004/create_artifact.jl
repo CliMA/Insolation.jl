@@ -32,14 +32,7 @@ artifact_tree_sha1 = create_artifact() do dir
             end
             varpi_rad += varpi_offset
             varpi_rad_prev = varpi_rad
-            @printf(
-                f,
-                "%.3f,%.16e,%.16e,%.16e\n",
-                kyr,
-                ecc,
-                obliq_rad,
-                varpi_rad
-            )
+            @printf(f, "%.3f,%.16e,%.16e,%.16e\n", kyr, ecc, obliq_rad, varpi_rad)
         end
     end
 

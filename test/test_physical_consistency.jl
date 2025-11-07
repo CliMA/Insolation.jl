@@ -8,7 +8,7 @@ od = Insolation.OrbitalDataSplines()
     # Generate random dates and locations
     n_samples = 50
 
-    for _ in 1:n_samples
+    for _ = 1:n_samples
         # Random date within reasonable range
         year = rand(1950:2050)
         month = rand(1:12)
@@ -43,7 +43,7 @@ end
 @testset "Physical Bounds - Daily Insolation" begin
     n_samples = 30
 
-    for _ in 1:n_samples
+    for _ = 1:n_samples
         year = rand(1950:2050)
         month = rand(1:12)
         day = rand(1:28)
@@ -83,8 +83,7 @@ end
     for date in dates
         Δt_years = Insolation.years_since_epoch(param_set, date)
         orb_params = Insolation.orbital_params(param_set)
-        d, θ, ζ =
-            Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
+        d, θ, ζ = Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
         F, S, μ = insolation(θ, d, param_set)
 
         push!(fluxes, S)
@@ -113,8 +112,7 @@ end
         date = date_base + Dates.Hour(hour)
         Δt_years = Insolation.years_since_epoch(param_set, date)
         orb_params = Insolation.orbital_params(param_set)
-        d, θ, ζ =
-            Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
+        d, θ, ζ = Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
         push!(zenith_angles, θ)
     end
 
@@ -127,15 +125,8 @@ end
     # Test the fundamental relationship: F = S × μ
     n_samples = 30
 
-    for _ in 1:n_samples
-        date = Dates.DateTime(
-            rand(1950:2050),
-            rand(1:12),
-            rand(1:28),
-            rand(0:23),
-            0,
-            0,
-        )
+    for _ = 1:n_samples
+        date = Dates.DateTime(rand(1950:2050), rand(1:12), rand(1:28), rand(0:23), 0, 0)
         lat = FT(rand(-90.0:1.0:90.0))
         lon = FT(rand(-180.0:1.0:180.0))
 
@@ -160,15 +151,14 @@ end
     d_aph = d0 * (1 + e)
 
     # Sample various dates
-    dates = [Dates.DateTime(2000, m, 15) for m in 1:12]
+    dates = [Dates.DateTime(2000, m, 15) for m = 1:12]
 
     for date in dates
         Δt_years = Insolation.years_since_epoch(param_set, date)
         orb_params = Insolation.orbital_params(param_set)
         lat = FT(0.0)
         lon = FT(0.0)
-        d, θ, ζ =
-            Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
+        d, θ, ζ = Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
 
         # Distance should be within orbital bounds
         @test d_peri <= d <= d_aph
@@ -186,16 +176,15 @@ end
     n_samples = 60
 
     F_values = Float64[]
-    for i in 0:(n_samples - 1)
+    for i = 0:(n_samples-1)
         date = date_base + Dates.Minute(i * dt_minutes)
         F, _, _, _ = insolation(date, lat, lon, param_set)
         push!(F_values, F)
     end
 
     # Check that consecutive values don't differ too much
-    for i in 1:(length(F_values) - 1)
-        relative_change =
-            abs(F_values[i + 1] - F_values[i]) / (F_values[i] + atol)
+    for i = 1:(length(F_values)-1)
+        relative_change = abs(F_values[i+1] - F_values[i]) / (F_values[i] + atol)
         @test relative_change < 0.01  # Less than 1% change per minute
     end
 end

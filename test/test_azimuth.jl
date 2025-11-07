@@ -39,8 +39,7 @@ end
     # At equinox on equator, sunrise should be due east (ζ ≈ 0 or 2π)
     ζ_sr_normalized = mod(ζ_sr, 2π)
     # Check if close to 0 or close to 2π
-    east_test =
-        (abs(ζ_sr_normalized) < 1e-2) || (abs(ζ_sr_normalized - 2π) < 1e-2)
+    east_test = (abs(ζ_sr_normalized) < 1e-2) || (abs(ζ_sr_normalized - 2π) < 1e-2)
     @test east_test
 
     # Sunset (approximately 6 PM)
@@ -53,7 +52,7 @@ end
 
 @testset "Azimuth - Bounds Check" begin
     # Azimuth should always be between 0 and 2π
-    dates = [Dates.DateTime(2000, 1, 1, h, 0, 0) for h in 0:23]
+    dates = [Dates.DateTime(2000, 1, 1, h, 0, 0) for h = 0:23]
 
     lat = FT(45.0)
     lon = FT(0.0)

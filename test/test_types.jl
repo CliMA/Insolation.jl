@@ -11,15 +11,8 @@ F, S, μ, ζ = insolation(date, lat, lon, param_set; eot_correction = false)
 @test typeof(ζ) == FT
 
 # Test with Milankovitch cycles (no eot correction)
-F, S, μ, ζ = insolation(
-    date,
-    lat,
-    lon,
-    param_set,
-    od;
-    milankovitch = true,
-    eot_correction = false,
-)
+F, S, μ, ζ =
+    insolation(date, lat, lon, param_set, od; milankovitch = true, eot_correction = false)
 @test typeof(F) == FT
 @test typeof(S) == FT
 @test typeof(μ) == FT
@@ -33,15 +26,8 @@ F, S, μ, ζ = insolation(date, lat, lon, param_set; eot_correction = true)
 @test typeof(ζ) == FT
 
 # Test with Milankovitch cycles (with eot correction)
-F, S, μ, ζ = insolation(
-    date,
-    lat,
-    lon,
-    param_set,
-    od;
-    milankovitch = true,
-    eot_correction = true,
-)
+F, S, μ, ζ =
+    insolation(date, lat, lon, param_set, od; milankovitch = true, eot_correction = true)
 @test typeof(F) == FT
 @test typeof(S) == FT
 @test typeof(μ) == FT
