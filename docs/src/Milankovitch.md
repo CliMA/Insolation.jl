@@ -156,10 +156,11 @@ lat = 65.0  # Arctic latitude
 F_modern, _, _, _ = insolation(date, lat, 0.0, params)
 
 # LGM climate (time-varying parameters)
+milankovitch = true
 F_lgm, _, _, _ = insolation(
-    date, lat, 0.0, params;
-    orbital_data = orbital_data,
-    milankovitch = true
+    date, lat, 0.0, params,
+    orbital_data,
+    milankovitch,
 )
 
 println("Modern summer insolation: $F_modern W/m²")

@@ -9,7 +9,8 @@ od = Insolation.OrbitalDataSplines()
     date = Dates.DateTime(2000, 6, 21, 12, 0, 0)  # Summer solstice
     lat = FT(45.0)
 
-    F, S, μ = daily_insolation(date, lat, param_set, od; milankovitch = true)
+    milankovitch = true
+    F, S, μ = daily_insolation(date, lat, param_set, od, milankovitch)
 
     # Check return types
     @test typeof(F) == FT
@@ -22,7 +23,9 @@ od = Insolation.OrbitalDataSplines()
     @test 0 <= μ <= 1
 
     # Test without Milankovitch cycles (epoch parameters)
-    F_epoch, S_epoch, μ_epoch = daily_insolation(date, lat, param_set; milankovitch = false)
+    milankovitch = false
+    F_epoch, S_epoch, μ_epoch =
+        daily_insolation(date, lat, param_set, nothing, milankovitch)
 
     @test typeof(F_epoch) == FT
     @test typeof(S_epoch) == FT
@@ -98,7 +101,7 @@ end
     # SH winter when NH summer
     @test F_sp_summer ≈ 0 atol = 1.0
     @test μ_sp_summer ≈ 0 atol = 0.01
-    # SH summer when NH winter  
+    # SH summer when NH winter
     @test F_sp_winter > 0
     @test μ_sp_winter > 0
 end

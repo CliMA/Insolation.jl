@@ -22,7 +22,8 @@ function calc_day_lat_insolation(od, n_days::I, n_lats::I, param_set::IP.AIP) wh
         for (j, lat) in enumerate(l_arr)
             date = Dates.DateTime(2000, 1, 1) + Dates.Day(d)
             # Use daily_insolation API
-            F, _, _ = daily_insolation(date, lat, param_set, od; milankovitch = false)
+            milankovitch = false
+            F, _, _ = daily_insolation(date, lat, param_set, od, milankovitch)
             F_arr[i, j] = F
         end
     end

@@ -4,30 +4,76 @@ lon, lat = [FT(80.0), FT(20.0)]
 od = Insolation.OrbitalDataSplines()
 
 # Test with fixed epoch parameters (no eot correction)
-F, S, μ, ζ = insolation(date, lat, lon, param_set; eot_correction = false)
+milankovitch = false
+solar_variability = false
+eot_correction = false
+F, S, μ, ζ = insolation(
+    date,
+    lat,
+    lon,
+    param_set,
+    nothing,
+    milankovitch,
+    solar_variability,
+    eot_correction,
+)
 @test typeof(F) == FT
 @test typeof(S) == FT
 @test typeof(μ) == FT
 @test typeof(ζ) == FT
 
 # Test with Milankovitch cycles (no eot correction)
-F, S, μ, ζ =
-    insolation(date, lat, lon, param_set, od; milankovitch = true, eot_correction = false)
+milankovitch = false
+solar_variability = false
+eot_correction = false
+F, S, μ, ζ = insolation(
+    date,
+    lat,
+    lon,
+    param_set,
+    od,
+    milankovitch,
+    solar_variability,
+    eot_correction,
+)
 @test typeof(F) == FT
 @test typeof(S) == FT
 @test typeof(μ) == FT
 @test typeof(ζ) == FT
 
 # Test with fixed epoch parameters (with eot correction)
-F, S, μ, ζ = insolation(date, lat, lon, param_set; eot_correction = true)
+milankovitch = false
+solar_variability = false
+eot_correction = true
+F, S, μ, ζ = insolation(
+    date,
+    lat,
+    lon,
+    param_set,
+    nothing,
+    milankovitch,
+    solar_variability,
+    eot_correction,
+)
 @test typeof(F) == FT
 @test typeof(S) == FT
 @test typeof(μ) == FT
 @test typeof(ζ) == FT
 
 # Test with Milankovitch cycles (with eot correction)
-F, S, μ, ζ =
-    insolation(date, lat, lon, param_set, od; milankovitch = true, eot_correction = true)
+milankovitch = true
+solar_variability = false
+eot_correction = true
+F, S, μ, ζ = insolation(
+    date,
+    lat,
+    lon,
+    param_set,
+    od,
+    milankovitch,
+    solar_variability,
+    eot_correction,
+)
 @test typeof(F) == FT
 @test typeof(S) == FT
 @test typeof(μ) == FT
