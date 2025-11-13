@@ -5,7 +5,7 @@ od = Insolation.OrbitalDataSplines()
 
 # Test with fixed epoch parameters (no eot correction)
 milankovitch = false
-solar_variability = false
+solar_variability = nothing
 eot_correction = false
 F, S, μ, ζ = insolation(
     date,
@@ -24,7 +24,7 @@ F, S, μ, ζ = insolation(
 
 # Test with Milankovitch cycles (no eot correction)
 milankovitch = false
-solar_variability = false
+solar_variability = nothing
 eot_correction = false
 F, S, μ, ζ = insolation(
     date,
@@ -43,7 +43,7 @@ F, S, μ, ζ = insolation(
 
 # Test with fixed epoch parameters (with eot correction)
 milankovitch = false
-solar_variability = false
+solar_variability = nothing
 eot_correction = true
 F, S, μ, ζ = insolation(
     date,
@@ -62,7 +62,26 @@ F, S, μ, ζ = insolation(
 
 # Test with Milankovitch cycles (with eot correction)
 milankovitch = true
-solar_variability = false
+solar_variability = nothing
+eot_correction = true
+F, S, μ, ζ = insolation(
+    date,
+    lat,
+    lon,
+    param_set,
+    od,
+    milankovitch,
+    solar_variability,
+    eot_correction,
+)
+@test typeof(F) == FT
+@test typeof(S) == FT
+@test typeof(μ) == FT
+@test typeof(ζ) == FT
+
+# Test with solar_variability
+milankovitch = true
+solar_variability = TSIDataSpline()
 eot_correction = true
 F, S, μ, ζ = insolation(
     date,

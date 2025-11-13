@@ -61,6 +61,16 @@ Insolation.orbital_params
 Insolation.OrbitalDataSplines
 ```
 
+## Solar Irradiance Parameters
+
+Functions for creating and evaluating a solar irradiance spline.
+
+```@docs
+Insolation.TSIDataSpline
+Insolation.TSIDataSpline()
+Insolation.evaluate
+```
+
 ## Insolation Calculations
 
 Main functions for computing top-of-atmosphere solar radiation.
