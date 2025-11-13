@@ -154,13 +154,15 @@ using CUDA, Adapt, Insolation, ClimaParams
 # Create parameters and orbital data on CPU
 params = InsolationParameters(Float32)
 cpu_od = OrbitalDataSplines()
+cpu_tsi = TSIDataSpline(Float32)
 
 # Transfer orbital data to GPU
 gpu_od = adapt(CuArray, cpu_od)
+gpu_tsi = adapt(CuArray, cpu_tsi)
 
 # Use in GPU kernels (positional argument required for GPU compatibility)
 milankovitch = true
-F, S, μ, ζ = insolation(date, lat, lon, params, gpu_od, milankovitch)
+F, S, μ, ζ = insolation(date, lat, lon, params, gpu_od, milankovitch, gpu_tsi)
 ```
 
 **Design Note**: The constructor creates data on CPU; users explicitly transfer to GPU using `adapt()`. This gives explicit control over data placement and follows Julia GPU ecosystem conventions.

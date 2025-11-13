@@ -5,7 +5,7 @@ od = Insolation.OrbitalDataSplines()
 
 # Test with fixed epoch parameters (no eot correction)
 milankovitch = false
-solar_variability = false
+solar_variability_spline = nothing
 eot_correction = false
 F, S, μ, ζ = insolation(
     date,
@@ -14,7 +14,7 @@ F, S, μ, ζ = insolation(
     param_set,
     nothing,
     milankovitch,
-    solar_variability,
+    solar_variability_spline,
     eot_correction,
 )
 @test typeof(F) == FT
@@ -24,7 +24,7 @@ F, S, μ, ζ = insolation(
 
 # Test with Milankovitch cycles (no eot correction)
 milankovitch = false
-solar_variability = false
+solar_variability_spline = nothing
 eot_correction = false
 F, S, μ, ζ = insolation(
     date,
@@ -33,7 +33,7 @@ F, S, μ, ζ = insolation(
     param_set,
     od,
     milankovitch,
-    solar_variability,
+    solar_variability_spline,
     eot_correction,
 )
 @test typeof(F) == FT
@@ -43,7 +43,7 @@ F, S, μ, ζ = insolation(
 
 # Test with fixed epoch parameters (with eot correction)
 milankovitch = false
-solar_variability = false
+solar_variability_spline = nothing
 eot_correction = true
 F, S, μ, ζ = insolation(
     date,
@@ -52,7 +52,7 @@ F, S, μ, ζ = insolation(
     param_set,
     nothing,
     milankovitch,
-    solar_variability,
+    solar_variability_spline,
     eot_correction,
 )
 @test typeof(F) == FT
@@ -62,7 +62,7 @@ F, S, μ, ζ = insolation(
 
 # Test with Milankovitch cycles (with eot correction)
 milankovitch = true
-solar_variability = false
+solar_variability_spline = nothing
 eot_correction = true
 F, S, μ, ζ = insolation(
     date,
@@ -71,7 +71,26 @@ F, S, μ, ζ = insolation(
     param_set,
     od,
     milankovitch,
-    solar_variability,
+    solar_variability_spline,
+    eot_correction,
+)
+@test typeof(F) == FT
+@test typeof(S) == FT
+@test typeof(μ) == FT
+@test typeof(ζ) == FT
+
+# Test with solar_variability_spline
+milankovitch = true
+solar_variability_spline = TSIDataSpline(FT)
+eot_correction = true
+F, S, μ, ζ = insolation(
+    date,
+    lat,
+    lon,
+    param_set,
+    od,
+    milankovitch,
+    solar_variability_spline,
     eot_correction,
 )
 @test typeof(F) == FT
