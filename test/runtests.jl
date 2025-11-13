@@ -22,6 +22,9 @@ import ClimaParams as CP
             @testset "Orbital Params" begin
                 include("test_orbit_param.jl")
             end
+            @testset "TSIDataSpline" begin
+                include("test_tsi_data_spline.jl")
+            end
             @testset "Types" begin
                 include("test_types.jl")
             end
