@@ -28,8 +28,7 @@ if CUDA_AVAILABLE
                 lon_cpu = FT(-105.0)
 
                 # Compute reference on CPU
-                F_cpu, S_cpu, μ_cpu, ζ_cpu =
-                    insolation(date, lat_cpu, lon_cpu, params)
+                F_cpu, S_cpu, μ_cpu, ζ_cpu = insolation(date, lat_cpu, lon_cpu, params)
 
                 # Create orbital data splines
                 od_cpu = OrbitalDataSplines()
@@ -54,23 +53,10 @@ if CUDA_AVAILABLE
 
                     # Compute with orbital_data and milankovitch = true
                     milankovitch = true
-                    F_cpu, S_cpu, μ_cpu, ζ_cpu = insolation(
-                        date,
-                        lat_cpu,
-                        lon_cpu,
-                        params,
-                        od_cpu,
-                        milankovitch,
-                    )
+                    F_cpu, S_cpu, μ_cpu, ζ_cpu =
+                        insolation(date, lat_cpu, lon_cpu, params, od_cpu, milankovitch)
                     result =
-                        insolation.(
-                            date,
-                            lat_gpu,
-                            lon_gpu,
-                            params,
-                            od_gpu,
-                            milankovitch,
-                        )
+                        insolation.(date, lat_gpu, lon_gpu, params, od_gpu, milankovitch)
                     F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
 
                     @test F_gpu ≈ F_cpu rtol = 1e-4
@@ -80,13 +66,11 @@ if CUDA_AVAILABLE
                 end
 
                 # Combinations that we want to try for insolation
-                combinations =
-                    ((nothing, nothing, false), (od_cpu, od_gpu, true))
+                combinations = ((nothing, nothing, false), (od_cpu, od_gpu, true))
 
                 # Test broadcasting over multiple values
                 @testset "Broadcasting over multiple locations" begin
-                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in
-                        combinations
+                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in combinations
                         n = 100
                         lats_cpu = FT.(range(-90, 90, length = n))
                         lons_cpu = FT.(range(-180, 180, length = n))
@@ -121,7 +105,7 @@ if CUDA_AVAILABLE
                         results_gpu_cpu = Array(results_gpu)
 
                         # Check all results match
-                        for i in 1:n
+                        for i = 1:n
                             F_cpu, S_cpu, μ_cpu, ζ_cpu = results_cpu[i]
                             F_gpu, S_gpu, μ_gpu, ζ_gpu = results_gpu_cpu[i]
 
@@ -135,19 +119,17 @@ if CUDA_AVAILABLE
 
                 # Test daily_insolation
                 @testset "daily_insolation on GPU" begin
-                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in
-                        combinations
+                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in combinations
                         lat_gpu = CuArray([lat_cpu])
 
                         # Compute reference on CPU
-                        F_daily_cpu, S_daily_cpu, μ_daily_cpu =
-                            daily_insolation(
-                                date,
-                                lat_cpu,
-                                params,
-                                maybe_od_cpu,
-                                milankovitch,
-                            )
+                        F_daily_cpu, S_daily_cpu, μ_daily_cpu = daily_insolation(
+                            date,
+                            lat_cpu,
+                            params,
+                            maybe_od_cpu,
+                            milankovitch,
+                        )
 
                         # Run on GPU
                         result =
@@ -171,8 +153,7 @@ if CUDA_AVAILABLE
 
                 # Test with different times
                 @testset "Multiple dates" begin
-                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in
-                        combinations
+                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in combinations
                         dates = [
                             DateTime(2024, 3, 20, 12, 0, 0),  # Equinox
                             DateTime(2024, 6, 21, 12, 0, 0),  # Summer solstice
@@ -209,7 +190,7 @@ if CUDA_AVAILABLE
 
                         # Compare
                         results_gpu_cpu = Array(results_gpu)
-                        for i in 1:length(dates)
+                        for i = 1:length(dates)
                             F_cpu, S_cpu, μ_cpu, ζ_cpu = results_cpu[i]
                             F_gpu, S_gpu, μ_gpu, ζ_gpu = results_gpu_cpu[i]
 
@@ -223,8 +204,7 @@ if CUDA_AVAILABLE
 
                 # Test edge cases
                 @testset "Edge cases on GPU" begin
-                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in
-                        combinations
+                    for (maybe_od_cpu, maybe_od_gpu, milankovitch) in combinations
                         # Polar night
                         result_cpu = insolation(
                             DateTime(2024, 12, 21, 12, 0, 0),

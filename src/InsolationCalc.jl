@@ -115,7 +115,7 @@ function insolation(
     latitude::FT1,
     longitude::FT2,
     param_set::IP.AIP,
-    orbital_data::Union{OrbitalDataSplines, Nothing} = nothing,
+    orbital_data::Union{OrbitalDataSplines,Nothing} = nothing,
     milankovitch::Bool = false,
     solar_variability::Bool = false,
     eot_correction::Bool = true,
@@ -198,7 +198,7 @@ function daily_insolation(
     date::DateTime,
     latitude::Real,
     param_set::IP.AIP,
-    orbital_data::Union{OrbitalDataSplines, Nothing} = nothing,
+    orbital_data::Union{OrbitalDataSplines,Nothing} = nothing,
     milankovitch::Bool = false,
     solar_variability::Bool = false,
 )

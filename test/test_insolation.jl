@@ -41,8 +41,7 @@ F, S, μ, ζ = insolation(date, lat, lon, param_set, od, milankovitch)
 milankovitch = true
 @test insolation(date, lat, Int(lon), param_set, od, milankovitch) == (F, S, μ, ζ)
 @test insolation(date, Int(lat), lon, param_set, od, milankovitch) == (F, S, μ, ζ)
-@test insolation(date, Int(lat), Int(lon), param_set, od, milankovitch) ==
-      (F, S, μ, ζ)
+@test insolation(date, Int(lat), Int(lon), param_set, od, milankovitch) == (F, S, μ, ζ)
 
 # polar night NH 2
 date = Dates.DateTime(2020, 12, 20, 23, 0, 0)
@@ -73,8 +72,8 @@ for (i, lat) in enumerate(l_arr)
     local F, S, μ = insolation(daily_θ, d, param_set)
     F_arr[i] = F
 end
-F_NH = sort(F_arr[l_arr .>= 0])
-F_SH = sort(F_arr[l_arr .<= 0])
+F_NH = sort(F_arr[l_arr.>=0])
+F_SH = sort(F_arr[l_arr.<=0])
 @test F_NH ≈ F_SH rtol = rtol
 
 ## Test globally averaged insolation ≈ TSI
@@ -136,8 +135,7 @@ F_simple, S_simple, μ_simple, ζ_simple = insolation(date, lat, lon, param_set)
 
 # Test full method with OrbitalDataSplines
 milankovitch = true
-F_full, S_full, μ_full, ζ_full =
-    insolation(date, lat, lon, param_set, od, milankovitch)
+F_full, S_full, μ_full, ζ_full = insolation(date, lat, lon, param_set, od, milankovitch)
 
 # For year 2000 (near epoch), both methods should give very similar results
 @test S_simple ≈ S_full rtol = 0.01
@@ -156,11 +154,4 @@ F_eq, S_eq, μ_eq, ζ_eq = insolation(date_equinox, lat_eq, lon_eq, param_set)
 
 # Test error when milankovitch=true but orbital_data is nothing
 milankovitch = true
-@test_throws ErrorException insolation(
-    date,
-    lat,
-    lon,
-    param_set,
-    nothing,
-    milankovitch,
-)
+@test_throws ErrorException insolation(date, lat, lon, param_set, nothing, milankovitch)
