@@ -21,7 +21,6 @@ makedocs(
     modules = [Insolation],
     pages = pages,
     checkdocs = :none,
-    warnonly = true,  # Don't fail on warnings
 )
 
 deploydocs(
