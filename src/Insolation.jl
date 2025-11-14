@@ -27,7 +27,8 @@ import .Parameters as IP
 import .Parameters: InsolationParameters
 const AIP = IP.AbstractInsolationParams
 
-export orbital_params, OrbitalDataSplines, insolation, daily_insolation
+export orbital_params,
+    OrbitalDataSplines, insolation, daily_insolation, TSIDataSpline, evaluate
 export InsolationParameters
 
 """
@@ -137,6 +138,72 @@ function orbital_params(param_set::AIP)
     e = IP.eccentricity_epoch(param_set)
     return ϖ, γ, e
 end
+
+"""
+    TSIDataSpline
+
+A container struct that holds the monthly mean total solar irradiance.
+
+The spline is a function of date between `1850-01-15T12:00:00` and
+` 2299-12-15T12:00:00`.
+
+# GPU Support
+This struct is GPU-compatible via Adapt.jl. To transfer to GPU memory:
+```julia
+using CUDA, Adapt
+cpu_tsi = TSIDataSpline()  # Create on CPU
+gpu_tsi = adapt(CuArray, TSIDataSpline)  # Transfer to GPU
+```
+"""
+struct TSIDataSpline{SPLINE,REF_DATE<:Dates.AbstractDateTime}
+    tsi_spline::SPLINE
+    ref_date::REF_DATE
+end
+
+"""
+    _get_tsi_data()
+
+Return the monthly dates and TSI data from the `cmip_monthly_tsi` artifact.
+"""
+function _get_tsi_data()
+    datapath = joinpath(artifact"cmip_monthly_tsi", "cmip_monthly_tsi.csv")
+    monthly_tsi_data, _ = readdlm(datapath, ',', String, header = true)
+
+    monthly_dates = Dates.DateTime.(monthly_tsi_data[:, 1])
+    tsi_data = parse.(Float64, monthly_tsi_data[:, 2])
+    return monthly_dates, tsi_data
+end
+
+"""
+    TSIDataSpline()
+
+Constructs a `TSIDataSpline` that linearly interpolates monthly mean total solar
+irradiance as a function of the date and time.
+"""
+function TSIDataSpline()
+    monthly_dates, tsi_data = _get_tsi_data()
+
+    ref_date = monthly_dates[1]
+    hourly_times =
+        [(monthly_date - ref_date) / Dates.Hour(1) for monthly_date in monthly_dates]
+
+    tsi_spline = interpolate((hourly_times,), tsi_data, Gridded(Linear()))
+    return TSIDataSpline(tsi_spline, ref_date)
+end
+
+"""
+    evaluate(tsi::TSIDataSpline, date::Dates.DateTime)
+
+Linearly interpolate monthly mean total solar irradiance at `date`.
+"""
+function evaluate(tsi::TSIDataSpline, date::Dates.DateTime)
+    t = (date - tsi.ref_date) / Dates.Hour(1)
+    return tsi.tsi_spline(t)
+end
+
+Adapt.@adapt_structure TSIDataSpline
+
+Base.broadcastable(x::TSIDataSpline) = tuple(x)
 
 include("SolarGeometry.jl")
 include("InsolationCalc.jl")
