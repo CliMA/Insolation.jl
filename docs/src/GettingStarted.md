@@ -177,10 +177,11 @@ date = DateTime(2000, 1, 1, 13, 0, 0)
 lat = 40.0
 lon = 15.0
 
+orbital_data = nothing
 milankovitch = false
-solar_variability = false
+solar_variability_spline = nothing
 eot_correction = false
-F, S, μ, ζ = insolation(date, lat, lon, params, milankovitch, solar_variability, eot_correction)
+F, S, μ, ζ = insolation(date, lat, lon, params, orbital_data, milankovitch, solar_variability_spline, eot_correction)
 ```
 
 ### Custom Orbital Parameters
