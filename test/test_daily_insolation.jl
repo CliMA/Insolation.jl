@@ -127,6 +127,47 @@ end
     @test maximum(insolations) / minimum(insolations) < 1.15
 end
 
+@testset "Daily insolation with solar variability" begin
+    date = Dates.DateTime(2000, 3, 20)
+    lat = 32.0
+    orbital_data = nothing
+    milankovitch = false
+    solar_variability_spline = TSIDataSpline(FT)
+    F_solar, S_solar, μ_solar = daily_insolation(
+        date,
+        lat,
+        param_set,
+        orbital_data,
+        milankovitch,
+        solar_variability_spline,
+    )
+
+    F_no_solar, S_no_solar, μ_no_solar =
+        daily_insolation(date, lat, param_set, orbital_data, milankovitch, nothing)
+
+    @test isapprox(F_solar, F_no_solar, rtol = 1e-3)
+    @test !isapprox(S_solar, S_full, rtol = 1e-3)
+    @test isapprox(μ_solar, μ_no_solar)
+
+    date, tsi_val = first.(Insolation._get_tsi_data())
+    diff_param_set = IP.InsolationParameters(FT, (; tot_solar_irrad = tsi_val))
+    F_solar, S_solar, μ_solar = daily_insolation(
+        date,
+        lat,
+        diff_param_set,
+        orbital_data,
+        milankovitch,
+        solar_variability_spline,
+    )
+
+    F_no_solar, S_no_solar, μ_no_solar =
+        daily_insolation(date, lat, diff_param_set, orbital_data, milankovitch, nothing)
+
+    @test isapprox(F_solar, F_no_solar)
+    @test isapprox(S_solar, S_no_solar)
+    @test isapprox(μ_solar, μ_no_solar)
+end
+
 @testset "Daily Insolation - Annual Mean" begin
     # Test that annual mean insolation ≈ TSI/4
     nlats = 37
