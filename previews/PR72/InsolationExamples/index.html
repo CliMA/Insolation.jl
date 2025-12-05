@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Insolation Examples · Insolation.jl</title><meta name="title" content="Insolation Examples · Insolation.jl"/><meta property="og:title" content="Insolation Examples · Insolation.jl"/><meta property="twitter:title" content="Insolation Examples · Insolation.jl"/><meta name="description" content="Documentation for Insolation.jl."/><meta property="og:description" content="Documentation for Insolation.jl."/><meta property="twitter:description" content="Documentation for Insolation.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Insolation.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../ZenithAngleEquations/">Zenith Angle Equations</a></li><li class="is-active"><a class="tocitem" href>Insolation Examples</a><ul class="internal"><li><a class="tocitem" href="#Diurnal-cycle-of-insolation"><span>Diurnal cycle of insolation</span></a></li><li><a class="tocitem" href="#Daily-mean-insolation"><span>Daily-mean insolation</span></a></li></ul></li><li><a class="tocitem" href="../Milankovitch/">Milankovitch Cycles</a></li><li><a class="tocitem" href="../library/">APIs</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Insolation Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Insolation Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/CliMA/Insolation.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/CliMA/Insolation.jl/blob/main/docs/src/InsolationExamples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Insolation-Examples"><a class="docs-heading-anchor" href="#Insolation-Examples">Insolation Examples</a><a id="Insolation-Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Insolation-Examples" title="Permalink"></a></h1><h2 id="Diurnal-cycle-of-insolation"><a class="docs-heading-anchor" href="#Diurnal-cycle-of-insolation">Diurnal cycle of insolation</a><a id="Diurnal-cycle-of-insolation-1"></a><a class="docs-heading-anchor-permalink" href="#Diurnal-cycle-of-insolation" title="Permalink"></a></h2><pre><code class="language-julia hljs">using Dates
+
+include(&quot;plot_diurnal_cycle.jl&quot;)
+
+# Pasadena in January
+lat, lon = [34.15, -118.14]
+date = DateTime(2020, 01, 10)
+timezone = +8 # Pacific Standard Time
+od = Insolation.OrbitalData()
+diurnal_cycle(lat, lon, date, od, timezone, &quot;Pasadena_January.png&quot;)
+
+# Finland in June
+lat, lon = [66.50, 25.73]
+date = DateTime(2020, 06, 10)
+timezone = -3 # Eastern European Summer Time
+diurnal_cycle(lat, lon, date, od, timezone, &quot;Finland_June.png&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;/home/runner/work/Insolation.jl/Insolation.jl/docs/build/Finland_June.png&quot;</code></pre><p><img src="../Pasadena_January.png" alt/> <img src="../Finland_June.png" alt/></p><h2 id="Daily-mean-insolation"><a class="docs-heading-anchor" href="#Daily-mean-insolation">Daily-mean insolation</a><a id="Daily-mean-insolation-1"></a><a class="docs-heading-anchor-permalink" href="#Daily-mean-insolation" title="Permalink"></a></h2><h3 id="Insolation-in-J2000"><a class="docs-heading-anchor" href="#Insolation-in-J2000">Insolation in J2000</a><a id="Insolation-in-J2000-1"></a><a class="docs-heading-anchor-permalink" href="#Insolation-in-J2000" title="Permalink"></a></h3><pre><code class="language-julia hljs">import Insolation
+import Insolation.Parameters as IP
+import ClimaParams as CP
+
+FT = Float64
+param_set = IP.InsolationParameters(FT)
+
+include(&quot;plot_insolation.jl&quot;)
+
+γ0 = IP.obliq_epoch(param_set)
+ϖ0 = IP.lon_perihelion_epoch(param_set)
+e0 = IP.eccentricity_epoch(param_set)
+od = Insolation.OrbitalData()
+
+days, lats, F0 = calc_day_lat_insolation(od, 365, 180, param_set)
+plot_day_lat_insolation(days, lats, F0, &quot;YlOrRd&quot;, title, &quot;insol_example1.png&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;/home/runner/work/Insolation.jl/Insolation.jl/docs/build/insol_example1.png&quot;</code></pre><p><img src="../insol_example1.png" alt/></p><h3 id="Insolation-with-smaller-obliquity"><a class="docs-heading-anchor" href="#Insolation-with-smaller-obliquity">Insolation with smaller obliquity</a><a id="Insolation-with-smaller-obliquity-1"></a><a class="docs-heading-anchor-permalink" href="#Insolation-with-smaller-obliquity" title="Permalink"></a></h3><pre><code class="language-julia hljs">import Insolation
+import Insolation.Parameters as IP
+import ClimaParams as CP
+
+FT = Float64
+param_set = IP.InsolationParameters(FT)
+
+od = Insolation.OrbitalData()
+
+# decrease γ to 20.0°
+param_set = IP.InsolationParameters(FT, (; obliq_epoch = deg2rad(20.0)))
+γ1 = IP.obliq_epoch(param_set)
+days, lats, F2 = calc_day_lat_insolation(od, 365, 180, param_set)
+
+plot_day_lat_insolation(days,lats,F2,&quot;YlOrRd&quot;,  title, &quot;insol_example2a.png&quot;)
+plot_day_lat_insolation(days, lats, F2-F0, &quot;PRGn&quot;, title, &quot;insol_example2b.png&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;/home/runner/work/Insolation.jl/Insolation.jl/docs/build/insol_example2b.png&quot;</code></pre><p><img src="../insol_example2a.png" alt/> <img src="../insol_example2b.png" alt/></p><h3 id="Insolation-with-very-large-obliquity-(like-Uranus)"><a class="docs-heading-anchor" href="#Insolation-with-very-large-obliquity-(like-Uranus)">Insolation with very large obliquity (like Uranus)</a><a id="Insolation-with-very-large-obliquity-(like-Uranus)-1"></a><a class="docs-heading-anchor-permalink" href="#Insolation-with-very-large-obliquity-(like-Uranus)" title="Permalink"></a></h3><pre><code class="language-julia hljs">import Insolation
+import Insolation.Parameters as IP
+import ClimaParams as CP
+
+FT = Float64
+param_set = IP.InsolationParameters(FT)
+
+od = Insolation.OrbitalData()
+
+# now change obliquity to 97.86°
+param_set = IP.InsolationParameters(FT, (;obliq_epoch = deg2rad(97.86)))
+γ4 = IP.obliq_epoch(param_set)
+days, lats, F5 = calc_day_lat_insolation(od, 365, 180, param_set)
+
+plot_day_lat_insolation(days,lats,F5,&quot;YlOrRd&quot;, title, &quot;insol_example3a.png&quot;)
+plot_day_lat_insolation(days, lats, F5-F0, &quot;PRGn&quot;, title, &quot;insol_example3b.png&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;/home/runner/work/Insolation.jl/Insolation.jl/docs/build/insol_example3b.png&quot;</code></pre><p><img src="../insol_example3a.png" alt/> <img src="../insol_example3b.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../ZenithAngleEquations/">« Zenith Angle Equations</a><a class="docs-footer-nextpage" href="../Milankovitch/">Milankovitch Cycles »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Monday 26 February 2024 19:17">Monday 26 February 2024</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
