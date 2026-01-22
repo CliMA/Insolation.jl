@@ -7,7 +7,7 @@ od = Insolation.OrbitalDataSplines()
 milankovitch = false
 solar_variability_spline = nothing
 eot_correction = false
-F, S, μ, ζ = insolation(
+(; F, S, μ, ζ) = insolation(
     date,
     lat,
     lon,
@@ -26,7 +26,7 @@ F, S, μ, ζ = insolation(
 milankovitch = false
 solar_variability_spline = nothing
 eot_correction = false
-F, S, μ, ζ = insolation(
+(; F, S, μ, ζ) = insolation(
     date,
     lat,
     lon,
@@ -45,7 +45,7 @@ F, S, μ, ζ = insolation(
 milankovitch = false
 solar_variability_spline = nothing
 eot_correction = true
-F, S, μ, ζ = insolation(
+(; F, S, μ, ζ) = insolation(
     date,
     lat,
     lon,
@@ -64,7 +64,7 @@ F, S, μ, ζ = insolation(
 milankovitch = true
 solar_variability_spline = nothing
 eot_correction = true
-F, S, μ, ζ = insolation(
+(; F, S, μ, ζ) = insolation(
     date,
     lat,
     lon,
@@ -83,7 +83,7 @@ F, S, μ, ζ = insolation(
 milankovitch = true
 solar_variability_spline = TSIDataSpline(FT)
 eot_correction = true
-F, S, μ, ζ = insolation(
+(; F, S, μ, ζ) = insolation(
     date,
     lat,
     lon,
@@ -117,21 +117,20 @@ F, S, μ, ζ = insolation(
     # Verify we got 2 results (one per date/lat/lon combo)
     @test length(results) == 2
 
-    # Verify each result is a tuple of (F, S, μ, ζ)
+    # Verify each result is a NamedTuple of (F, S, μ, ζ)
     for result in results
-        @test result isa Tuple
+        @test result isa NamedTuple
         @test length(result) == 4
-        F_test, S_test, μ_test, ζ_test = result
-        @test F_test isa FT
-        @test S_test isa FT
-        @test μ_test isa FT
-        @test ζ_test isa FT
+        @test result.F isa FT
+        @test result.S isa FT
+        @test result.μ isa FT
+        @test result.ζ isa FT
     end
 
     # Test that results match single calls
-    F1, S1, μ1, ζ1 = insolation(dates[1], lats[1], lons[1], param_set)
-    @test results[1][1] == F1
-    @test results[1][2] == S1
-    @test results[1][3] == μ1
-    @test results[1][4] == ζ1
+    result1 = insolation(dates[1], lats[1], lons[1], param_set)
+    @test results[1].F == result1.F
+    @test results[1].S == result1.S
+    @test results[1].μ == result1.μ
+    @test results[1].ζ == result1.ζ
 end

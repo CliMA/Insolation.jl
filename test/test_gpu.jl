@@ -28,7 +28,9 @@ if CUDA_AVAILABLE
                 lon_cpu = FT(-105.0)
 
                 # Compute reference on CPU
-                F_cpu, S_cpu, μ_cpu, ζ_cpu = insolation(date, lat_cpu, lon_cpu, params)
+                result_cpu = insolation(date, lat_cpu, lon_cpu, params)
+                F_cpu, S_cpu, μ_cpu, ζ_cpu =
+                    result_cpu.F, result_cpu.S, result_cpu.μ, result_cpu.ζ
 
                 # Create orbital data splines
                 od_cpu = OrbitalDataSplines()
@@ -46,7 +48,11 @@ if CUDA_AVAILABLE
                     result = insolation.(date, lat_gpu, lon_gpu, params)
 
                     # Bring back to CPU for comparison
-                    F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
+                    result_gpu_arr = Array(result)[1]
+                    F_gpu, S_gpu, μ_gpu, ζ_gpu = result_gpu_arr.F,
+                    result_gpu_arr.S,
+                    result_gpu_arr.μ,
+                    result_gpu_arr.ζ
 
                     # Check results match
                     @test F_gpu ≈ F_cpu rtol = 1e-4
@@ -56,11 +62,17 @@ if CUDA_AVAILABLE
 
                     # Compute with orbital_data and milankovitch = true
                     milankovitch = true
-                    F_cpu, S_cpu, μ_cpu, ζ_cpu =
+                    result_cpu2 =
                         insolation(date, lat_cpu, lon_cpu, params, od_cpu, milankovitch)
+                    F_cpu, S_cpu, μ_cpu, ζ_cpu =
+                        result_cpu2.F, result_cpu2.S, result_cpu2.μ, result_cpu2.ζ
                     result =
                         insolation.(date, lat_gpu, lon_gpu, params, od_gpu, milankovitch)
-                    F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
+                    result_gpu_arr = Array(result)[1]
+                    F_gpu, S_gpu, μ_gpu, ζ_gpu = result_gpu_arr.F,
+                    result_gpu_arr.S,
+                    result_gpu_arr.μ,
+                    result_gpu_arr.ζ
 
                     @test F_gpu ≈ F_cpu rtol = 1e-4
                     @test S_gpu ≈ S_cpu rtol = 1e-4
@@ -68,7 +80,7 @@ if CUDA_AVAILABLE
                     @test ζ_gpu ≈ ζ_cpu rtol = 1e-4
 
                     # Compute with solar variability
-                    F_cpu, S_cpu, μ_cpu, ζ_cpu = insolation(
+                    result_cpu3 = insolation(
                         date,
                         lat_cpu,
                         lon_cpu,
@@ -77,6 +89,8 @@ if CUDA_AVAILABLE
                         milankovitch,
                         tsi_cpu,
                     )
+                    F_cpu, S_cpu, μ_cpu, ζ_cpu =
+                        result_cpu3.F, result_cpu3.S, result_cpu3.μ, result_cpu3.ζ
                     result =
                         insolation.(
                             date,
@@ -87,7 +101,11 @@ if CUDA_AVAILABLE
                             milankovitch,
                             tsi_gpu,
                         )
-                    F_gpu, S_gpu, μ_gpu, ζ_gpu = Array(result)[1]
+                    result_gpu_arr = Array(result)[1]
+                    F_gpu, S_gpu, μ_gpu, ζ_gpu = result_gpu_arr.F,
+                    result_gpu_arr.S,
+                    result_gpu_arr.μ,
+                    result_gpu_arr.ζ
 
                     @test F_gpu ≈ F_cpu rtol = 1e-4
                     @test S_gpu ≈ S_cpu rtol = 1e-4
@@ -155,8 +173,16 @@ if CUDA_AVAILABLE
 
                         # Check all results match
                         for i = 1:n
-                            F_cpu, S_cpu, μ_cpu, ζ_cpu = results_cpu[i]
-                            F_gpu, S_gpu, μ_gpu, ζ_gpu = results_gpu_cpu[i]
+                            result_cpu_i = results_cpu[i]
+                            F_cpu, S_cpu, μ_cpu, ζ_cpu = result_cpu_i.F,
+                            result_cpu_i.S,
+                            result_cpu_i.μ,
+                            result_cpu_i.ζ
+                            result_gpu_i = results_gpu_cpu[i]
+                            F_gpu, S_gpu, μ_gpu, ζ_gpu = result_gpu_i.F,
+                            result_gpu_i.S,
+                            result_gpu_i.μ,
+                            result_gpu_i.ζ
 
                             @test F_gpu ≈ F_cpu rtol = 1e-4
                             @test S_gpu ≈ S_cpu rtol = 1e-4
@@ -178,7 +204,7 @@ if CUDA_AVAILABLE
                         lat_gpu = CuArray([lat_cpu])
 
                         # Compute reference on CPU
-                        F_daily_cpu, S_daily_cpu, μ_daily_cpu = daily_insolation(
+                        result_daily_cpu = daily_insolation(
                             date,
                             lat_cpu,
                             params,
@@ -186,6 +212,8 @@ if CUDA_AVAILABLE
                             milankovitch,
                             maybe_tsi_cpu,
                         )
+                        F_daily_cpu, S_daily_cpu, μ_daily_cpu =
+                            result_daily_cpu.F, result_daily_cpu.S, result_daily_cpu.μ
 
                         # Run on GPU
                         result =
@@ -199,7 +227,9 @@ if CUDA_AVAILABLE
                             )
 
                         # Bring back to CPU
-                        F_daily_gpu, S_daily_gpu, μ_daily_gpu = Array(result)[1]
+                        result_daily_gpu = Array(result)[1]
+                        F_daily_gpu, S_daily_gpu, μ_daily_gpu =
+                            result_daily_gpu.F, result_daily_gpu.S, result_daily_gpu.μ
 
                         # Check results match
                         @test F_daily_gpu ≈ F_daily_cpu rtol = 1e-5
@@ -256,8 +286,16 @@ if CUDA_AVAILABLE
                         # Compare
                         results_gpu_cpu = Array(results_gpu)
                         for i = 1:length(dates)
-                            F_cpu, S_cpu, μ_cpu, ζ_cpu = results_cpu[i]
-                            F_gpu, S_gpu, μ_gpu, ζ_gpu = results_gpu_cpu[i]
+                            result_cpu_i = results_cpu[i]
+                            F_cpu, S_cpu, μ_cpu, ζ_cpu = result_cpu_i.F,
+                            result_cpu_i.S,
+                            result_cpu_i.μ,
+                            result_cpu_i.ζ
+                            result_gpu_i = results_gpu_cpu[i]
+                            F_gpu, S_gpu, μ_gpu, ζ_gpu = result_gpu_i.F,
+                            result_gpu_i.S,
+                            result_gpu_i.μ,
+                            result_gpu_i.ζ
 
                             @test F_gpu ≈ F_cpu rtol = 1e-5
                             @test S_gpu ≈ S_cpu rtol = 1e-5

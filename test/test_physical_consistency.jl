@@ -21,7 +21,7 @@ od = Insolation.OrbitalDataSplines()
         lon = FT(rand(-180.0:0.1:180.0))
 
         # Test instantaneous insolation
-        F, S, μ, ζ = insolation(date, lat, lon, param_set)
+        (; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
         # Insolation must be non-negative
         @test F >= 0
@@ -51,7 +51,7 @@ end
 
         lat = FT(rand(-90.0:1.0:90.0))
 
-        F, S, μ = daily_insolation(date, lat, param_set)
+        (; F, S, μ) = daily_insolation(date, lat, param_set)
 
         # All values must be non-negative
         @test F >= 0
@@ -82,9 +82,9 @@ end
 
     for date in dates
         Δt_years = Insolation.years_since_epoch(param_set, date)
-        orb_params = Insolation.orbital_params(param_set)
-        d, θ, ζ = Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
-        F, S, μ = insolation(θ, d, param_set)
+        orb_params = orbital_params(param_set)
+        (; d, θ, ζ) = solar_geometry(date, lat, lon, orb_params, param_set)
+        (; F, S, μ) = insolation(θ, d, param_set)
 
         push!(fluxes, S)
         push!(distances, d)
@@ -111,8 +111,8 @@ end
     for hour in hours
         date = date_base + Dates.Hour(hour)
         Δt_years = Insolation.years_since_epoch(param_set, date)
-        orb_params = Insolation.orbital_params(param_set)
-        d, θ, ζ = Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
+        orb_params = orbital_params(param_set)
+        d, θ, ζ = solar_geometry(date, lat, lon, orb_params, param_set)
         push!(zenith_angles, θ)
     end
 
@@ -130,7 +130,7 @@ end
         lat = FT(rand(-90.0:1.0:90.0))
         lon = FT(rand(-180.0:1.0:180.0))
 
-        F, S, μ, ζ = insolation(date, lat, lon, param_set)
+        (; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
         # F should equal S × μ
         @test F ≈ S * μ rtol = 1e-5
@@ -155,10 +155,10 @@ end
 
     for date in dates
         Δt_years = Insolation.years_since_epoch(param_set, date)
-        orb_params = Insolation.orbital_params(param_set)
+        orb_params = orbital_params(param_set)
         lat = FT(0.0)
         lon = FT(0.0)
-        d, θ, ζ = Insolation.solar_geometry(date, lat, lon, orb_params, param_set)
+        d, θ, ζ = solar_geometry(date, lat, lon, orb_params, param_set)
 
         # Distance should be within orbital bounds
         @test d_peri <= d <= d_aph
@@ -178,7 +178,7 @@ end
     F_values = Float64[]
     for i = 0:(n_samples-1)
         date = date_base + Dates.Minute(i * dt_minutes)
-        F, _, _, _ = insolation(date, lat, lon, param_set)
+        F = insolation(date, lat, lon, param_set).F
         push!(F_values, F)
     end
 

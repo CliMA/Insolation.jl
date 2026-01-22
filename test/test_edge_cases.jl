@@ -15,8 +15,10 @@ od = Insolation.OrbitalDataSplines()
     lat_np = FT(90.0)
 
     # Should not error
-    F_np_s, S_np_s, μ_np_s, ζ_np_s = insolation(date_summer, lat_np, lon, param_set)
-    F_np_w, S_np_w, μ_np_w, ζ_np_w = insolation(date_winter, lat_np, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date_summer, lat_np, lon, param_set)
+    F_np_s, S_np_s, μ_np_s, ζ_np_s = F, S, μ, ζ
+    (; F, S, μ, ζ) = insolation(date_winter, lat_np, lon, param_set)
+    F_np_w, S_np_w, μ_np_w, ζ_np_w = F, S, μ, ζ
 
     @test all(isfinite.([F_np_s, S_np_s, μ_np_s, ζ_np_s]))
     @test all(isfinite.([F_np_w, S_np_w, μ_np_w, ζ_np_w]))
@@ -28,8 +30,10 @@ od = Insolation.OrbitalDataSplines()
     # South Pole
     lat_sp = FT(-90.0)
 
-    F_sp_s, S_sp_s, μ_sp_s, ζ_sp_s = insolation(date_summer, lat_sp, lon, param_set)
-    F_sp_w, S_sp_w, μ_sp_w, ζ_sp_w = insolation(date_winter, lat_sp, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date_summer, lat_sp, lon, param_set)
+    F_sp_s, S_sp_s, μ_sp_s, ζ_sp_s = F, S, μ, ζ
+    (; F, S, μ, ζ) = insolation(date_winter, lat_sp, lon, param_set)
+    F_sp_w, S_sp_w, μ_sp_w, ζ_sp_w = F, S, μ, ζ
 
     @test all(isfinite.([F_sp_s, S_sp_s, μ_sp_s, ζ_sp_s]))
     @test all(isfinite.([F_sp_w, S_sp_w, μ_sp_w, ζ_sp_w]))
@@ -48,8 +52,10 @@ end
     lon_neg180 = FT(-180.0)
 
     # Both should give same results (same location)
-    F1, S1, μ1, ζ1 = insolation(date, lat, lon_180, param_set)
-    F2, S2, μ2, ζ2 = insolation(date, lat, lon_neg180, param_set)
+    (; F, S, μ, ζ) = insolation(date, lat, lon_180, param_set)
+    F1, S1, μ1, ζ1 = F, S, μ, ζ
+    (; F, S, μ, ζ) = insolation(date, lat, lon_neg180, param_set)
+    F2, S2, μ2, ζ2 = F, S, μ, ζ
 
     @test F1 ≈ F2 rtol = rtol
     @test S1 ≈ S2 rtol = rtol
@@ -66,8 +72,8 @@ end
     # Far past
     date_past = Dates.DateTime(1900, 6, 21, 12, 0, 0)
     milankovitch = true
-    F_past, S_past, μ_past, ζ_past =
-        insolation(date_past, lat, lon, param_set, od, milankovitch)
+    (; F, S, μ, ζ) = insolation(date_past, lat, lon, param_set, od, milankovitch)
+    F_past, S_past, μ_past, ζ_past = F, S, μ, ζ
 
     @test all(isfinite.([F_past, S_past, μ_past, ζ_past]))
     @test F_past > 0
@@ -77,8 +83,8 @@ end
     # Far future
     date_future = Dates.DateTime(2100, 6, 21, 12, 0, 0)
     milankovitch = true
-    F_future, S_future, μ_future, ζ_future =
-        insolation(date_future, lat, lon, param_set, od, milankovitch)
+    (; F, S, μ, ζ) = insolation(date_future, lat, lon, param_set, od, milankovitch)
+    F_future, S_future, μ_future, ζ_future = F, S, μ, ζ
 
     @test all(isfinite.([F_future, S_future, μ_future, ζ_future]))
     @test F_future > 0
@@ -92,7 +98,7 @@ end
     lat = FT(45.0)
     lon = FT(0.0)
 
-    F, S, μ, ζ = insolation(date, lat, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
     # Should work without errors
     @test all(isfinite.([F, S, μ, ζ]))
@@ -109,8 +115,10 @@ end
     lat = FT(0.0)  # Equator
     lon = FT(0.0)
 
-    F_spring, _, μ_spring, _ = insolation(equinox_spring, lat, lon, param_set)
-    F_fall, _, μ_fall, _ = insolation(equinox_fall, lat, lon, param_set)
+    (; F, μ) = insolation(equinox_spring, lat, lon, param_set)
+    F_spring, μ_spring = F, μ
+    (; F, μ) = insolation(equinox_fall, lat, lon, param_set)
+    F_fall, μ_fall = F, μ
 
     # At equinoxes, equator should have sun nearly overhead at local noon 
     # (exactly overhead at solar noon, but this is not exactly what we are testing here)
@@ -130,14 +138,16 @@ end
     lat_toc = FT(rad2deg(IP.obliq_epoch(param_set)))
     lon = FT(0.0)
 
-    F_summer, _, μ_summer, _ = insolation(solstice_summer, lat_toc, lon, param_set)
+    (; F, μ) = insolation(solstice_summer, lat_toc, lon, param_set)
+    F_summer, μ_summer = F, μ
 
     # Sun should be nearly overhead at summer solstice on Tropic of Cancer
     @test μ_summer > 0.98
 
     # At Tropic of Capricorn
     lat_toc_s = FT(-rad2deg(IP.obliq_epoch(param_set)))
-    F_winter, _, μ_winter, _ = insolation(solstice_winter, lat_toc_s, lon, param_set)
+    (; F, μ) = insolation(solstice_winter, lat_toc_s, lon, param_set)
+    F_winter, μ_winter = F, μ
 
     # Sun should be nearly overhead at winter solstice on Tropic of Capricorn
     @test μ_winter > 0.98
@@ -149,7 +159,7 @@ end
     lat = FT(45.0)
     lon = FT(0.0)
 
-    F, S, μ, ζ = insolation(date, lat, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
     @test all(isfinite.([F, S, μ, ζ]))
     @test F > 0
@@ -164,7 +174,7 @@ end
     lat = FT(45.0)
     lon = FT(0.0)
 
-    F, S, μ, ζ = insolation(date_leap, lat, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date_leap, lat, lon, param_set)
 
     # Should handle leap day without issues
     @test all(isfinite.([F, S, μ, ζ]))
@@ -174,8 +184,10 @@ end
     date_before = Dates.DateTime(2000, 2, 28, 12, 0, 0)
     date_after = Dates.DateTime(2000, 3, 1, 12, 0, 0)
 
-    F_before, _, _, _ = insolation(date_before, lat, lon, param_set)
-    F_after, _, _, _ = insolation(date_after, lat, lon, param_set)
+    (; F) = insolation(date_before, lat, lon, param_set)
+    F_before = F
+    (; F) = insolation(date_after, lat, lon, param_set)
+    F_after = F
 
     # Should be reasonably close (within 10% due to changing solar position)
     @test 0.9 * F_before < F < 1.1 * F_after
@@ -190,13 +202,15 @@ end
     lon = FT(0.0)
 
     # Daily should be near zero
-    F_daily, _, μ_daily = daily_insolation(date, lat, param_set)
+    (; F, μ) = daily_insolation(date, lat, param_set)
+    F_daily, μ_daily = F, μ
     @test F_daily ≈ 0 atol = atol
     @test μ_daily ≈ 0 atol = atol
 
     # Instantaneous at noon should also be near zero
     date_noon = date + Dates.Hour(12)
-    F_inst, _, μ_inst, _ = insolation(date_noon, lat, lon, param_set)
+    (; F, μ) = insolation(date_noon, lat, lon, param_set)
+    F_inst, μ_inst = F, μ
     @test F_inst ≈ 0 atol = atol
     @test μ_inst ≈ 0 atol = atol
 end
@@ -209,7 +223,7 @@ end
     longitudes = FT.(range(-180, stop = 180, length = 37))
 
     for lon in longitudes
-        F, S, μ, ζ = insolation(date, lat, lon, param_set)
+        (; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
         # All should give valid finite results
         @test all(isfinite.([F, S, μ, ζ]))

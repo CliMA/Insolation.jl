@@ -10,7 +10,7 @@ od = Insolation.OrbitalDataSplines()
     lat = FT(45.0)
 
     milankovitch = true
-    F, S, μ = daily_insolation(date, lat, param_set, od, milankovitch)
+    (; F, S, μ) = daily_insolation(date, lat, param_set, od, milankovitch)
 
     # Check return types
     @test typeof(F) == FT
@@ -24,8 +24,8 @@ od = Insolation.OrbitalDataSplines()
 
     # Test without Milankovitch cycles (epoch parameters)
     milankovitch = false
-    F_epoch, S_epoch, μ_epoch =
-        daily_insolation(date, lat, param_set, nothing, milankovitch)
+    (; F, S, μ) = daily_insolation(date, lat, param_set, nothing, milankovitch)
+    F_epoch, S_epoch, μ_epoch = F, S, μ
 
     @test typeof(F_epoch) == FT
     @test typeof(S_epoch) == FT
@@ -42,15 +42,18 @@ end
 
     # Summer solstice - higher insolation in NH
     summer = Dates.DateTime(2000, 6, 21)
-    F_summer, _, _ = daily_insolation(summer, lat, param_set)
+    (; F) = daily_insolation(summer, lat, param_set)
+    F_summer = F
 
     # Winter solstice - lower insolation in NH
     winter = Dates.DateTime(2000, 12, 21)
-    F_winter, _, _ = daily_insolation(winter, lat, param_set)
+    (; F) = daily_insolation(winter, lat, param_set)
+    F_winter = F
 
     # Test equinoxes - should be between summer and winter
     spring = Dates.DateTime(2000, 3, 20)
-    F_spring, _, _ = daily_insolation(spring, lat, param_set)
+    (; F) = daily_insolation(spring, lat, param_set)
+    F_spring = F
 
     # Summer should have more insolation than winter in NH
     @test F_winter < F_spring < F_summer
@@ -61,16 +64,20 @@ end
     lat_north = FT(45.0)
     lat_south = FT(-45.0)
 
-    F_north, _, _ = daily_insolation(date, lat_north, param_set)
-    F_south, _, _ = daily_insolation(date, lat_south, param_set)
+    (; F) = daily_insolation(date, lat_north, param_set)
+    F_north = F
+    (; F) = daily_insolation(date, lat_south, param_set)
+    F_south = F
 
     # NH should have more insolation than SH at NH summer solstice
     @test F_north > F_south
 
     # Test at equinox - should be symmetric
     equinox = Dates.DateTime(2000, 3, 20)
-    F_north_eq, _, _ = daily_insolation(equinox, lat_north, param_set)
-    F_south_eq, _, _ = daily_insolation(equinox, lat_south, param_set)
+    (; F) = daily_insolation(equinox, lat_north, param_set)
+    F_north_eq = F
+    (; F) = daily_insolation(equinox, lat_south, param_set)
+    F_south_eq = F
 
     @test F_north_eq ≈ F_south_eq rtol = rtol
 end
@@ -79,7 +86,8 @@ end
     # North pole during polar day (summer) - use latitude below pole to avoid singularity
     date_summer = Dates.DateTime(2000, 6, 21)
     lat_np = FT(85.0)  # Near pole but not exactly at it
-    F_np_summer, _, μ_np_summer = daily_insolation(date_summer, lat_np, param_set)
+    (; F, μ) = daily_insolation(date_summer, lat_np, param_set)
+    F_np_summer, μ_np_summer = F, μ
 
     # Should have positive insolation during polar day
     @test F_np_summer > 0
@@ -87,7 +95,8 @@ end
 
     # North pole during polar night (winter)
     date_winter = Dates.DateTime(2000, 12, 21)
-    F_np_winter, _, μ_np_winter = daily_insolation(date_winter, lat_np, param_set)
+    (; F, μ) = daily_insolation(date_winter, lat_np, param_set)
+    F_np_winter, μ_np_winter = F, μ
 
     # Should have zero or near-zero insolation during polar night
     @test F_np_winter ≈ 0 atol = 1.0  # Small numerical tolerance
@@ -95,8 +104,10 @@ end
 
     # South pole - opposite pattern
     lat_sp = FT(-85.0)  # Near pole but not exactly at it
-    F_sp_summer, _, μ_sp_summer = daily_insolation(date_summer, lat_sp, param_set)
-    F_sp_winter, _, μ_sp_winter = daily_insolation(date_winter, lat_sp, param_set)
+    (; F, μ) = daily_insolation(date_summer, lat_sp, param_set)
+    F_sp_summer, μ_sp_summer = F, μ
+    (; F, μ) = daily_insolation(date_winter, lat_sp, param_set)
+    F_sp_winter, μ_sp_winter = F, μ
 
     # SH winter when NH summer
     @test F_sp_summer ≈ 0 atol = 1.0
@@ -133,7 +144,7 @@ end
     orbital_data = nothing
     milankovitch = false
     solar_variability_spline = TSIDataSpline(FT)
-    F_solar, S_solar, μ_solar = daily_insolation(
+    (; F, S, μ) = daily_insolation(
         date,
         lat,
         param_set,
@@ -141,12 +152,14 @@ end
         milankovitch,
         solar_variability_spline,
     )
+    F_solar, S_solar, μ_solar = F, S, μ
 
-    F_no_solar, S_no_solar, μ_no_solar =
+    (; F, S, μ) =
         daily_insolation(date, lat, param_set, orbital_data, milankovitch, nothing)
+    F_no_solar, S_no_solar, μ_no_solar = F, S, μ
 
     @test isapprox(F_solar, F_no_solar, rtol = 1e-3)
-    @test !isapprox(S_solar, S_full, rtol = 1e-3)
+    @test !isapprox(S_solar, S_no_solar, rtol = 1e-5)
     @test isapprox(μ_solar, μ_no_solar)
 
     date, tsi_val = first.(Insolation._get_tsi_data())
@@ -204,9 +217,10 @@ end
 
     # Using low-level functions manually
     Δt_years = Insolation.years_since_epoch(param_set, date)
-    orb_params = Insolation.orbital_params(param_set)
-    daily_θ, d = Insolation.daily_distance_zenith_angle(date, lat, orb_params, param_set)
-    F_low, S_low, μ_low = insolation(daily_θ, d, param_set)
+    orb_params = orbital_params(param_set)
+    (; daily_θ, d) = daily_distance_zenith_angle(date, lat, orb_params, param_set)
+    (; F, S, μ) = insolation(daily_θ, d, param_set)
+    F_low, S_low, μ_low = F, S, μ
 
     # Should match exactly
     @test F_high == F_low

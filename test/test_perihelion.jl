@@ -13,9 +13,8 @@
         Δt_years = Insolation.years_since_epoch(param_set, date)
         ϖ, γ, e = orbital_params(od, Δt_years)
         orb_params = (FT(ϖ), FT(γ), FT(e))
-        daily_θ, d =
-            Insolation.daily_distance_zenith_angle(date, FT(0), orb_params, param_set)
-        return d / IP.orbit_semimaj(param_set)
+        result = daily_distance_zenith_angle(date, FT(0), orb_params, param_set)
+        return result.d / IP.orbit_semimaj(param_set)
     end
 
     years = 1900:2100

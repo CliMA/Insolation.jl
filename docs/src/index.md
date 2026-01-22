@@ -9,6 +9,7 @@ CurrentModule = Insolation
 ## Overview
 
 The package computes:
+
 - **Solar Geometry**: Zenith angle, azimuth angle, and planet-star distance for any location and time
 - **Insolation**: Instantaneous and daily-averaged incoming solar radiation
 - **Orbital Parameters**: Time-varying orbital elements using the [Laskar et al. (2004)](https://doi.org/10.1051/0004-6361:20041335) solution for paleoclimate applications
@@ -32,7 +33,7 @@ The package is organized into several modules:
 
 ## Mathematical Background
 
-The calculations follow fundamental principles of celestial mechanics and solar geometry, as described in [Physics of Earth's Climate](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf) by Tapio Schneider and Lenka Novak. See the [Mathematical Background](SolarGeometry.md) page for detailed mathematical formulations of the zenith angle, azimuth angle, and other astronomical calculations. 
+The calculations follow fundamental principles of celestial mechanics and solar geometry, as described in [Physics of Earth's Climate](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf) by Tapio Schneider and Lenka Novak. See the [Mathematical Background](SolarGeometry.md) page for detailed mathematical formulations of the zenith angle, azimuth angle, and other astronomical calculations.
 
 ## Quick Example
 
@@ -53,16 +54,18 @@ using ClimaParams
 params = InsolationParameters(FT)
 
 # Calculate instantaneous insolation with solar geometry
-F, S, μ, ζ = insolation(date, lat, lon, params)
+(; F, S, μ, ζ) = insolation(date, lat, lon, params)
 # F: TOA insolation [W m⁻²]
 # S: Solar flux [W m⁻²]  
 # μ: Cosine of solar zenith angle
 # ζ: Solar azimuth angle [radians]
 ```
+
 This is the instantaneous insolation at the given location and time. Here's the daily averaged insolation at the same location and time:
+
 ```@example quick
 # Calculate daily-averaged insolation
-F_daily, S_daily, μ_daily = daily_insolation(date, lat, params)
+(; F, S, μ) = daily_insolation(date, lat, params)
 ```
 
 ## Documentation Outline

@@ -53,6 +53,7 @@ planet-star distance. Insolation is set to 0 at night (when ``\\cos(\\theta) < 0
   `TSIDataSpline` is passed as an argument.
 
 # Returns
+A `NamedTuple` with fields:
 - `F`: TOA insolation [W m⁻²]
 - `S`: Solar flux at the given planet-star distance [W m⁻²]
 - `μ`: Cosine of solar zenith angle [unitless], clamped to [0, 1]
@@ -73,7 +74,7 @@ function insolation(
     # TOA insolation
     F = S * μ
 
-    return F, S, μ
+    return (; F, S, μ)
 end
 
 """
@@ -104,6 +105,7 @@ in Earth's orbital parameters (Milankovitch cycles) and solar luminosity.
 - `eot_correction::Bool`: (default true) Apply equation of time correction
 
 # Returns
+A `NamedTuple` with fields:
 - `F`: TOA insolation [W m⁻²]
 - `S`: Solar flux [W m⁻²]
 - `μ`: Cosine of solar zenith angle [unitless]
@@ -112,18 +114,18 @@ in Earth's orbital parameters (Milankovitch cycles) and solar luminosity.
 # Examples
 ```julia
 # Modern climate (fixed epoch parameters)
-F, S, μ, ζ = insolation(date, lat, lon, param_set)
+(; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
 # Paleoclimate with Milankovitch cycles
 od = OrbitalDataSplines()  # Load once
 milankovitch = true
-F, S, μ, ζ = insolation(date, lat, lon, param_set, od, milankovitch)
+(; F, S, μ, ζ) = insolation(date, lat, lon, param_set, od, milankovitch)
 
 # Without equation of time correction
 milankovitch = false,
 solar_variability_spline = nothing
 eot_correction = false
-F, S, μ, ζ = insolation(date, lat, lon, param_set, milankovitch, solar_variability_spline, eot_correction)
+result = insolation(date, lat, lon, param_set, milankovitch, solar_variability_spline, eot_correction)
 ```
 
 # GPU Usage
@@ -137,7 +139,7 @@ cpu_solar = TSIDataSpline(Float32) # Create on CPU
 gpu_solar = adapt(CuArray, cpu_solar) # Transfer to GPU
 # In GPU kernel:
 milankovitch=true
-F, S, μ, ζ = insolation(date, lat, lon, param_set, gpu_od, milankovitch, gpu_solar)
+result = insolation(date, lat, lon, param_set, gpu_od, milankovitch, gpu_solar)
 ```
 """
 function insolation(
@@ -160,7 +162,7 @@ function insolation(
     )
 
     # Get solar geometry
-    d, θ, ζ = Insolation.solar_geometry(
+    (; d, θ, ζ) = Insolation.solar_geometry(
         date,
         latitude,
         longitude,
@@ -170,9 +172,9 @@ function insolation(
     )
 
     # Calculate insolation
-    F, S, μ = insolation(θ, d, param_set, date, solar_variability_spline)
+    (; F, S, μ) = insolation(θ, d, param_set, date, solar_variability_spline)
 
-    return F, S, μ, ζ
+    return (; F, S, μ, ζ)
 end
 
 """
@@ -200,6 +202,7 @@ averaged over a full day.
   solar luminosity if `TSIDataSpline` is passed as an argument.
 
 # Returns
+A `NamedTuple` with fields:
 - `F`: Daily averaged TOA insolation [W m⁻²]
 - `S`: Solar flux [W m⁻²]
 - `μ`: Daily averaged cosine of solar zenith angle [unitless]
@@ -207,11 +210,12 @@ averaged over a full day.
 # Examples
 ```julia
 # Modern climate (fixed epoch parameters)
-F, S, μ = daily_insolation(date, lat, param_set)
+result = daily_insolation(date, lat, param_set)
+# Access fields: result.F, result.S, result.μ
 
 # Paleoclimate with Milankovitch cycles
 od = OrbitalDataSplines()  # Load once
-F, S, μ = daily_insolation(date, lat, param_set, od; milankovitch=true)
+result = daily_insolation(date, lat, param_set, od; milankovitch=true)
 ```
 
 # GPU Usage
@@ -225,7 +229,7 @@ cpu_solar = TSIDataSpline(Float32) # Create on CPU
 gpu_solar = adapt(CuArray, cpu_solar)
 milankovitch = true
 # In GPU kernel:
-F, S, μ = daily_insolation(date, lat, param_set, gpu_od, milankovitch, gpu_solar)
+result = daily_insolation(date, lat, param_set, gpu_od, milankovitch, gpu_solar)
 ```
 """
 function daily_insolation(
@@ -246,17 +250,15 @@ function daily_insolation(
     )
 
     # Get effective zenith angle and distance for daily averaged insolation
-    daily_θ, d = Insolation.daily_distance_zenith_angle(
+    (; daily_θ, d) = Insolation.daily_distance_zenith_angle(
         date,
         eltype(param_set)(latitude),
         orb_params,
         param_set,
     )
 
-    # Calculate daily averaged insolation
-    F, S, μ = insolation(daily_θ, d, param_set, date, solar_variability_spline)
-
-    return F, S, μ
+    # Return daily averaged insolation
+    return insolation(daily_θ, d, param_set, date, solar_variability_spline)
 end
 
 """
