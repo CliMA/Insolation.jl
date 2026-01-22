@@ -13,6 +13,7 @@ Milankovitch cycles are variations in Earth's orbital parameters (eccentricity, 
 3. **Precession (ϖ)**: The longitude of perihelion, determining when during the year Earth is closest to the Sun. Period: ~21,000 years. Affects the timing and intensity of seasons.
 
 ## Variations in orbital parameters
+
 ```@example orbital_variations
 using Insolation
 using Plots
@@ -47,13 +48,14 @@ plot(p1, p2, p3, layout = grid(3,1), size=(600,500), dpi=250);
 savefig("orbital_params.png")
 nothing # hide
 ```
+
 ![](orbital_params.png)
 
 The three panels show the periodic variations in Earth's orbital parameters:
+
 - **Top**: Precession varies with ~21 kyr period, controlling seasonal timing
 - **Middle**: Obliquity oscillates between ~22-25° with ~41 kyr period
 - **Bottom**: Eccentricity varies with ~100 kyr and ~400 kyr periods
-
 
 ## Calendar Considerations: Equinox and Perihelion Dates
 
@@ -129,6 +131,7 @@ title!("Date of Vernal Equinox Over 80 kyr")
 savefig("equinox_dates_long.png") 
 nothing # hide
 ```
+
 ![](equinox_dates_long.png)
 
 **Paleoclimate Applications**: The vernal equinox date according to the Gregorian calendar still shifts substantially over millennia because even the Gregorian calendar does not precisely fix vernal equinox near March 21. For meaningful paleoclimate comparisons, scientists often reference the day of year relative to the vernal equinox (seasonal dating) rather than January 1 (calendar dating). It is common to define a calendar where March 21 defines vernal equinox (beginning of northern spring).
@@ -137,7 +140,7 @@ nothing # hide
 
 To use time-varying orbital parameters in your insolation calculations:
 
-```julia
+```@example milankovitch
 using Insolation
 using Dates
 using ClimaParams
@@ -148,24 +151,30 @@ orbital_data = OrbitalDataSplines()
 # Create parameter set
 params = InsolationParameters(Float64)
 
-# Calculate for Last Glacial Maximum (20,000 years ago)
-date = DateTime(2000, 6, 21)  # Summer solstice (relative date)
-lat = 65.0  # Arctic latitude
+# Define location: 65°N (Arctic)
+lat = 65.0
 
-# Modern climate (fixed parameters)
-F_modern, _, _, _ = insolation(date, lat, 0.0, params)
-
-# LGM climate (time-varying parameters)
+# 1. Modern Climate (Year 2000)
+date_modern = DateTime(2000, 6, 21, 12, 0, 0)
 milankovitch = true
-F_lgm, _, _, _ = insolation(
-    date, lat, 0.0, params,
+F_modern = insolation(
+    date_modern, lat, 0.0, params,
     orbital_data,
     milankovitch,
-)
+).F
 
-println("Modern summer insolation: $F_modern W/m²")
-println("LGM summer insolation: $F_lgm W/m²")
-println("Difference: $(F_lgm - F_modern) W/m²")
+# 2. Last Glacial Maximum (approx 21,000 years ago)
+# 2000 AD - 21,000 years = Year -19,000
+date_lgm = DateTime(-19000, 6, 21, 12, 0, 0)
+F_lgm = insolation(
+    date_lgm, lat, 0.0, params,
+    orbital_data,
+    milankovitch,
+).F
+
+println("Modern (65°N, Solstice): $(round(F_modern, digits=1)) W/m²")
+println("LGM (65°N, Solstice):    $(round(F_lgm, digits=1)) W/m²")
+println("Difference:              $(round(F_lgm - F_modern, digits=1)) W/m²")
 ```
 
 This capability enables studies of ice age cycles, interglacial periods, and long-term climate evolution driven by orbital forcing.

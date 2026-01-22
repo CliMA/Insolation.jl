@@ -13,17 +13,17 @@ od = Insolation.OrbitalDataSplines()
     lon = FT(0.0)
     lat = FT(45.0)  # Northern hemisphere
 
-    F, S, μ, ζ = insolation(date, lat, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date, lat, lon, param_set)
 
     # At solar noon, azimuth should be approximately 3π/2 (due south)
     @test ζ ≈ 3π / 2 rtol = rtol
 
     # Test in Southern Hemisphere
     lat_s = FT(-45.0)
-    F_s, S_s, μ_s, ζ_s = insolation(date, lat_s, lon, param_set)
+    (; F, S, μ, ζ) = insolation(date, lat_s, lon, param_set)
 
     # In SH, sun at noon should be due north (π/2)
-    @test ζ_s ≈ π / 2 rtol = rtol
+    @test ζ ≈ π / 2 rtol = rtol
 end
 
 @testset "Azimuth - Sunrise and Sunset" begin
@@ -34,7 +34,8 @@ end
 
     # Sunrise (approximately 6 AM)
     sunrise = Dates.DateTime(2000, 3, 20, 6, 0, 0)
-    F_sr, S_sr, μ_sr, ζ_sr = insolation(sunrise, lat, lon, param_set)
+    (; F, S, μ, ζ) = insolation(sunrise, lat, lon, param_set)
+    F_sr, S_sr, μ_sr, ζ_sr = F, S, μ, ζ
 
     # At equinox on equator, sunrise should be due east (ζ ≈ 0 or 2π)
     ζ_sr_normalized = mod(ζ_sr, 2π)
@@ -44,7 +45,8 @@ end
 
     # Sunset (approximately 6 PM)
     sunset = Dates.DateTime(2000, 3, 20, 18, 0, 0)
-    F_ss, S_ss, μ_ss, ζ_ss = insolation(sunset, lat, lon, param_set)
+    (; F, S, μ, ζ) = insolation(sunset, lat, lon, param_set)
+    F_ss, S_ss, μ_ss, ζ_ss = F, S, μ, ζ
 
     # At equinox on equator, sunset should be due west (ζ ≈ π)
     @test ζ_ss ≈ π atol = 1e-2
@@ -58,7 +60,7 @@ end
     lon = FT(0.0)
 
     for date in dates
-        _, _, _, ζ = insolation(date, lat, lon, param_set)
+        ζ = insolation(date, lat, lon, param_set).ζ
         @test 0 <= ζ <= 2π
     end
 end
@@ -77,15 +79,15 @@ end
 
     # Morning
     morning = date_base + Dates.Hour(8)
-    _, _, _, ζ_morning = insolation(morning, lat, lon, param_set)
+    ζ_morning = insolation(morning, lat, lon, param_set).ζ
 
     # Noon
     noon = date_base + Dates.Hour(12)
-    _, _, _, ζ_noon = insolation(noon, lat, lon, param_set)
+    ζ_noon = insolation(noon, lat, lon, param_set).ζ
 
     # Afternoon
     afternoon = date_base + Dates.Hour(16)
-    _, _, _, ζ_afternoon = insolation(afternoon, lat, lon, param_set)
+    ζ_afternoon = insolation(afternoon, lat, lon, param_set).ζ
 
     # Morning should be in eastern quadrant (near 0 or 2π)
     @test abs(ζ_morning - 2π) < 1e-1 || abs(ζ_morning) < 1e-1
@@ -103,15 +105,15 @@ end
 
     # Prime meridian
     lon1 = FT(0.0)
-    _, _, _, ζ1 = insolation(date, lat, lon1, param_set)
+    ζ1 = insolation(date, lat, lon1, param_set).ζ
 
     # 30° East - solar noon was earlier (should be past noon)
     lon2 = FT(30.0)
-    _, _, _, ζ2 = insolation(date, lat, lon2, param_set)
+    ζ2 = insolation(date, lat, lon2, param_set).ζ
 
     # 30° West - solar noon is later (should be before noon)
     lon3 = FT(-30.0)
-    _, _, _, ζ3 = insolation(date, lat, lon3, param_set)
+    ζ3 = insolation(date, lat, lon3, param_set).ζ
 
     # Should be close to south at prime meridian
     @test ζ1 ≈ 3π / 2 rtol = 0.05
@@ -129,13 +131,13 @@ end
 
     # Arctic
     lat_arctic = FT(70.0)
-    _, _, _, ζ_arctic = insolation(date, lat_arctic, lon, param_set)
+    ζ_arctic = insolation(date, lat_arctic, lon, param_set).ζ
 
     @test 0 <= ζ_arctic <= 2π
 
     # Antarctic  
     lat_antarctic = FT(-70.0)
-    _, _, _, ζ_antarctic = insolation(date, lat_antarctic, lon, param_set)
+    ζ_antarctic = insolation(date, lat_antarctic, lon, param_set).ζ
 
     @test 0 <= ζ_antarctic <= 2π
 end
@@ -146,7 +148,7 @@ end
     lon = FT(0.0)
     lat = FT(45.0)
 
-    _, _, _, ζ = insolation(date, lat, lon, param_set)
+    ζ = insolation(date, lat, lon, param_set).ζ
 
     @test typeof(ζ) == FT
 end
@@ -160,7 +162,8 @@ end
     date1 = Dates.DateTime(2025, 10, 22, 13, 30, 0)
     lat1 = FT(40.0)
     lon1 = FT(-15.0)
-    F1, S1, μ1, ζ1 = insolation(date1, lat1, lon1, param_set)
+    (; F, S, μ, ζ) = insolation(date1, lat1, lon1, param_set)
+    F1, S1, μ1, ζ1 = F, S, μ, ζ
 
     # Convert azimuth from radians to degrees for comparison
     ζ1_deg = rad2deg(ζ1)
@@ -171,7 +174,8 @@ end
     date2 = Dates.DateTime(2025, 10, 22, 13, 30, 0)
     lat2 = FT(-50.0)
     lon2 = FT(-15.0)
-    F2, S2, μ2, ζ2 = insolation(date2, lat2, lon2, param_set)
+    (; F, S, μ, ζ) = insolation(date2, lat2, lon2, param_set)
+    F2, S2, μ2, ζ2 = F, S, μ, ζ
 
     ζ2_deg = rad2deg(ζ2)
     @test abs(ζ2_deg - 107.61) < 1.0
@@ -181,7 +185,8 @@ end
     date3 = Dates.DateTime(2025, 5, 22, 10, 30, 0)
     lat3 = FT(-50.0)
     lon3 = FT(-15.0)
-    F3, S3, μ3, ζ3 = insolation(date3, lat3, lon3, param_set)
+    (; F, S, μ, ζ) = insolation(date3, lat3, lon3, param_set)
+    F3, S3, μ3, ζ3 = F, S, μ, ζ
 
     ζ3_deg = rad2deg(ζ3)
     @test abs(ζ3_deg - 55.05) < 1.0
@@ -191,7 +196,8 @@ end
     date4 = Dates.DateTime(2025, 5, 22, 23, 30, 0)
     lat4 = FT(43.0)
     lon4 = FT(105.0)
-    F4, S4, μ4, ζ4 = insolation(date4, lat4, lon4, param_set)
+    (; F, S, μ, ζ) = insolation(date4, lat4, lon4, param_set)
+    F4, S4, μ4, ζ4 = F, S, μ, ζ
 
     ζ4_deg = rad2deg(ζ4)
     @test abs(ζ4_deg - 10.99) < 1.0

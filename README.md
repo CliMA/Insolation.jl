@@ -50,18 +50,18 @@ date = DateTime(2024, 6, 21, 12, 0, 0)  # Summer solstice, noon
 params = InsolationParameters(FT)
 
 # Calculate instantaneous insolation with solar geometry
-F, S, μ, ζ = insolation(date, lat, lon, params)
+(; F, S, μ, ζ) = insolation(date, lat, lon, params)
 # F: TOA insolation [W m⁻²]
 # S: Solar flux [W m⁻²]  
 # μ: Cosine of solar zenith angle
 # ζ: Solar azimuth angle [radians]
 
 # Calculate daily-averaged insolation
-F_daily, S_daily, μ_daily = daily_insolation(date, lat, params)
+(; F, S, μ) = daily_insolation(date, lat, params)
+F_daily, S_daily, μ_daily = F, S, μ
 ```
 
 For more detailed examples and API documentation, see the [documentation](https://clima.github.io/Insolation.jl/dev/).
-
 
 [version-img]: https://juliahub.com/docs/General/Insolation/stable/version.svg
 [version-url]: https://juliahub.com/ui/Packages/General/Insolation

@@ -73,11 +73,11 @@ lat = 40.0    # Boulder, Colorado (degrees North)
 lon = -105.0  # (degrees East)
 
 # Calculate insolation and solar geometry
-F, S, μ, ζ = insolation(date, lat, lon, params)
+(; F, S, μ, ζ) = insolation(date, lat, lon, params)
 
-println("TOA Insolation: $F W/m²")
-println("Solar flux: $S W/m²")
-println("Cosine of zenith angle: $μ")
+println("TOA Insolation: $(F) W/m²")
+println("Solar flux: $(S) W/m²")
+println("Cosine of zenith angle: $(μ)")
 println("Solar zenith angle: $(rad2deg(acos(μ)))°")
 println("Solar azimuth angle: $(rad2deg(ζ))°")
 ```
@@ -91,10 +91,10 @@ Calculate diurnally averaged insolation (useful for climate models):
 date = DateTime(2024, 6, 21)
 lat = 40.0
 
-F_daily, S_daily, μ_daily = daily_insolation(date, lat, params)
+(; F, μ) = daily_insolation(date, lat, params)
 
-println("Daily-averaged TOA Insolation: $F_daily W/m²")
-println("Daily-averaged cosine of zenith angle: $μ_daily")
+println("Daily-averaged TOA Insolation: $(F) W/m²")
+println("Daily-averaged cosine of zenith angle: $(μ)")
 ```
 
 ### Computing Solar Position
@@ -106,13 +106,11 @@ For applications that only need solar geometry without insolation:
 orb_params = orbital_params(params)
 
 # Calculate solar geometry
-distance, zenith_angle, azimuth = solar_geometry(
-    date, lat, lon, orb_params, params
-)
+(; d, θ, ζ) = solar_geometry(date, lat, lon, orb_params, params)
 
-println("Sun-Earth distance: $(distance / 1.496e11) AU")
-println("Solar zenith angle: $(rad2deg(zenith_angle))°")
-println("Solar azimuth angle: $(rad2deg(azimuth))°")
+println("Sun-Earth distance: $(d / 1.496e11) AU")
+println("Solar zenith angle: $(rad2deg(θ))°")
+println("Solar azimuth angle: $(rad2deg(ζ))°")
 ```
 
 ## Working with Milankovitch Cycles
@@ -129,7 +127,7 @@ params = InsolationParameters(Float64)
 
 # Use Milankovitch cycles
 milankovitch = true
-F, S, μ, ζ = insolation(
+result = insolation(
     date, lat, lon, params,
     orbital_data,
     milankovitch,
@@ -162,7 +160,7 @@ gpu_tsi = adapt(CuArray, cpu_tsi)
 
 # Use in GPU kernels (positional argument required for GPU compatibility)
 milankovitch = true
-F, S, μ, ζ = insolation(date, lat, lon, params, gpu_od, milankovitch, gpu_tsi)
+result = insolation(date, lat, lon, params, gpu_od, milankovitch, gpu_tsi)
 ```
 
 **Design Note**: The constructor creates data on CPU; users explicitly transfer to GPU using `adapt()`. This gives explicit control over data placement and follows Julia GPU ecosystem conventions.
@@ -181,7 +179,7 @@ orbital_data = nothing
 milankovitch = false
 solar_variability_spline = nothing
 eot_correction = false
-F, S, μ, ζ = insolation(date, lat, lon, params, orbital_data, milankovitch, solar_variability_spline, eot_correction)
+result = insolation(date, lat, lon, params, orbital_data, milankovitch, solar_variability_spline, eot_correction)
 ```
 
 ### Custom Orbital Parameters
@@ -194,7 +192,7 @@ params_high_obliq = InsolationParameters(Float64, (;
     obliq_epoch = deg2rad(23.44 + 5.0)
 ))
 
-F_modified, _, _, _ = insolation(date, lat, lon, params_high_obliq)
+F_modified = insolation(date, lat, lon, params_high_obliq).F
 ```
 
 ### Type Flexibility
@@ -206,7 +204,7 @@ params_f32 = InsolationParameters(Float32)
 lat_f32 = Float32(lat)
 lon_f32 = Float32(lon)
 
-F, S, μ, ζ = insolation(date, lat_f32, lon_f32, params_f32)
+result = insolation(date, lat_f32, lon_f32, params_f32)
 ```
 
 ## Common Patterns
@@ -232,7 +230,7 @@ insolation_array = zeros(length(latitudes), length(longitudes), length(dates))
 for (k, date) in enumerate(dates)
     for (j, lon) in enumerate(longitudes)
         for (i, lat) in enumerate(latitudes)
-            F, _, _, _ = insolation(date, lat, lon, params)
+            F = insolation(date, lat, lon, params).F
             insolation_array[i, j, k] = F
         end
     end
@@ -253,7 +251,7 @@ lon = -105.0
 
 # Sample every day for a year
 dates = DateTime(2024, 1, 1):Day(1):DateTime(2024, 12, 31)
-daily_insol = [daily_insolation(d, lat, params)[1] for d in dates]
+daily_insol = [daily_insolation(d, lat, params).F for d in dates]
 
 # Plot
 plot(dates, daily_insol, 

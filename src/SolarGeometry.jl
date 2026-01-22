@@ -273,6 +273,7 @@ at a specific time and location.
 - `eot_correction::Bool`: (default true) Apply equation of time correction
 
 # Returns
+A `NamedTuple` with fields:
 - `d`: Planet-Sun distance [m]
 - `θ`: Solar zenith angle [radians]
 - `ζ`: Solar azimuth angle [radians], 0 = due East, increasing CCW
@@ -307,7 +308,7 @@ function solar_geometry(
     # ζ = 3π/2 (due S) when η=0 at local solar noon
     ζ = mod(FT(3π / 2) - atan(sin(η), cos(η) * sin(ϕ) - tan(δ) * cos(ϕ)), FT(2π))
 
-    return d, θ, ζ
+    return (; d, θ, ζ)
 end
 
 """
@@ -335,8 +336,9 @@ the planet-star distance for a given date and latitude.
 - `param_set::IP.AIP`: Parameter struct
 
 # Returns
-- `daily_θ`: Effective solar zenith angle [radians]
+A `NamedTuple` with fields:
 - `d`: Planet-star distance [m]
+- `daily_θ`: Effective solar zenith angle [radians]
 """
 function daily_distance_zenith_angle(
     date::DateTime,
@@ -364,5 +366,5 @@ function daily_distance_zenith_angle(
     daily_θ =
         mod(acos(FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd))), FT(2π))
 
-    return daily_θ, d
+    return (; daily_θ, d)
 end
