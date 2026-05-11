@@ -6,10 +6,12 @@ version = "1.1.0"
 [deps]
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
-ClimaParams = "5c42b081-d73a-476f-9059-fd94b934656c"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+
+[weakdeps]
+ClimaParams = "5c42b081-d73a-476f-9059-fd94b934656c"
 
 [extensions]
 CreateParametersExt = "ClimaParams"
