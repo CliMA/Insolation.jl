@@ -14,13 +14,15 @@
   expressed in units of the semi-major axis (≈ AU for Earth) rather than meters.
   Multiply by the semi-major axis to recover a physical distance. The flux is
   `S0 / d^2`. This does not affect `F`, `S`, `μ`, or `ζ`.
+  - The equation of time is now computed from the exact equatorial projection of the
+  Sun's ecliptic longitude (`Δη = L − α`, with `α = atan2(cosγ sinLₛ, cosLₛ)`)
+  instead of the small-obliquity expansion `tan²(γ/2)`. It reduces to the previous
+  formula for small tilt but remains valid for any obliquity (e.g., Uranus-like). This
+  leads to tiny changes in insolation (shift by up to about 45 s in time), possibly
+  breaking downstream bitwise reproducibility tests.
 
 ### Bug fixes
 
-- The equation of time is now computed from the exact equatorial projection of the
-  Sun's ecliptic longitude (`Δη = L − α`, with `α = atan2(cosγ sinLₛ, cosLₛ)`)
-  instead of the small-obliquity expansion `tan²(γ/2)`. It reduces to the previous
-  formula for small tilt but remains valid for any obliquity (e.g., Uranus-like).
 - Fixed an interval-selection bug in `TSIDataSpline`'s `evaluate` that produced a
   small non-physical discontinuity in the interpolated total solar irradiance for
   dates after the 15th of a month but before noon.
