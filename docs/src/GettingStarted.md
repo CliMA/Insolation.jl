@@ -41,17 +41,17 @@ Insolation calculations require a parameter set containing orbital and physical 
 using ClimaParams
 params = InsolationParameters(Float64)
 
-# Without ClimaParams, specify all parameters manually:
+# Without ClimaParams, specify all parameters manually (values below
+# approximate the ClimaParams defaults for modern Earth):
 params = InsolationParameters{Float64}(
     year_anom = 365.259636 * 86400.0,  # Anomalistic year [s]
     day = 86400.0,                      # Day length [s]
-    orbit_semimaj = 1.496e11,           # Semi-major axis [m]
-    eccentricity_epoch = 0.0167,        # Eccentricity
-    obliq_epoch = deg2rad(23.44),       # Obliquity [rad]
-    lon_perihelion_epoch = deg2rad(282.95),  # Longitude of perihelion [rad]
-    tot_solar_irrad = 1362.0,           # Solar irradiance at 1 AU [W/m²]
-    epoch = DateTime(2000, 1, 1, 11, 58, 56, 816),  # J2000 epoch
-    mean_anom_epoch = deg2rad(357.5291)  # Mean anomaly at epoch [rad]
+    eccentricity_epoch = 0.016708634,   # Eccentricity [unitless]
+    obliq_epoch = deg2rad(23.43278),    # Obliquity [rad]
+    lon_perihelion_epoch = deg2rad(282.9373),  # Longitude of perihelion [rad]
+    tot_solar_irrad = 1362.0,           # Solar irradiance at mean orbital distance [W m⁻²]
+    epoch = DateTime(2000, 1, 1, 11, 58, 55, 816),  # J2000 epoch (UTC)
+    mean_anom_epoch = deg2rad(357.52911)  # Mean anomaly at epoch [rad]
 )
 ```
 
@@ -108,7 +108,7 @@ orb_params = orbital_params(params)
 # Calculate solar geometry
 (; d, θ, ζ) = solar_geometry(date, lat, lon, orb_params, params)
 
-println("Sun-Earth distance: $(d / 1.496e11) AU")
+println("Sun-Earth distance: $(d) (in units of the semi-major axis; ≈ AU for Earth)")
 println("Solar zenith angle: $(rad2deg(θ))°")
 println("Solar azimuth angle: $(rad2deg(ζ))°")
 ```

@@ -35,13 +35,24 @@ export InsolationParameters
     OrbitalDataSplines
 
 A container struct that holds cubic spline interpolators for Earth's
-orbital parameters, based on the Laskar 2004 dataset.
+orbital parameters, based on the Laskar et al. (2004) dataset.
 
-The time series of orbital parameters are lazily downloaded from the 
-`orbital_parameters_dataset_path(artifact_dir)` path where `artifact_dir` is 
-the path and filename to save the artifacts toml file.
+The orbital parameter time series is loaded from the `laskar2004` artifact,
+which is downloaded lazily on first use. The splines are functions of time in
+Julian years since the J2000 epoch (see [`julian_years_since_epoch`](@ref)).
 
-The splines are functions of time (in years since J2000 epoch).
+!!! warning "Earth-specific"
+    The Laskar et al. (2004) solution describes the orbital history of **Earth**.
+    Enabling Milankovitch cycles (`milankovitch = true`) with these splines for
+    another planet would silently apply Earth's orbital variations to it, so the
+    time-varying orbital parameters are meaningful for Earth only. Fixed,
+    user-supplied epoch parameters (`milankovitch = false`) remain valid for any
+    planetary body.
+
+# Fields
+- `e_spline`: Spline for eccentricity [unitless].
+- `γ_spline`: Spline for obliquity [radians].
+- `ϖ_spline`: Spline for longitude of perihelion [radians].
 
 # GPU Support
 This struct is GPU-compatible via Adapt.jl. To transfer to GPU memory:
@@ -91,20 +102,22 @@ Base.broadcastable(x::OrbitalDataSplines) = tuple(x)
 """
     orbital_params(od::OrbitalDataSplines, dt::FT) where {FT <: Real}
 
-Interpolates time-varying orbital parameters using Milankovitch cycles.
+Interpolate the time-varying orbital parameters (Milankovitch cycles).
 
-Interpolates orbital parameters from the Laskar et al. (2004) dataset for
+Interpolate orbital parameters from the Laskar et al. (2004) dataset for
 paleoclimate studies. The parameters vary over geological timescales.
 
 # Arguments
-- `od::OrbitalDataSplines`: The struct containing orbital parameter splines.
-- `dt::FT`: The time for interpolation [Years since J2000 epoch].
+- `od::OrbitalDataSplines`: The struct containing the orbital parameter splines.
+- `dt::FT`: The time for interpolation [Julian years since the J2000 epoch].
 
 # Returns
 - `(ϖ, γ, e)`: A tuple containing:
   - `ϖ`: Longitude of perihelion [radians]
   - `γ`: Obliquity (axial tilt) [radians]
   - `e`: Orbital eccentricity [unitless]
+
+See also the `orbital_params(param_set)` method for the fixed epoch parameters.
 """
 function orbital_params(od::OrbitalDataSplines, dt::FT) where {FT<:Real}
     # Call the spline fields directly
@@ -117,7 +130,7 @@ end
 """
     orbital_params(param_set::AIP)
 
-Returns fixed orbital parameters at epoch.
+Return the fixed orbital parameters at epoch.
 
 Uses the constant orbital parameter values at the reference epoch (typically
 J2000) stored in the parameter set. Suitable for modern climate simulations
@@ -143,17 +156,31 @@ end
     TSIDataSpline
 
 A container struct that holds a cubic interpolator for the monthly mean total
-solar irradiance.
+solar irradiance, from the CMIP record of the Sun's irradiance **at 1 au**.
 
 The spline is a function of date between `1850-01-15T12:00` and
 `2229-12-15T12:00`. Dates outside this range will result in `NaN`.
+
+!!! warning "Earth-specific"
+    The data are the Sun's total solar irradiance at 1 au. When passed to
+    [`insolation`](@ref)/[`daily_insolation`](@ref), the value is used as the
+    irradiance at the planet's *mean orbital distance* (the semi-major axis),
+    which is correct only for Earth, whose semi-major axis is ≈ 1 au. For another
+    body the value would need to be rescaled by `(1 au / semi-major axis)²`, which
+    this package does not do; the spline is therefore meaningful for Earth only.
+    (It is also a fixed historical/projected record of *our* Sun.)
+
+# Fields
+- `tsi_spline`: Spline of total solar irradiance in months since `ref_date` [W m⁻²].
+- `dates`: The monthly dates of the underlying data points.
+- `ref_date`: The reference date corresponding to the first data point.
 
 # GPU Support
 This struct is GPU-compatible via Adapt.jl. To transfer to GPU memory:
 ```julia
 using CUDA, Adapt
 cpu_tsi = TSIDataSpline(Float32)  # Create on CPU
-gpu_tsi = adapt(CuArray, TSIDataSpline)  # Transfer to GPU
+gpu_tsi = adapt(CuArray, cpu_tsi)  # Transfer to GPU
 ```
 """
 struct TSIDataSpline{SPLINE,DATES,DATE<:Dates.DateTime}
@@ -178,7 +205,7 @@ end
 """
     TSIDataSpline(::Type{FT}) where {FT <: AbstractFloat}
 
-Constructs a `TSIDataSpline` that interpolates monthly mean total solar
+Construct a `TSIDataSpline` that interpolates monthly mean total solar
 irradiance as a function of the date and time.
 """
 function TSIDataSpline(::Type{FT}) where {FT<:AbstractFloat}
@@ -194,8 +221,8 @@ end
 """
     evaluate(tsi::TSIDataSpline, date::Dates.DateTime)
 
-Interpolate monthly mean total solar irradiance at `date` via a cubic
-interpolation.
+Interpolate the monthly mean total solar irradiance at `date` (the Sun's
+irradiance at 1 au) via a cubic interpolation.
 
 The spline is a function of date between `1850-01-15T12:00` and
 `2229-12-15T12:00`. Dates outside this range will result in `NaN`.
@@ -208,13 +235,15 @@ function evaluate(tsi::TSIDataSpline, date::Dates.DateTime)
         return NaN
     end
 
-    # There are two cases:
-    # 1. Day and time of month is on or after 12:00 of the 15th
-    # 2. Day and time of month is before 12:00 of the 15th
+    # The data points sit at 12:00 on the 15th of each month, so we locate the
+    # interval [dates[i], dates[i+1]] that contains `date` by identifying the
+    # month whose 15th-at-noon starts that interval. There are two cases:
+    # 1. `date` is on or after 12:00 of the 15th: the interval starts in this month.
+    # 2. `date` is before 12:00 of the 15th: the interval starts in the previous month.
     day_val = Dates.day(date)
     hour_val = Dates.hour(date)
-    if day_val >= 15 && hour_val >= 12
-        # Cover casea 1
+    if day_val > 15 || (day_val == 15 && hour_val >= 12)
+        # Cover case 1
         target_year = Dates.year(date)
         target_month = Dates.month(date)
     else
