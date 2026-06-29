@@ -13,7 +13,7 @@ function zdiff(x, year, od)
     date = xtomarchdate(x, year)
 
     # Get orbital parameters for this time
-    Δt_years = Insolation.years_since_epoch(param_set, date)
+    Δt_years = Insolation.julian_years_since_epoch(param_set, date)
     orb_params = Insolation.orbital_params(od, Δt_years)
 
     # Calculate zenith angles for Southern and Northern mid-latitudes
@@ -35,13 +35,13 @@ function edist(x, year, od)
     date = xtojandate(x, year)
 
     # Get orbital parameters for this time
-    Δt_years = Insolation.years_since_epoch(param_set, date)
+    Δt_years = Insolation.julian_years_since_epoch(param_set, date)
     orb_params = Insolation.orbital_params(od, Δt_years)
 
-    # Calculate distance
+    # Calculate distance (already in units of the semi-major axis)
     result = Insolation.daily_distance_zenith_angle(date, 0.0, orb_params, param_set)
 
-    return result.d / IP.orbit_semimaj(param_set)
+    return result.d
 end
 
 # x is date relative to Jan 1, with 1.00 representing Jan 1 00:00

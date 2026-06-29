@@ -14,7 +14,8 @@
         ϖ, γ, e = orbital_params(od, Δt_years)
         orb_params = (FT(ϖ), FT(γ), FT(e))
         result = daily_distance_zenith_angle(date, FT(0), orb_params, param_set)
-        return result.d / IP.orbit_semimaj(param_set)
+        # result.d is already in units of the semi-major axis
+        return result.d
     end
 
     years = 1900:2100

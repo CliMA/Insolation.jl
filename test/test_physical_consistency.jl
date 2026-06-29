@@ -138,17 +138,14 @@ end
 end
 
 @testset "Physical Consistency - Earth-Sun Distance Bounds" begin
-    # Earth-Sun distance should be within known bounds
-    # Perihelion: ~147.1 million km
-    # Aphelion: ~152.1 million km
-
-    d0 = IP.orbit_semimaj(param_set)
+    # Earth-Sun distance (in units of the semi-major axis) should be within known
+    # bounds: perihelion at 1 - e and aphelion at 1 + e.
     e = IP.eccentricity_epoch(param_set)
 
-    # Perihelion distance
-    d_peri = d0 * (1 - e)
-    # Aphelion distance  
-    d_aph = d0 * (1 + e)
+    # Perihelion distance (units of semi-major axis)
+    d_peri = 1 - e
+    # Aphelion distance (units of semi-major axis)
+    d_aph = 1 + e
 
     # Sample various dates
     dates = [Dates.DateTime(2000, m, 15) for m = 1:12]

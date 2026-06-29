@@ -83,4 +83,5 @@ date = Dates.DateTime(2000, 3, 22, 0, 0, 0)
 ϖ, γ, e = orbital_params(od, Δt_years)
 orb_params = (FT(ϖ), FT(γ), FT(e))
 (; d, θ, ζ) = solar_geometry(date, lat, lon, orb_params, param_set)
-@test d ≈ IP.orbit_semimaj(param_set) rtol = rtol
+# d is in units of the semi-major axis; near the equinox it is ≈ 1
+@test d ≈ 1 rtol = rtol

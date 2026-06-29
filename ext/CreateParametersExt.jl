@@ -69,9 +69,8 @@ The following ClimaParams names are mapped to Insolation.jl fields:
 - `epoch_time` → `epoch`: Reference epoch (DateTime)
 - `day` → `day`: Length of solar day [s]
 - `anomalistic_year_length` → `year_anom`: Anomalistic year length [s]
-- `length_orbit_semi_major` → `orbit_semimaj`: Orbital semi-major axis [m]
 - `orbit_eccentricity_at_epoch` → `eccentricity_epoch`: Eccentricity at epoch
-- `total_solar_irradiance` → `tot_solar_irrad`: Solar irradiance at 1 AU [W m⁻²]
+- `total_solar_irradiance` → `tot_solar_irrad`: Solar irradiance at the mean orbital distance [W m⁻²]
 - `orbit_obliquity_at_epoch` → `obliq_epoch`: Obliquity at epoch [rad]
 - `mean_anomaly_at_epoch` → `mean_anom_epoch`: Mean anomaly at epoch [rad]
 - `longitude_perihelion_at_epoch` → `lon_perihelion_epoch`: Longitude of perihelion at epoch [rad]
@@ -97,7 +96,6 @@ function InsolationParameters(
         :epoch_time => :epoch,
         :day => :day,
         :anomalistic_year_length => :year_anom,
-        :length_orbit_semi_major => :orbit_semimaj,
         :orbit_eccentricity_at_epoch => :eccentricity_epoch,
         :total_solar_irradiance => :tot_solar_irrad,
         :orbit_obliquity_at_epoch => :obliq_epoch,

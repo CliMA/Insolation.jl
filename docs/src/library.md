@@ -18,7 +18,9 @@ The package provides functions organized into three main categories:
 
 ### Parameter Structures
 
-**`InsolationParameters{FT}`** - The main parameter struct containing physical and orbital constants needed for insolation calculations. See the source code or API documentation for all fields.
+```@docs
+Insolation.InsolationParameters
+```
 
 ### Parameter Creation
 
@@ -42,13 +44,12 @@ using Insolation.Parameters
 params = InsolationParameters{Float64}(
     year_anom = 365.259636 * 86400.0,
     day = 86400.0,
-    orbit_semimaj = 1.496e11,
-    eccentricity_epoch = 0.0167,
-    obliq_epoch = deg2rad(23.44),
-    lon_perihelion_epoch = deg2rad(282.95),
+    eccentricity_epoch = 0.016708634,
+    obliq_epoch = deg2rad(23.43278),
+    lon_perihelion_epoch = deg2rad(282.9373),
     tot_solar_irrad = 1362.0,
-    epoch = DateTime(2000, 1, 1, 12, 0, 0),
-    mean_anom_epoch = deg2rad(357.5291)
+    epoch = DateTime(2000, 1, 1, 11, 58, 55, 816),
+    mean_anom_epoch = deg2rad(357.52911)
 )
 ```
 
@@ -128,6 +129,7 @@ Insolation.equation_of_time
 ```@docs
 Insolation.planet_star_distance
 Insolation.years_since_epoch
+Insolation.julian_years_since_epoch
 Insolation.distance_declination_mean_anomaly
 ```
 

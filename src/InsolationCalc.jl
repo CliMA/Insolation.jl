@@ -8,16 +8,27 @@ export insolation, daily_insolation
         solar_variability_spline::Union{TSIDataSpline,Nothing} = nothing,
     ) where {FT<:Real}
 
-Calculates the solar radiative energy flux at the top of the atmosphere
+Calculate the solar radiative energy flux at the top of the atmosphere
 (TOA) based on the planet-star distance and the inverse square law.
 
+The total solar irradiance `S0` (either `tot_solar_irrad` or, if a
+`solar_variability_spline` is supplied, the interpolated value) is defined at the
+*mean* orbital distance (the semi-major axis). Since `d` is the planet-star
+distance in units of the semi-major axis, the flux is simply
+``S = S_0 / d^2``. The absolute size of the orbit does not enter: the flux
+depends only on `S0` and the orbital shape (eccentricity and true anomaly).
+
 # Arguments
-- `d::FT`: Planet-star distance [m]
-- `param_set::IP.AIP`: Struct containing `tot_solar_irrad` [W m⁻²] and `orbit_semimaj` [m]
-- `date::Union{DateTime,Nothing}`: (default `nothing`) Current date and time to evaluate the
-  solar flux if `tsi_spline` is available.
-- `solar_variability_spline::Union{TSIDataSpline,Nothing}`: Use time-varying solar
-  luminosity if `TSIDataSpline` is passed as an argument.
+- `d::FT`: Planet-star distance, in units of the semi-major axis [unitless]
+- `param_set::IP.AIP`: Struct containing `tot_solar_irrad`, the total solar irradiance
+  at the mean orbital distance [W m⁻²]
+- `date::Union{DateTime,Nothing}`: (default `nothing`) Current date and time used to evaluate
+  the solar flux if `solar_variability_spline` is available.
+- `solar_variability_spline::Union{TSIDataSpline,Nothing}`: (default `nothing`) Use time-varying
+  solar luminosity if a `TSIDataSpline` is passed as an argument.
+
+# Returns
+- `S`: Solar flux at the given planet-star distance [W m⁻²]
 """
 function solar_flux(
     d::FT,
@@ -28,29 +39,35 @@ function solar_flux(
     S0::FT =
         isnothing(solar_variability_spline) ? IP.tot_solar_irrad(param_set) :
         FT(evaluate(solar_variability_spline, date))
-    d0::FT = IP.orbit_semimaj(param_set)
 
-    # Solar radiative energy flux
-    S = S0 * (d0 / d)^2
+    # Solar radiative energy flux. `d` is in units of the semi-major axis (the mean
+    # orbital distance at which S0 is defined), so the inverse-square law is S0 / d².
+    S = S0 / d^2
     return S
 end
 
 """
-    insolation(θ::FT, d::FT, param_set::IP.AIP) where {FT <: Real}
+    insolation(
+        θ::FT,
+        d::FT,
+        param_set::IP.AIP,
+        date::Union{DateTime,Nothing} = nothing,
+        solar_variability_spline::Union{TSIDataSpline,Nothing} = nothing,
+    ) where {FT <: Real}
 
-Calculates top-of-atmosphere (TOA) insolation and cosine of solar zenith angle.
+Calculate top-of-atmosphere (TOA) insolation and the cosine of the solar zenith angle.
 
 Implements ``F = S \\cos(\\theta)`` where S is the solar flux at the given
 planet-star distance. Insolation is set to 0 at night (when ``\\cos(\\theta) < 0``).
 
 # Arguments
 - `θ::FT`: Solar zenith angle [radians]
-- `d::FT`: Planet-star distance [m]
+- `d::FT`: Planet-star distance, in units of the semi-major axis [unitless]
 - `param_set::IP.AIP`: Parameter struct
-- `date::Union{DateTime,Nothing}`: (default `nothing`) Current date and time to evaluate the
-  solar flux if `tsi_spline` is available.
-- `solar_variability_spline::Union{TSIDataSpline,Nothing}`: Use time-varying solar luminosity if
-  `TSIDataSpline` is passed as an argument.
+- `date::Union{DateTime,Nothing}`: (default `nothing`) Current date and time used to evaluate the
+  solar flux if `solar_variability_spline` is available.
+- `solar_variability_spline::Union{TSIDataSpline,Nothing}`: (default `nothing`) Use time-varying
+  solar luminosity if a `TSIDataSpline` is passed as an argument.
 
 # Returns
 A `NamedTuple` with fields:
@@ -89,7 +106,7 @@ end
         eot_correction::Bool = true,
     ) where {FT1 <: Real, FT2 <: Real}
 
-Calculates instantaneous TOA insolation with optional long-term variations
+Calculate instantaneous TOA insolation with optional long-term variations
 in Earth's orbital parameters (Milankovitch cycles) and solar luminosity.
 
 # Arguments
@@ -99,9 +116,11 @@ in Earth's orbital parameters (Milankovitch cycles) and solar luminosity.
 - `param_set::IP.AIP`: Parameter struct
 - `orbital_data::Union{OrbitalDataSplines, Nothing}`: (default nothing) Orbital parameter splines.
   **Required** when `milankovitch=true` for GPU compatibility.
-- `milankovitch::Bool`: (default false) Use time-varying orbital parameters (Milankovitch cycles)
+- `milankovitch::Bool`: (default false) Use time-varying orbital parameters (Milankovitch cycles).
+  The `OrbitalDataSplines` are Earth-specific (Laskar et al., 2004), so this is meaningful for Earth only.
 - `solar_variability_spline::Union{TSIDataSpline, Nothing}`: (default nothing) Use time-varying
-  solar luminosity if `TSIDataSpline` is passed as an argument.
+  solar luminosity if `TSIDataSpline` is passed as an argument. The `TSIDataSpline` gives the
+  Sun's irradiance at 1 au, so this is meaningful for Earth only.
 - `eot_correction::Bool`: (default true) Apply equation of time correction
 
 # Returns
@@ -122,11 +141,14 @@ milankovitch = true
 (; F, S, μ, ζ) = insolation(date, lat, lon, param_set, od, milankovitch)
 
 # Without equation of time correction
-milankovitch = false,
+orbital_data = nothing
+milankovitch = false
 solar_variability_spline = nothing
 eot_correction = false
-result = insolation(date, lat, lon, param_set, milankovitch, solar_variability_spline, eot_correction)
+result = insolation(date, lat, lon, param_set, orbital_data, milankovitch, solar_variability_spline, eot_correction)
 ```
+
+See also [`daily_insolation`](@ref) and [`solar_geometry`](@ref).
 
 # GPU Usage
 For GPU execution, create orbital and solar variability data on CPU and transfer
@@ -187,19 +209,21 @@ end
         solar_variability_spline::Union{TSIDataSpline, Nothing} = nothing,
     )
 
-Calculates diurnally averaged TOA insolation with optional long-term variations
-in orbital parameters (Milankovitch cycles) and solar luminosity. The insolation is 
+Calculate diurnally averaged TOA insolation with optional long-term variations
+in orbital parameters (Milankovitch cycles) and solar luminosity. The insolation is
 averaged over a full day.
 
 # Arguments
 - `date::DateTime`: Current date
-- `latitude::FT`: Latitude [degrees]
+- `latitude::Real`: Latitude [degrees]
 - `param_set::IP.AIP`: Parameter struct
 - `orbital_data::Union{OrbitalDataSplines, Nothing}`: (default nothing) Orbital parameter splines.
   **Required** when `milankovitch=true` for GPU compatibility.
 - `milankovitch::Bool`: (default false) Use time-varying orbital parameters (Milankovitch cycles).
+  The `OrbitalDataSplines` are Earth-specific (Laskar et al., 2004), so this is meaningful for Earth only.
 - `solar_variability_spline::Union{TSIDataSpline, Nothing}`: (default nothing) Use time-varying
-  solar luminosity if `TSIDataSpline` is passed as an argument.
+  solar luminosity if `TSIDataSpline` is passed as an argument. The `TSIDataSpline` gives the
+  Sun's irradiance at 1 au, so this is meaningful for Earth only.
 
 # Returns
 A `NamedTuple` with fields:
@@ -215,8 +239,11 @@ result = daily_insolation(date, lat, param_set)
 
 # Paleoclimate with Milankovitch cycles
 od = OrbitalDataSplines()  # Load once
-result = daily_insolation(date, lat, param_set, od; milankovitch=true)
+milankovitch = true
+result = daily_insolation(date, lat, param_set, od, milankovitch)
 ```
+
+See also [`insolation`](@ref).
 
 # GPU Usage
 For GPU execution, create orbital and solar variability data on CPU and transfer
@@ -250,12 +277,9 @@ function daily_insolation(
     )
 
     # Get effective zenith angle and distance for daily averaged insolation
-    (; daily_θ, d) = Insolation.daily_distance_zenith_angle(
-        date,
-        eltype(param_set)(latitude),
-        orb_params,
-        param_set,
-    )
+    # (daily_distance_zenith_angle converts inputs to eltype(param_set) internally)
+    (; daily_θ, d) =
+        Insolation.daily_distance_zenith_angle(date, latitude, orb_params, param_set)
 
     # Return daily averaged insolation
     return insolation(daily_θ, d, param_set, date, solar_variability_spline)
@@ -300,10 +324,11 @@ function get_orbital_parameters(
                 "Spline interpolator orbital_data must be provided when milankovitch=true for GPU compatibility.\n
                 Load OrbitalDataSplines: od = OrbitalDataSplines();\n
                 Transfer to GPU: gpu_od = adapt(CuArray, od);\n
-                Then call: insolation(date, lat, lon, param_set, gpu_od; milankovitch=true)\n",
+                Then call: insolation(date, lat, lon, param_set, gpu_od, true)\n",
             )
         end
-        Δt_years = Insolation.years_since_epoch(param_set, date)
+        # The Laskar (2004) tables are indexed in Julian years since J2000
+        Δt_years = Insolation.julian_years_since_epoch(param_set, date)
         ϖ, γ, e = Insolation.orbital_params(orbital_data, Δt_years)
     else
         # Compute epoch parameters

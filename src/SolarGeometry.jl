@@ -3,13 +3,13 @@ export solar_geometry, daily_distance_zenith_angle
 """
     mean_anomaly(Δt_years::FT, param_set::IP.AIP) where {FT}
 
-Calculates the mean anomaly at a given time since epoch.
+Calculate the mean anomaly at a given time since epoch.
 
 The mean anomaly is the angle the planet would have traveled from perihelion
 if it moved in a circular orbit at constant angular velocity.
 
 # Arguments
-- `Δt_years::FT`: Time since epoch [years]
+- `Δt_years::FT`: Time since epoch [anomalistic years]
 - `param_set::IP.AIP`: Parameter struct containing `mean_anom_epoch`
 
 # Returns
@@ -24,11 +24,20 @@ end
 """
     true_anomaly(MA::FT, e::FT) where {FT <: Real}
 
-Calculates the true anomaly from the mean anomaly.
+Calculate the true anomaly from the mean anomaly.
 
 The true anomaly is the actual angular distance of the planet from perihelion
-along its orbital path. This function uses a series expansion accurate to
-O(e⁴) where e is the eccentricity (see Fitzpatrick (2012), Appendix A.10).
+along its orbital path. This function uses a series expansion (the "equation of
+the center") that is accurate to third order in the eccentricity `e`, with an
+error of O(e⁴) (see Fitzpatrick (2012), Appendix A.10).
+
+!!! warning "Low-eccentricity approximation"
+    The series is intended for nearly circular orbits such as Earth's
+    (`e ≈ 0.0167`). Its error grows rapidly with eccentricity (exceeding a few
+    degrees near `e ≈ 0.5`), so for highly eccentric orbits it should be replaced
+    by an exact solution of Kepler's equation (e.g., a Newton–Raphson iteration
+    for the eccentric anomaly). This approximation affects every quantity derived
+    from the true anomaly (declination, distance, and the equation of time).
 
 # Arguments
 - `MA::FT`: Mean anomaly [radians]
@@ -50,10 +59,10 @@ end
 """
     solar_longitude(TA::FT, ϖ::FT) where {FT <: Real}
 
-Calculates the solar longitude (ecliptic longitude of the Sun).
+Calculate the solar longitude (ecliptic longitude of the Sun).
 
-The solar longitude is the angular distance of the planet along its orbital 
-path, measured from vernal equinox. It is the sum of the true anomaly 
+The solar longitude is the angular distance of the planet along its orbital
+path, measured from the vernal equinox. It is the sum of the true anomaly
 (angle from perihelion) and the longitude of perihelion.
 
 # Arguments
@@ -77,7 +86,7 @@ end
         eot_correction::Bool = true,
     ) where {FT}
 
-Calculates the hour angle at a given time and longitude.
+Calculate the hour angle at a given time and longitude.
 
 The hour angle is zero at local solar noon and increases with time.
 Optionally applies the equation of time correction to account for 
@@ -119,14 +128,23 @@ end
 """
     equation_of_time(MA::FT, (ϖ, γ, e)::Tuple{FT, FT, FT}) where {FT <: Real}
 
-Calculates the equation of time correction for the hour angle.
+Calculate the equation of time correction for the hour angle.
 
-The equation of time accounts for the difference between apparent solar time 
-(based on the actual Sun's position in the sky) and mean solar time (based on 
-a fictitious mean Sun moving at constant speed). This difference arises from 
+The equation of time accounts for the difference between apparent solar time
+(based on the actual Sun's position in the sky) and mean solar time (based on
+a fictitious mean Sun moving at constant speed). This difference arises from
 two effects:
-1. Earth's elliptical orbit (eccentricity e)
-2. Earth's axial tilt (obliquity γ)
+1. The elliptical orbit (eccentricity e)
+2. The axial tilt (obliquity γ)
+
+It is computed as the difference between the mean longitude ``L = M + \\varpi``
+and the right ascension ``\\alpha`` of the true Sun. The right ascension is
+obtained from the exact projection of the ecliptic longitude onto the equatorial
+plane, ``\\alpha = \\mathrm{atan2}(\\cos\\gamma \\sin L_s, \\cos L_s)`` with
+``L_s`` the solar longitude, so the obliquity contribution is exact for any
+``\\gamma`` (it does not rely on a small-tilt expansion). The eccentricity
+contribution enters through the true anomaly and is therefore accurate to the
+same order in `e` as [`true_anomaly`](@ref).
 
 # Arguments
 - `MA::FT`: Mean anomaly [radians]
@@ -139,31 +157,40 @@ two effects:
 - `Δη`: Hour angle correction [radians]
 """
 function equation_of_time(MA::FT, (ϖ, γ, e)::Tuple{FT,FT,FT}) where {FT<:Real}
-    Δη = -2 * e * sin(MA) + tan(γ / 2)^2 * sin(2 * (MA + ϖ))
+    # Mean longitude of the fictitious mean Sun and true ecliptic (solar) longitude
+    L = MA + ϖ
+    L_s = true_anomaly(MA, e) + ϖ
+    # Right ascension of the true Sun from the exact equatorial projection (valid
+    # for any obliquity γ, including γ > π/2)
+    α = atan(cos(γ) * sin(L_s), cos(L_s))
+    # Equation of time as an hour-angle correction: mean longitude − right ascension
+    Δη = L - α
     return mod(Δη + FT(π), FT(2π)) - FT(π)
 end
 
 """
-    planet_star_distance(TA::FT, e::FT, param_set::IP.AIP) where {FT <: Real}
+    planet_star_distance(TA::FT, e::FT) where {FT <: Real}
 
-Calculates the distance between planet (Earth) and star (Sun) at a given 
-true anomaly.
+Calculate the planet-star distance at a given true anomaly, in units of the
+semi-major axis (the mean orbital distance).
 
 The distance varies due to the planet's elliptical orbit, being shortest at
 perihelion and longest at aphelion. The calculation uses the orbit equation
-for an ellipse.
+for an ellipse. The result is normalized by the semi-major axis ``a``, so it is
+the dimensionless ratio ``d/a = (1-e^2)/(1+e\\cos A)``, which ranges from `1-e`
+(perihelion) to `1+e` (aphelion). The absolute orbit size is irrelevant to the
+insolation, so it is not carried; multiply by the semi-major axis to recover a
+physical distance.
 
 # Arguments
 - `TA::FT`: True anomaly [radians]
 - `e::FT`: Orbital eccentricity [unitless]
-- `param_set::IP.AIP`: Parameter struct containing `orbit_semimaj`
 
 # Returns
-- `d`: Planet-star distance [m]
+- `d`: Planet-star distance, in units of the semi-major axis [unitless]
 """
-function planet_star_distance(TA::FT, e::FT, param_set::IP.AIP) where {FT<:Real}
-    d0 = IP.orbit_semimaj(param_set)
-    d = d0 * (1 - e^2) / (1 + e * cos(TA))
+function planet_star_distance(TA::FT, e::FT) where {FT<:Real}
+    d = (1 - e^2) / (1 + e * cos(TA))
     return d
 end
 
@@ -173,7 +200,7 @@ end
         date::DateTime,
     ) where {FT}
 
-Calculates the time elapsed since epoch (typically J2000) in anomalistic 
+Calculate the time elapsed since epoch (typically J2000) in anomalistic
 years (the time from perihelion to perihelion).
 
 Converts the time difference between two dates from Julian days to
@@ -185,6 +212,9 @@ anomalistic years, which is the natural time unit for orbital calculations.
 
 # Returns
 - `Δt_years`: Time since epoch [anomalistic years]
+
+See also [`julian_years_since_epoch`](@ref), which uses Julian years (the time unit
+of the Laskar et al. (2004) orbital tables).
 """
 function years_since_epoch(
     param_set::IP.InsolationParameters{FT},
@@ -196,13 +226,44 @@ function years_since_epoch(
 end
 
 """
+    julian_years_since_epoch(
+        param_set::IP.InsolationParameters{FT},
+        date::DateTime,
+    ) where {FT}
+
+Calculate the time elapsed since epoch (typically J2000) in Julian years
+(a Julian year is exactly 365.25 days of 86400 s each).
+
+This is the time unit of the Laskar et al. (2004) orbital-parameter tables, so it
+is used to index [`OrbitalDataSplines`](@ref). It differs slightly from
+[`years_since_epoch`](@ref), which returns *anomalistic* years (the natural unit
+for the mean anomaly); the two differ by the ratio of the anomalistic year to the
+Julian year (~0.0026% for Earth).
+
+# Arguments
+- `param_set::IP.InsolationParameters{FT}`: Parameter struct
+- `date::DateTime`: Current date and time
+
+# Returns
+- `Δt_years`: Time since epoch [Julian years]
+"""
+function julian_years_since_epoch(
+    param_set::IP.InsolationParameters{FT},
+    date::DateTime,
+) where {FT}
+    epoch = IP.epoch(param_set)
+    days_per_julian_year = FT(365.25)
+    return FT(datetime2julian(date) - datetime2julian(epoch)) / days_per_julian_year
+end
+
+"""
     distance_declination_mean_anomaly(
         Δt_years::FT,
         (ϖ, γ, e)::Tuple{FT, FT, FT},
         param_set::IP.AIP,
     ) where {FT}
 
-Computes planet-star distance, solar declination angle, and mean anomaly.
+Compute the planet-star distance, solar declination angle, and mean anomaly.
 
 This function calculates key astronomical parameters from orbital elements.
 The declination determines the subsolar latitude, while the planet-star distance
@@ -218,7 +279,7 @@ hour angle calculations.
 - `param_set::IP.AIP`: Parameter struct
 
 # Returns
-- `d`: Planet-star distance [m]
+- `d`: Planet-star distance, in units of the semi-major axis [unitless]
 - `δ`: Solar declination angle [radians]
 - `MA`: Mean anomaly [radians]
 """
@@ -236,11 +297,11 @@ function distance_declination_mean_anomaly(
     # Solar longitude [radians]
     SL = solar_longitude(TA, ϖ)
 
-    # Declination angle [radians]
-    δ = mod(asin(sin(γ) * sin(SL)), FT(2π))
+    # Declination angle [radians], in [-π/2, π/2]
+    δ = asin(sin(γ) * sin(SL))
 
-    # Planet-star distance [m] 
-    d = planet_star_distance(TA, e, param_set)
+    # Planet-star distance, in units of the semi-major axis
+    d = planet_star_distance(TA, e)
 
     return d, δ, MA
 end
@@ -250,22 +311,25 @@ end
         date::DateTime,
         latitude::Real,
         longitude::Real,
-        (ϖ, γ, e)::Tuple{FT, FT, FT},
+        orb_params::Tuple{<:Real, <:Real, <:Real},
         param_set::AIP;
         eot_correction::Bool = true,
-    ) where {FT}
+    )
 
-Calculates planet-star distance, solar zenith angle, and azimuthal angle.
+Calculate the planet-star distance, solar zenith angle, and azimuth angle.
 
 This is a high-level function that combines all necessary astronomical
-calculations to determine the planet's position and distance from the star
-at a specific time and location.
+calculations to determine the position of the star in the sky (zenith and
+azimuth angles) and the planet-star distance at a specific time and location.
+
+All real-valued inputs are converted to `eltype(param_set)` internally, so the
+computation is carried out consistently in the parameter set's floating-point type.
 
 # Arguments
 - `date::DateTime`: Current date and time
 - `latitude::Real`: Latitude [degrees]
 - `longitude::Real`: Longitude [degrees]
-- `(ϖ, γ, e)::Tuple{FT, FT, FT}`: Orbital parameters tuple containing:
+- `orb_params::Tuple{<:Real, <:Real, <:Real}`: Orbital parameters tuple `(ϖ, γ, e)`:
   - `ϖ`: Longitude of perihelion [radians]
   - `γ`: Obliquity (axial tilt) [radians]
   - `e`: Orbital eccentricity [unitless]
@@ -274,7 +338,7 @@ at a specific time and location.
 
 # Returns
 A `NamedTuple` with fields:
-- `d`: Planet-Sun distance [m]
+- `d`: Planet-Sun distance, in units of the semi-major axis [unitless]
 - `θ`: Solar zenith angle [radians]
 - `ζ`: Solar azimuth angle [radians], 0 = due East, increasing CCW
 """
@@ -282,12 +346,15 @@ function solar_geometry(
     date::DateTime,
     latitude::Real,
     longitude::Real,
-    (ϖ, γ, e)::Tuple{FT,FT,FT},
+    orb_params::Tuple{<:Real,<:Real,<:Real},
     param_set::AIP;
     eot_correction = true,
-) where {FT}
-    ϕ = eltype(param_set)(deg2rad(latitude))
-    λ = eltype(param_set)(deg2rad(longitude))
+)
+    FT = eltype(param_set)
+    # Convert all inputs to the parameter set's float type for type consistency
+    ϖ, γ, e = FT.(orb_params)
+    ϕ = FT(deg2rad(latitude))
+    λ = FT(deg2rad(longitude))
 
     # Get time since epoch in anomalistic years
     Δt_years = years_since_epoch(param_set, date)
@@ -298,15 +365,18 @@ function solar_geometry(
     # Get hour angle at given longitude
     η = hour_angle(date, λ, MA, (ϖ, γ, e); eot_correction)
 
-    # Solar zenith angle [radians]
-    θ = mod(
-        acos(max(FT(-1), min(FT(1), cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ)))),
-        FT(2π),
-    )
+    # Solar zenith angle [radians], in [0, π] (argument clamped for acos safety)
+    θ = acos(clamp(cos(ϕ) * cos(δ) * cos(η) + sin(ϕ) * sin(δ), FT(-1), FT(1)))
 
     # Solar azimuth angle: ζ = 0 when due E and increasing CCW
-    # ζ = 3π/2 (due S) when η=0 at local solar noon
-    ζ = mod(FT(3π / 2) - atan(sin(η), cos(η) * sin(ϕ) - tan(δ) * cos(ϕ)), FT(2π))
+    # ζ = 3π/2 (due S) when η=0 at local solar noon.
+    # The arguments are multiplied through by cos(δ) ≥ 0 to avoid the tan(δ)
+    # singularity at high declinations (e.g., extreme obliquity).
+    ζ = mod(
+        FT(3π / 2) -
+        atan(cos(δ) * sin(η), cos(δ) * cos(η) * sin(ϕ) - sin(δ) * cos(ϕ)),
+        FT(2π),
+    )
 
     return (; d, θ, ζ)
 end
@@ -314,22 +384,25 @@ end
 """
     daily_distance_zenith_angle(
         date::DateTime,
-        latitude::FT,
-        (ϖ, γ, e)::Tuple{FT, FT, FT},
+        latitude::Real,
+        orb_params::Tuple{<:Real, <:Real, <:Real},
         param_set::IP.AIP,
-    ) where {FT <: Real}
+    )
 
-Calculates the effective zenith angle for diurnally averaged insolation and 
+Calculate the effective zenith angle for diurnally averaged insolation and the
 planet-star distance.
 
-Returns the effective zenith angle corresponding to the diurnally
-averaged insolation (averaging cos(zenith angle) over 24 hours) and 
-the planet-star distance for a given date and latitude.
+Return the effective zenith angle corresponding to the diurnally averaged
+insolation (averaging the cosine of the zenith angle over 24 hours) and the
+planet-star distance for a given date and latitude.
+
+All real-valued inputs are converted to `eltype(param_set)` internally, so the
+computation is carried out consistently in the parameter set's floating-point type.
 
 # Arguments
 - `date::DateTime`: Current date
-- `latitude::FT`: Latitude [degrees]
-- `(ϖ, γ, e)::Tuple{FT, FT, FT}`: Orbital parameters tuple containing:
+- `latitude::Real`: Latitude [degrees]
+- `orb_params::Tuple{<:Real, <:Real, <:Real}`: Orbital parameters tuple `(ϖ, γ, e)`:
   - `ϖ`: Longitude of perihelion [radians]
   - `γ`: Obliquity (axial tilt) [radians]
   - `e`: Orbital eccentricity [unitless]
@@ -337,34 +410,39 @@ the planet-star distance for a given date and latitude.
 
 # Returns
 A `NamedTuple` with fields:
-- `d`: Planet-star distance [m]
 - `daily_θ`: Effective solar zenith angle [radians]
+- `d`: Planet-star distance, in units of the semi-major axis [unitless]
 """
 function daily_distance_zenith_angle(
     date::DateTime,
-    latitude::FT,
-    (ϖ, γ, e)::Tuple{FT,FT,FT},
-    param_set::IP.AIP;
-) where {FT}
-    ϕ = deg2rad(latitude)
+    latitude::Real,
+    orb_params::Tuple{<:Real,<:Real,<:Real},
+    param_set::IP.AIP,
+)
+    FT = eltype(param_set)
+    # Convert all inputs to the parameter set's float type for type consistency
+    ϖ, γ, e = FT.(orb_params)
+    ϕ = FT(deg2rad(latitude))
 
     Δt_years = years_since_epoch(param_set, date)
 
     # Get distance and declination
     d, δ, _ = distance_declination_mean_anomaly(Δt_years, (ϖ, γ, e), param_set)
 
-    # Sunrise/sunset hour angle 
-    T = tan(ϕ) * tan(δ)
-    # Clamp T to valid acos range and compute
-    T_clamped = clamp(T, FT(-1), FT(1))
-    ηd_normal = acos(-T_clamped)
-    # Use ifelse to select: polar day (π), polar night (0), or normal
-    ηd = ifelse(T >= FT(1), FT(π), ifelse(T <= FT(-1), FT(0), ηd_normal))
+    # Sunrise/sunset hour angle. Clamping the argument to [-1, 1] also encodes the
+    # polar limits in a single branchless expression: clamp gives acos(-1) = π for
+    # polar day (tanϕ·tanδ ≥ 1) and acos(1) = 0 for polar night (tanϕ·tanδ ≤ -1).
+    ηd = acos(clamp(-tan(ϕ) * tan(δ), FT(-1), FT(1)))
 
     # Effective zenith angle to get diurnally averaged insolation
-    # (i.e., averaging cosine of zenith angle)
-    daily_θ =
-        mod(acos(FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd))), FT(2π))
+    # (i.e., averaging the cosine of the zenith angle). The argument is clamped
+    # to [-1, 1] to guard against floating-point overshoot in acos.
+    daily_cosθ = clamp(
+        FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd)),
+        FT(-1),
+        FT(1),
+    )
+    daily_θ = acos(daily_cosθ)
 
     return (; daily_θ, d)
 end

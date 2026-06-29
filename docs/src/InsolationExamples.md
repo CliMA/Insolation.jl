@@ -20,19 +20,21 @@ od = OrbitalDataSplines()
 # Example 1: Pasadena, California in January (mid-latitude winter)
 lat, lon = [34.15, -118.14]  # Pasadena coordinates
 date = DateTime(2020, 01, 10)
-timezone = +8  # Pacific Standard Time (UTC+8)
+# `timezone` is the offset added to local time to obtain UTC.
+timezone = +8  # Pacific Standard Time is UTC-8, so add 8 h to get UTC
 diurnal_cycle(lat, lon, date, od, timezone, "Pasadena_January.png")
 nothing # hide
 ```
 ![](Pasadena_January.png)
 
-**Finland in Summer**: At the Arctic Circle, the sun does not set at northern summer solitice, resulting in continuous daylight and non-zero insolation for the 24-hour period. This "midnight sun" phenomenon is visible as the sustained insolation during night hours.
+**Finland in Summer**: At the Arctic Circle, the sun does not set at northern summer solstice, resulting in continuous daylight and non-zero insolation for the 24-hour period. This "midnight sun" phenomenon is visible as the sustained insolation during night hours.
 
 ```@example diurnal
 # Example 2: Rovaniemi, Finland in June (Arctic summer - midnight sun)
 lat, lon = [66.50, 25.73]  # Rovaniemi coordinates (Arctic Circle)
 date = DateTime(2020, 06, 20)  # Summer solstice
-timezone = -3  # Eastern European Summer Time (UTC+3)
+# `timezone` is the offset added to local time to obtain UTC.
+timezone = -3  # Eastern European Summer Time is UTC+3, so subtract 3 h to get UTC
 diurnal_cycle(lat, lon, date, od, timezone, "Finland_June.png")
 nothing # hide
 ```
