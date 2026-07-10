@@ -91,16 +91,15 @@ if CUDA_AVAILABLE
                     )
                     F_cpu, S_cpu, μ_cpu, ζ_cpu =
                         result_cpu3.F, result_cpu3.S, result_cpu3.μ, result_cpu3.ζ
-                    result =
-                        insolation.(
-                            date,
-                            lat_gpu,
-                            lon_gpu,
-                            params,
-                            od_gpu,
-                            milankovitch,
-                            tsi_gpu,
-                        )
+                    result = insolation.(
+                        date,
+                        lat_gpu,
+                        lon_gpu,
+                        params,
+                        od_gpu,
+                        milankovitch,
+                        tsi_gpu,
+                    )
                     result_gpu_arr = Array(result)[1]
                     F_gpu, S_gpu, μ_gpu, ζ_gpu = result_gpu_arr.F,
                     result_gpu_arr.S,
@@ -130,43 +129,42 @@ if CUDA_AVAILABLE
                 # Test broadcasting over multiple values
                 @testset "Broadcasting over multiple locations" begin
                     for (
-                        maybe_od_cpu,
-                        maybe_od_gpu,
-                        milankovitch,
-                        maybe_tsi_cpu,
-                        maybe_tsi_gpu,
-                    ) in combinations
+                            maybe_od_cpu,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_cpu,
+                            maybe_tsi_gpu,
+                        ) in combinations
+
                         n = 100
                         lats_cpu = FT.(range(-90, 90, length = n))
                         lons_cpu = FT.(range(-180, 180, length = n))
 
                         # Compute on CPU
-                        results_cpu =
-                            insolation.(
-                                date,
-                                lats_cpu,
-                                lons_cpu,
-                                params,
-                                maybe_od_cpu,
-                                milankovitch,
-                                maybe_tsi_cpu,
-                            )
+                        results_cpu = insolation.(
+                            date,
+                            lats_cpu,
+                            lons_cpu,
+                            params,
+                            maybe_od_cpu,
+                            milankovitch,
+                            maybe_tsi_cpu,
+                        )
 
                         # Transfer to GPU
                         lats_gpu = CuArray(lats_cpu)
                         lons_gpu = CuArray(lons_cpu)
 
                         # Compute on GPU
-                        results_gpu =
-                            insolation.(
-                                date,
-                                lats_gpu,
-                                lons_gpu,
-                                params,
-                                maybe_od_gpu,
-                                milankovitch,
-                                maybe_tsi_gpu,
-                            )
+                        results_gpu = insolation.(
+                            date,
+                            lats_gpu,
+                            lons_gpu,
+                            params,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_gpu,
+                        )
 
                         # Bring back to CPU
                         results_gpu_cpu = Array(results_gpu)
@@ -195,12 +193,13 @@ if CUDA_AVAILABLE
                 # Test daily_insolation
                 @testset "daily_insolation on GPU" begin
                     for (
-                        maybe_od_cpu,
-                        maybe_od_gpu,
-                        milankovitch,
-                        maybe_tsi_cpu,
-                        maybe_tsi_gpu,
-                    ) in combinations
+                            maybe_od_cpu,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_cpu,
+                            maybe_tsi_gpu,
+                        ) in combinations
+
                         lat_gpu = CuArray([lat_cpu])
 
                         # Compute reference on CPU
@@ -216,15 +215,14 @@ if CUDA_AVAILABLE
                             result_daily_cpu.F, result_daily_cpu.S, result_daily_cpu.μ
 
                         # Run on GPU
-                        result =
-                            daily_insolation.(
-                                date,
-                                lat_gpu,
-                                params,
-                                maybe_od_gpu,
-                                milankovitch,
-                                maybe_tsi_gpu,
-                            )
+                        result = daily_insolation.(
+                            date,
+                            lat_gpu,
+                            params,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_gpu,
+                        )
 
                         # Bring back to CPU
                         result_daily_gpu = Array(result)[1]
@@ -241,12 +239,13 @@ if CUDA_AVAILABLE
                 # Test with different times
                 @testset "Multiple dates" begin
                     for (
-                        maybe_od_cpu,
-                        maybe_od_gpu,
-                        milankovitch,
-                        maybe_tsi_cpu,
-                        maybe_tsi_gpu,
-                    ) in combinations
+                            maybe_od_cpu,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_cpu,
+                            maybe_tsi_gpu,
+                        ) in combinations
+
                         dates = [
                             DateTime(2024, 3, 20, 12, 0, 0),  # Equinox
                             DateTime(2024, 6, 21, 12, 0, 0),  # Summer solstice
@@ -257,31 +256,29 @@ if CUDA_AVAILABLE
                         lons = FT.([0.0, 0.0, 180.0, 0.0])
 
                         # CPU computation
-                        results_cpu =
-                            insolation.(
-                                dates,
-                                lats,
-                                lons,
-                                params,
-                                maybe_od_cpu,
-                                milankovitch,
-                                maybe_tsi_cpu,
-                            )
+                        results_cpu = insolation.(
+                            dates,
+                            lats,
+                            lons,
+                            params,
+                            maybe_od_cpu,
+                            milankovitch,
+                            maybe_tsi_cpu,
+                        )
 
                         # GPU computation
                         lats_gpu = CuArray(lats)
                         lons_gpu = CuArray(lons)
                         dates_gpu = CuArray(dates)
-                        results_gpu =
-                            insolation.(
-                                dates_gpu,
-                                lats_gpu,
-                                lons_gpu,
-                                params,
-                                maybe_od_gpu,
-                                milankovitch,
-                                maybe_tsi_gpu,
-                            )
+                        results_gpu = insolation.(
+                            dates_gpu,
+                            lats_gpu,
+                            lons_gpu,
+                            params,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_gpu,
+                        )
 
                         # Compare
                         results_gpu_cpu = Array(results_gpu)
@@ -308,12 +305,12 @@ if CUDA_AVAILABLE
                 # Test edge cases
                 @testset "Edge cases on GPU" begin
                     for (
-                        maybe_od_cpu,
-                        maybe_od_gpu,
-                        milankovitch,
-                        maybe_tsi_cpu,
-                        maybe_tsi_gpu,
-                    ) in combinations
+                            maybe_od_cpu,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_cpu,
+                            maybe_tsi_gpu,
+                        ) in combinations
                         # Polar night
                         result_cpu = insolation(
                             DateTime(2024, 12, 21, 12, 0, 0),
@@ -324,16 +321,15 @@ if CUDA_AVAILABLE
                             milankovitch,
                             maybe_tsi_cpu,
                         )
-                        result_gpu =
-                            insolation.(
-                                DateTime(2024, 12, 21, 12, 0, 0),
-                                CuArray([FT(80.0)]),
-                                CuArray([FT(0.0)]),
-                                params,
-                                maybe_od_gpu,
-                                milankovitch,
-                                maybe_tsi_gpu,
-                            )
+                        result_gpu = insolation.(
+                            DateTime(2024, 12, 21, 12, 0, 0),
+                            CuArray([FT(80.0)]),
+                            CuArray([FT(0.0)]),
+                            params,
+                            maybe_od_gpu,
+                            milankovitch,
+                            maybe_tsi_gpu,
+                        )
                         result_gpu_cpu = Array(result_gpu)[1]
 
                         @test result_gpu_cpu[1] ≈ result_cpu[1] rtol = 1e-5  # F
