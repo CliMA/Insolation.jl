@@ -373,8 +373,7 @@ function solar_geometry(
     # The arguments are multiplied through by cos(δ) ≥ 0 to avoid the tan(δ)
     # singularity at high declinations (e.g., extreme obliquity).
     ζ = mod(
-        FT(3π / 2) -
-        atan(cos(δ) * sin(η), cos(δ) * cos(η) * sin(ϕ) - sin(δ) * cos(ϕ)),
+        FT(3π / 2) - atan(cos(δ) * sin(η), cos(δ) * cos(η) * sin(ϕ) - sin(δ) * cos(ϕ)),
         FT(2π),
     )
 
@@ -437,11 +436,8 @@ function daily_distance_zenith_angle(
     # Effective zenith angle to get diurnally averaged insolation
     # (i.e., averaging the cosine of the zenith angle). The argument is clamped
     # to [-1, 1] to guard against floating-point overshoot in acos.
-    daily_cosθ = clamp(
-        FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd)),
-        FT(-1),
-        FT(1),
-    )
+    daily_cosθ =
+        clamp(FT(1 / π) * (ηd * sin(ϕ) * sin(δ) + cos(ϕ) * cos(δ) * sin(ηd)), FT(-1), FT(1))
     daily_θ = acos(daily_cosθ)
 
     return (; daily_θ, d)

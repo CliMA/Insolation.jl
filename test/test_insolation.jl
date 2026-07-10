@@ -72,8 +72,8 @@ for (i, lat) in enumerate(l_arr)
     local (; F, S, μ) = insolation(daily_θ, d, param_set)
     F_arr[i] = F
 end
-F_NH = sort(F_arr[l_arr.>=0])
-F_SH = sort(F_arr[l_arr.<=0])
+F_NH = sort(F_arr[l_arr .>= 0])
+F_SH = sort(F_arr[l_arr .<= 0])
 @test F_NH ≈ F_SH rtol = rtol
 
 ## Test globally averaged insolation ≈ TSI
