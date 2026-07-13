@@ -78,8 +78,8 @@ For more detailed examples and API documentation, see the [documentation](https:
 [gha-ci-img]: https://github.com/CliMA/Insolation.jl/actions/workflows/ci.yml/badge.svg
 [gha-ci-url]: https://github.com/CliMA/Insolation.jl/actions/workflows/ci.yml
 
-[bk-ci-img]: https://badge.buildkite.com/ee06e8b47ddc81626a82eca3ec918610572c060e9c55590fc0.svg
-[bk-ci-url]: https://buildkite.com/clima/insolation-ci
+[bk-ci-img]: https://badge.buildkite.com/ee06e8b47ddc81626a82eca3ec918610572c060e9c55590fc0.svg?branch=main
+[bk-ci-url]: https://buildkite.com/clima/insolation-ci/builds?branch=main
 
 [codecov-img]: https://codecov.io/gh/CliMA/Insolation.jl/branch/main/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/CliMA/Insolation.jl
