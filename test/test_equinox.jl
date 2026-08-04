@@ -24,9 +24,14 @@
         days[i] = find_zeros(f, 1.0, 30)[1]
     end
 
-    # test mean is about March 21
-    @test mean(days) ≈ 21 atol = 1
+    # The equinox date swings over a full day within this window (the leap cycle), so its
+    # 1900-2100 mean is the meaningful quantity: March 20.70. The tolerance is set by the
+    # Float32/Float64 spread of about 0.05 d, which dominates; plausible refinements of the
+    # orbital elements move the mean by only a few thousandths of a day, so this stays a
+    # real constraint on the calendar without tracking the parameter values.
+    @test mean(days) ≈ 20.7 atol = 0.2
 
-    # test decreasing
-    @test mean(days[:100]) > mean(days[100:end])
+    # Equinox drifts to earlier dates within a century (a four-year leap cycle averages
+    # 365.25 d, longer than the tropical year), reset by the century exceptions.
+    @test mean(days[1:100]) > mean(days[100:end])
 end

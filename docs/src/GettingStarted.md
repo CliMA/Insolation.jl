@@ -41,19 +41,27 @@ Insolation calculations require a parameter set containing orbital and physical 
 using ClimaParams
 params = InsolationParameters(Float64)
 
-# Without ClimaParams, specify all parameters manually (values below
-# approximate the ClimaParams defaults for modern Earth):
+# Without ClimaParams, specify all parameters manually (the values below are
+# the ClimaParams defaults for modern Earth):
 params = InsolationParameters{Float64}(
-    year_anom = 365.259636 * 86400.0,  # Anomalistic year [s]
+    year_anom = 31558433.5,             # Anomalistic year [s] (≈ 365.2596 days)
     day = 86400.0,                      # Day length [s]
-    eccentricity_epoch = 0.016708634,   # Eccentricity [unitless]
-    obliq_epoch = deg2rad(23.43278),    # Obliquity [rad]
-    lon_perihelion_epoch = deg2rad(282.9373),  # Longitude of perihelion [rad]
+    eccentricity_epoch = 0.01671123,    # Eccentricity [unitless]
+    obliq_epoch = deg2rad(23.43927944), # Obliquity [rad]
+    lon_perihelion_epoch = deg2rad(282.93768193),  # Longitude of perihelion [rad]
     tot_solar_irrad = 1362.0,           # Solar irradiance at mean orbital distance [W m⁻²]
     epoch = DateTime(2000, 1, 1, 11, 58, 55, 816),  # J2000 epoch (UTC)
-    mean_anom_epoch = deg2rad(357.52911)  # Mean anomaly at epoch [rad]
+    mean_anom_epoch = deg2rad(357.52688973)  # Mean anomaly at epoch [rad]
 )
 ```
+
+The `epoch` is J2000, 12:00 Terrestrial Time on January 1, 2000, expressed in UTC. The
+orbital elements are their values at that instant: the obliquity is the IAU 2006 mean
+obliquity of the ecliptic, and the eccentricity, longitude of perihelion, and mean anomaly
+are one self-consistent set from the JPL (Standish) 1800–2050 Earth-Moon barycenter
+elements. Passing `milankovitch = true` replaces the three orbital elements with
+time-varying values (see [Milankovitch Cycles](@ref)) but leaves `epoch`, `year_anom`,
+`day`, and `mean_anom_epoch` untouched.
 
 ## Basic Usage
 
@@ -118,27 +126,28 @@ println("Solar azimuth angle: $(rad2deg(ζ))°")
 For paleoclimate applications, use time-varying orbital parameters:
 
 ```@example howto
-# Load orbital parameter time series (covers -50 to +20 million years around present)
+# Load orbital parameter time series (covers -50 to +20 Myr around J2000).
+# Construction is expensive; do it once and reuse.
 orbital_data = OrbitalDataSplines()
 
-# Calculate for 20,000 years ago (Last Glacial Maximum)
-date = DateTime(2000, 1, 1)  # Reference date (day of year matters)
-params = InsolationParameters(Float64)
-
-# Use Milankovitch cycles
+# Turning on Milankovitch cycles takes the orbital elements from the Laskar et al.
+# (2004) tables at the requested date instead of from the parameter set
 milankovitch = true
-result = insolation(
-    date, lat, lon, params,
-    orbital_data,
-    milankovitch,
-)
+date = DateTime(-18000, 6, 21)  # ~20 kyr before J2000, in astronomical year numbering
+F = insolation(date, lat, lon, params, orbital_data, milankovitch).F
+println("TOA insolation 20 kyr ago: $(round(F, digits = 1)) W/m²")
 
-# Get orbital parameters at specific time
-years_since_epoch = -20000.0  # 20 kyr ago
-ϖ, γ, e = orbital_params(orbital_data, years_since_epoch)
-println("Obliquity 20 kyr ago: $(rad2deg(γ))°")
-println("Eccentricity 20 kyr ago: $e")
+# The orbital parameters themselves, indexed in Julian years since J2000
+ϖ, γ, e = orbital_params(orbital_data, -20000.0)
+println("Obliquity 20 kyr ago: $(round(rad2deg(γ), digits = 2))°")
+println("Eccentricity 20 kyr ago: $(round(e, digits = 4))")
 ```
+
+!!! warning "Calendar dates drift relative to the seasons"
+    The date passed here fixes the position relative to *perihelion*, not relative to the
+    equinoxes, so a given calendar date corresponds to a different season in deep time.
+    See [Milankovitch Cycles](@ref) for the size of the drift and for
+    calendar-independent ways to make paleoclimate comparisons.
 
 ## Advanced Options
 
@@ -187,9 +196,9 @@ result = insolation(date, lat, lon, params, orbital_data, milankovitch, solar_va
 Override specific parameters for sensitivity studies:
 
 ```@example howto
-# Increase obliquity by 5 degrees
+# Obliquity raised 5° above the default of 23.44°
 params_high_obliq = InsolationParameters(Float64, (;
-    obliq_epoch = deg2rad(23.44 + 5.0)
+    obliq_epoch = deg2rad(28.44)
 ))
 
 F_modified = insolation(date, lat, lon, params_high_obliq).F
@@ -254,8 +263,8 @@ dates = DateTime(2024, 1, 1):Day(1):DateTime(2024, 12, 31)
 daily_insol = [daily_insolation(d, lat, params).F for d in dates]
 
 # Plot
-plot(dates, daily_insol, 
-     xlabel="Date", 
+plot(dates, daily_insol,
+     xlabel="Date",
      ylabel="Daily-mean TOA Insolation [W/m²]",
      title="Seasonal Cycle at $(lat)°N, $(lon)°E",
      legend=false)
@@ -264,5 +273,5 @@ plot(dates, daily_insol,
 ## Next Steps
 
 - See [Insolation Examples](@ref) for visualization and more complex use cases
-- Learn about [Milankovitch Cycles](@ref) for paleoclimate applications  
+- Learn about [Milankovitch Cycles](@ref) for paleoclimate applications
 - Check the [API Reference](@ref) for complete function documentation

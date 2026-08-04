@@ -42,14 +42,14 @@ Without ClimaParams.jl, create parameters directly:
 ```julia
 using Insolation.Parameters
 params = InsolationParameters{Float64}(
-    year_anom = 365.259636 * 86400.0,
+    year_anom = 31558433.5,  # anomalistic year [s], ≈ 365.2596 days
     day = 86400.0,
-    eccentricity_epoch = 0.016708634,
-    obliq_epoch = deg2rad(23.43278),
-    lon_perihelion_epoch = deg2rad(282.9373),
+    eccentricity_epoch = 0.01671123,
+    obliq_epoch = deg2rad(23.43927944),
+    lon_perihelion_epoch = deg2rad(282.93768193),
     tot_solar_irrad = 1362.0,
     epoch = DateTime(2000, 1, 1, 11, 58, 55, 816),
-    mean_anom_epoch = deg2rad(357.52911)
+    mean_anom_epoch = deg2rad(357.52688973)
 )
 ```
 

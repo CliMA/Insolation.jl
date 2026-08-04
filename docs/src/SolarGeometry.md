@@ -1,6 +1,6 @@
 # Solar Geometry and Insolation
 
-This page provides the mathematical formulations used in `Insolation.jl` to calculate solar geometry and insolation. The equations are from Tapio Schneider and Lenka Novak's textbook draft ["Physics of Earth's Climate"](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf), Chapter 3.
+This page provides the mathematical formulations used in `Insolation.jl` to calculate solar geometry and insolation. The equations are from the textbook draft ["Physics of Earth's Climate"](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf), Chapter 3.
 
 ## Overview
 
@@ -24,7 +24,7 @@ M = \frac{2\pi (t - t_0)}{Y_a} + M_0,
 
 where we have:
 
-- The time at the epoch (J2000), $t_0$, typically defined as January 1, 2000 at 12:00 Terrestrial Time (TT), corresponding to 11:59 UTC
+- The time at the epoch (J2000), $t_0$, defined as January 1, 2000 at 12:00 Terrestrial Time (TT); the package default is the corresponding UTC instant, 11:58:55.816
 - The mean anomaly at the epoch, $M_0$ [radians]
 - The length of the anomalistic year, $Y_a$ (period from perihelion to perihelion) [seconds]
 
@@ -57,7 +57,7 @@ For Earth, $\varpi$ varies slowly due to precession (period $\sim 21{,}000$ year
 
 ## Declination
 
-The **solar declination** $\delta$ is the angle between the sun's rays and the equatorial plane, or the latitude of the subsolar point (where the sun is in zenith at solar noon). It determines the subsolar latitude (where the sun is directly overhead at solar noon). The declination varies between $\pm\gamma$ (obliquity) over the course of a year.
+The **solar declination** $\delta$ is the angle between the sun's rays and the equatorial plane — equivalently, the latitude of the subsolar point, where the sun is directly overhead at solar noon. The declination varies between $\pm\gamma$ (obliquity) over the course of a year.
 
 The sine of the declination angle is
 
@@ -70,7 +70,7 @@ where we have:
 - The orbital obliquity $\gamma$ (axial tilt) [radians]
 - The solar longitude $L_s$ [radians]
 
-For Earth's current obliquity of $\gamma \approx 23.44°$, the declination ranges from $-23.44°$ (winter solstice) to $+23.44°$ (summer solstice), passing through $0°$ at the equinoxes.
+For Earth's current obliquity of $\gamma \approx 23.44°$, the declination ranges from $-23.44°$ (northern winter solstice) to $+23.44°$ (northern summer solstice), passing through $0°$ at the equinoxes. Its extremes are the latitudes of the Tropics of Capricorn and Cancer. The package default, `obliq_epoch`, is the mean obliquity of the ecliptic at J2000 — the IAU 2006 value, $23.43927944° = 84381.406''$.
 
 ## Equation of Time
 
@@ -79,7 +79,7 @@ The **equation of time** corrects for the difference between **apparent solar ti
 1. The elliptical orbit causes varying orbital speed (eccentricity effect)
 2. The tilted axis projects the sun's motion onto the equatorial plane (obliquity effect)
 
-The equation-of-time hour angle correction [radians] is computed exactly as the difference between the mean longitude $L = M + \varpi$ and the right ascension $\alpha$ of the true Sun,
+The equation-of-time hour angle correction [radians] is computed as the difference between the mean longitude $L = M + \varpi$ and the right ascension $\alpha$ of the true Sun,
 
 ```math
 \Delta \eta = L - \alpha, \qquad \alpha = \operatorname{atan2}\left(\cos\gamma \, \sin L_s,\; \cos L_s\right),
@@ -93,15 +93,15 @@ For small eccentricity and obliquity this reduces to the familiar perturbative f
 \Delta \eta \approx -2 e \sin(M) + \tan^2(\gamma/2) \sin(2M+2\varpi),
 ```
 
-where the first term accounts for orbital eccentricity and the second for axial tilt. The correction can be converted to a time offset through $\Delta t = \Delta\eta T_d/(2\pi)$, where $T_d$ is the length of the solar day. For Earth it reaches roughly ±16 minutes over the year, explaining why sundials and clocks disagree.
+where the first term accounts for orbital eccentricity and the second for axial tilt. The correction can be converted to a time offset through $\Delta t = \Delta\eta T_d/(2\pi)$, where $T_d$ is the length of the solar day. For present-day Earth it runs from about $-14$ minutes in February to $+16$ minutes in November, which is why sundials and clocks disagree.
 
 ## Hour Angle
 
 The **hour angle** $\eta$ measures the angular distance of the sun from the local meridian (north-south line). It quantifies how far past (or before) solar noon we are at a given location:
 
-- Local solar noon: $\eta = 0$  
+- Local solar noon: $\eta = 0$
 - In the afternoon: $\eta > 0$
-- In the morning: $\eta < 0$  
+- In the morning: $\eta < 0$
 
 The hour angle is calculated from the time of day, with equation of time correction, and adjusted for longitude:
 
@@ -112,11 +112,13 @@ The hour angle is calculated from the time of day, with equation of time correct
 where we have:
 
 - The uncorrected hour angle at the prime meridian (0° longitude), $\eta_\text{uncorrected} = 2\pi t_\text{day}$ [radians]
-- The fractional time of day at the prime meridian (0 at midnight, 0.5 at noon), $t_\text{day}$ [dimensionless]
+- The fractional part of the Julian date, $t_\text{day}$ [dimensionless]
 - The equation of time hour angle correction, $\Delta\eta$ [radians]
 - The longitude $\lambda$ [radians]
 
-All terms are taken modulo $2\pi$ for proper angle wrapping. The factor $2\pi$ converts fractional day to angle.
+The Julian day begins at noon, so $t_\text{day}$ is 0 at 12:00 UTC and 0.5 at 00:00 UTC; this is what makes $\eta = 0$ at mean solar noon on the prime meridian, with no further offset. The factor $2\pi$ converts fractional day to angle.
+
+All terms are taken modulo $2\pi$ for proper angle wrapping, so the returned hour angle lies in $[0, 2\pi)$: morning hours appear as $\eta$ slightly below $2\pi$ rather than as negative values. Since $\cos\eta$ is what enters the zenith angle, the wrapping is immaterial to the insolation.
 
 ## Zenith Angle
 
@@ -144,8 +146,9 @@ This is a fundamental equation in solar geometry. The incident solar radiation i
 
 The **sunrise/sunset hour angle** $\eta_d$ is the hour angle at which the sun crosses the horizon. It determines the length of day and night:
 
-- Day length = $2\eta_d$ (in radians, or multiply by $T_d/(2\pi)$ for seconds)
-- If $|\tan \phi \tan \delta| > 1$: polar day ($\eta_d = \pi$) or polar night ($\eta_d = 0$)
+- Day length: the sun is above the horizon for hour angles between $-\eta_d$ and $+\eta_d$, a fraction $\eta_d/\pi$ of the day, i.e., for a time $2\eta_d \, T_d/(2\pi)$ with $T_d$ the length of the solar day
+- Polar day when $\tan \phi \tan \delta \ge 1$ (the sun never sets, $\eta_d = \pi$)
+- Polar night when $\tan \phi \tan \delta \le -1$ (the sun never rises, $\eta_d = 0$)
 
 The sunrise/sunset hour angle is given by
 
@@ -153,7 +156,9 @@ The sunrise/sunset hour angle is given by
 \cos \eta_d = - \tan \phi \tan \delta,
 ```
 
-where this equation comes from setting $\theta = 90°$ (sun at horizon) in the zenith angle formula. The negative sign reflects that sunrise occurs at negative hour angles and sunset at positive hour angles.
+which follows from setting $\theta = 90°$ (sun at horizon) in the zenith angle formula. Sunrise occurs at $-\eta_d$ and sunset at $+\eta_d$, symmetrically about solar noon. In the code, the two polar cases need no branching: clamping the right-hand side to $[-1, 1]$ before taking the arccosine returns $\eta_d = \pi$ for polar day and $\eta_d = 0$ for polar night automatically.
+
+Note that both polar cases require $|\phi| \ge 90° - |\delta|$, so they can only occur poleward of the polar circles at $\pm(90° - \gamma)$ — for present-day Earth, poleward of 66.6°.
 
 ## Diurnally Averaged Insolation
 
@@ -169,8 +174,10 @@ Since insolation is proportional to $\cos \theta$, we need $\overline{\cos \thet
 
 - The $1/\pi$ prefactor combines the $1/(2\pi)$ average over the full 24-hour day with a factor of 2 from the symmetric sunrise-to-sunset integration limits ($\pm\eta_d$)
 - When $\eta_d = 0$ (polar night), $\overline{\cos \theta} = 0$ (no insolation)
-- When $\eta_d = \pi$ (polar day), $\overline{\cos \theta} = \sin \phi \sin \delta$ (24-hour average of the noon-and-midnight sun)
+- When $\eta_d = \pi$ (polar day), $\overline{\cos \theta} = \sin \phi \sin \delta$: the sun circles the horizon without setting, and only the term that survives a full rotation remains
 - At the equator ($\phi = 0$) during equinox ($\delta = 0$), we have $\eta_d = \pi/2$ and the formula reduces to $(1/\pi) \cos \phi \cos \delta \sin \eta_d = 1/\pi \approx 0.318$
+
+This expression is what makes summer insolation maximal at the *pole* rather than at the subsolar latitude near the solstices: the polar-day term $\eta_d \sin\phi \sin\delta$ grows with latitude fast enough to beat the falling solar elevation. For a planet on a nearly circular orbit, this happens whenever the obliquity exceeds about $20.7°$, which Earth's $23.4°$ does.
 
 ## Azimuth Angle
 
@@ -191,7 +198,7 @@ where the two-argument arctangent ($\operatorname{atan2}$) resolves the correct 
 - Sun due **West**: $\zeta = \pi$
 - Sun due **South**: $\zeta = 3\pi/2$
 
-The azimuth increases counter-clockwise when viewed from above. At local solar noon ($\eta = 0$), the sun is due south in the Northern Hemisphere ($\zeta = 3\pi/2$) or due north in the Southern Hemisphere.
+The azimuth increases counter-clockwise when viewed from above. At local solar noon ($\eta = 0$) the sun is exactly due south ($\zeta = 3\pi/2$) or due north ($\zeta = \pi/2$), depending on which side of the subsolar latitude the observer is on: due south when $\phi > \delta$, due north when $\phi < \delta$. This is not the same as the hemisphere — in the tropics in summer the subsolar point can lie poleward of the observer, and the noon sun then stands to the north in the Northern Hemisphere.
 
 ## Planet-Star Distance
 
@@ -207,7 +214,7 @@ where we have:
 
 - The orbital eccentricity $e$ (0 for circular, $0<e<1$ for elliptical) [unitless]
 - The true anomaly $A$ [radians]
-- The semi-major axis $d_0$, i.e., the mean planet-star distance
+- The semi-major axis $d_0$, the mean of the perihelion and aphelion distances, at which the total solar irradiance $S_0$ is defined
 
 Since the insolation depends only on the *ratio* $d/d_0$ (the inverse-square law gives $S = S_0 (d_0/d)^2$ with $S_0$ the irradiance at the mean distance), `Insolation.jl` works with the dimensionless distance $d/d_0 = (1-e^2)/(1+e\cos A)$ and never needs the absolute orbit size. The returned distance is therefore expressed in units of the semi-major axis.
 
@@ -219,4 +226,6 @@ Since the insolation depends only on the *ratio* $d/d_0$ (the inverse-square law
 - The $\pm 1.7\%$ variation in distance causes a $\pm 3.4\%$ variation in solar flux
 - The semi-major axis is $d_0 \approx 1.496 \times 10^{11}$ m $= 1$ AU; multiply $d/d_0$ by this to recover a physical distance
 
-Earth is closest to the sun during Northern Hemisphere winter, but the obliquity effect dominates over the distance effect in determining seasons.
+Earth is closest to the sun during Northern Hemisphere winter, but the obliquity effect dominates over the distance effect in determining seasons: a $\pm 3.4\%$ swing in flux is small next to the factor-of-several swing in $\overline{\cos\theta}$ that the tilt produces at middle and high latitudes.
+
+There is also an exact cancellation worth knowing about. The flux varies as $d^{-2}$, and by Kepler's second law so does the orbital angular velocity, so the planet lingers in a given arc of its orbit for a time proportional to $d^{2}$. The two effects cancel, and the energy received over any fixed interval of solar longitude — an astronomical season, or the whole year — is independent of where in the orbit that interval falls (*Herschel's law*). Changing the longitude of perihelion therefore redistributes insolation within the seasonal cycle without changing any seasonal total; see [Milankovitch Cycles](@ref) for a numerical demonstration.
