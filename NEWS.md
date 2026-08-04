@@ -1,5 +1,6 @@
 # Insolation.jl Release Notes
 
+## v1.2.1
 ### Documentation
 
 - Expanded and reorganized the documentation: the mathematical background page now matches
