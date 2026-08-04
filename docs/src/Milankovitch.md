@@ -179,9 +179,9 @@ println("Difference:              $(round(F_lgm - F_modern, digits=1)) W/m²")
 
 This capability enables studies of ice age cycles, interglacial periods, and long-term climate evolution driven by orbital forcing.
 
-## Diagnosing Ice Pacing with Peak Summer Insolation at 65°N
+## Diagnosing Ice Age Pacing with Peak Summer Insolation at 65°N
 
-Milankovitch was first to calculate how orbital cycles modulate peak summer insolation at 65°N, which he claimed drove the onset of ice ages. While no small feat for Milankovitch, calculating by hand for years, you can compute this classical result in paleoclimate in seconds using the following lines of code:
+Milankovitch was first to calculate how orbital cycles modulate peak summer insolation at 65°N, which he claimed drove the onset of ice ages. While no small feat for Milankovitch, calculating by hand for years, you can display this classical result in paleoclimate in seconds using the following lines of code:
 
 ```@example ice_ages
 using Insolation
@@ -214,5 +214,5 @@ nothing # hide
 
 ![](insol_65N_ice_ages.png)
 
-Note that peak summer inslation over the past 700,000 years varies by over 25%. Easiest to see is the effect of the high-frequency precession and its constructive and destructive interference with the lower-frequency orbital parameter effects. 
+Note that peak summer insolation over the past 700,000 years varies by over 25%. Easiest to see is the effect of the high-frequency precession and its constructive and destructive interference with the lower-frequency orbital parameter effects. 
 
