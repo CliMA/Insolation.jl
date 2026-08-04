@@ -6,8 +6,7 @@ A Julia package to calculate top-of-atmosphere (TOA) insolation
 body's) orbital parameters.
 
 The calculations follow fundamental principles of celestial mechanics
-and solar geometry, as described in ["Physics of Earth's Climate"](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf) 
-by Tapio Schneider and Lenka Novak.
+and solar geometry, as described in ["Physics of Earth's Climate"](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf).
 
 The package provides functions to:
 - Calculate instantaneous insolation for a specific time and location.

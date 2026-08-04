@@ -1,5 +1,29 @@
 # Insolation.jl Release Notes
 
+### Documentation
+
+- Expanded and reorganized the documentation: the mathematical background page now matches
+  the implementation (exact equation of time, dimensionless planet-star distance, azimuth
+  convention), the Milankovitch page adds a discussion of calendar drift and the 65°N
+  ice-age diagnostic, and quantitative statements throughout have been verified against
+  the package output.
+
+### Tests
+
+- Reworked the J2000 consistency checks in `test/test_orbit_param.jl` so that they
+  constrain physics rather than track the reference values. The epoch parameters are
+  compared against the Laskar et al. (2004) solution at `t = 0` using absolute tolerances
+  derived from how fast each element drifts (0.1° for the longitude of perihelion, 0.02°
+  for obliquity, 1e-4 for eccentricity), which catches a wrong epoch, unit, or body while
+  staying insensitive to refinements of either source. Added a check that `year_anom` is
+  the anomalistic year and not the sidereal, Julian, or tropical year.
+- `test/test_equinox.jl` and `test/test_perihelion.jl` now constrain the mean 1900–2100
+  equinox and perihelion dates to ±0.2 d (March 20.7 and January 3.6) instead of ±1 d. The
+  tolerance is set by the Float32/Float64 spread, which dominates any plausible change in
+  the orbital elements. Their monotonicity checks compared `days[:100]`, which Julia parses
+  as `days[100]` (a single element) rather than the first hundred; corrected to
+  `days[1:100]`.
+
 ## v1.2.0
 
 ### Breaking changes

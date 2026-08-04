@@ -27,9 +27,12 @@
         days[i] = Optim.minimizer(res)[1]
     end
 
-    # test mean is about Jan 3.5
-    @test mean(days) ≈ 3.5 atol = 1
+    # Mean date of perihelion over 1900-2100 is January 3.63. As for the equinox, the
+    # tolerance is set by the Float32/Float64 spread (about 0.07 d) rather than by the
+    # orbital elements, whose plausible refinements move the mean by ~0.003 d.
+    @test mean(days) ≈ 3.6 atol = 0.2
 
-    # test increasing
-    @test mean(days[:100]) < mean(days[100:end])
+    # Perihelion drifts to later dates: the Gregorian year is ~0.017 d shorter than the
+    # anomalistic year, so perihelion arrives about 1.7 d later per century.
+    @test mean(days[1:100]) < mean(days[100:end])
 end

@@ -33,14 +33,12 @@ The package is organized into several modules:
 
 ## Mathematical Background
 
-The calculations follow fundamental principles of celestial mechanics and solar geometry, as described in [Physics of Earth's Climate](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf) by Tapio Schneider and Lenka Novak. See the [Mathematical Background](SolarGeometry.md) page for detailed mathematical formulations of the zenith angle, azimuth angle, and other astronomical calculations.
+The calculations follow fundamental principles of celestial mechanics and solar geometry, as described in [Physics of Earth's Climate](https://climate-dynamics.org/wp-content/uploads/2017/04/Climate_Book.pdf). See the [Mathematical Background](SolarGeometry.md) page for detailed mathematical formulations of the zenith angle, azimuth angle, and other astronomical calculations.
 
 ## Quick Example
 
 ```@example quick
-using Pkg
-Pkg.instantiate()  # Install all dependencies
-using Insolation   
+using Insolation
 using Dates
 
 # Calculate insolation for a specific location and time
@@ -56,12 +54,12 @@ params = InsolationParameters(FT)
 # Calculate instantaneous insolation with solar geometry
 (; F, S, μ, ζ) = insolation(date, lat, lon, params)
 # F: TOA insolation [W m⁻²]
-# S: Solar flux [W m⁻²]  
-# μ: Cosine of solar zenith angle
-# ζ: Solar azimuth angle [radians]
+# S: Solar flux at the current planet-star distance [W m⁻²]
+# μ: Cosine of solar zenith angle, zero at night
+# ζ: Solar azimuth angle [radians], 0 = due East, increasing counterclockwise
 ```
 
-This is the instantaneous insolation at the given location and time. Here's the daily averaged insolation at the same location and time:
+This is the instantaneous insolation at the given location and time. Here is the daily averaged insolation at the same latitude and date (it does not depend on longitude or time of day):
 
 ```@example quick
 # Calculate daily-averaged insolation
