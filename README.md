@@ -69,8 +69,8 @@ For more detailed examples and API documentation, see the [documentation](https:
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://CliMA.github.io/Insolation.jl/dev/
 
-[version-img]: https://juliahub.com/docs/General/Insolation/stable/version.svg
-[version-url]: https://juliahub.com/ui/Packages/General/Insolation
+[version-img]: https://img.shields.io/github/v/release/CliMA/Insolation.jl
+[version-url]: https://github.com/CliMA/Insolation.jl/releases
 
 [license-img]: https://img.shields.io/badge/license-Apache%202.0-blue.svg
 [license-url]: https://github.com/CliMA/Insolation.jl/blob/main/LICENSE
