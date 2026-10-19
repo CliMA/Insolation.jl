@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Milankovitch Cycles · Insolation.jl</title><meta name="title" content="Milankovitch Cycles · Insolation.jl"/><meta property="og:title" content="Milankovitch Cycles · Insolation.jl"/><meta property="twitter:title" content="Milankovitch Cycles · Insolation.jl"/><meta name="description" content="Documentation for Insolation.jl."/><meta property="og:description" content="Documentation for Insolation.jl."/><meta property="twitter:description" content="Documentation for Insolation.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="Insolation.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">Insolation.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../GettingStarted/">Getting Started</a></li><li><a class="tocitem" href="../InsolationExamples/">Examples</a></li><li class="is-active"><a class="tocitem" href>Milankovitch Cycles</a><ul class="internal"><li><a class="tocitem" href="#The-Three-Orbital-Parameters"><span>The Three Orbital Parameters</span></a></li><li><a class="tocitem" href="#Variations-in-the-orbital-parameters"><span>Variations in the orbital parameters</span></a></li><li><a class="tocitem" href="#Calendar-Considerations:-Equinox-and-Perihelion-Dates"><span>Calendar Considerations: Equinox and Perihelion Dates</span></a></li><li><a class="tocitem" href="#Using-Milankovitch-Cycles-in-Calculations"><span>Using Milankovitch Cycles in Calculations</span></a></li><li><a class="tocitem" href="#Milankovitch&#39;s-Diagnostic:-Peak-Summer-Insolation-at-65N"><span>Milankovitch&#39;s Diagnostic: Peak Summer Insolation at 65°N</span></a></li></ul></li><li><a class="tocitem" href="../SolarGeometry/">Mathematical Background</a></li><li><a class="tocitem" href="../library/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Milankovitch Cycles</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Milankovitch Cycles</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/CliMA/Insolation.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/CliMA/Insolation.jl/blob/main/docs/src/Milankovitch.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Milankovitch-Cycles"><a class="docs-heading-anchor" href="#Milankovitch-Cycles">Milankovitch Cycles</a><a id="Milankovitch-Cycles-1"></a><a class="docs-heading-anchor-permalink" href="#Milankovitch-Cycles" title="Permalink"></a></h1><p>Gravitational tugs from the other planets, and torques exerted by the Moon and Sun on Earth&#39;s equatorial bulge, make Earth&#39;s orbit and spin axis drift slowly over millennia. The resulting variations in eccentricity, obliquity, and the longitude of perihelion are the <em>Milankovitch cycles</em>. They do not change the Sun&#39;s output, but they redistribute insolation across latitudes and across the seasons, and they pace the glacial cycles of the past few million years.</p><p><code>Insolation.jl</code> provides the <a href="https://doi.org/10.1051/0004-6361:20041335">Laskar et al. (2004)</a> solution for Earth&#39;s orbital parameters, spanning -50 Myr to +20 Myr around the J2000 epoch. Passing <code>milankovitch = true</code> swaps the fixed epoch parameters for the time-varying ones, which makes paleoclimate calculations a one-line change.</p><h2 id="The-Three-Orbital-Parameters"><a class="docs-heading-anchor" href="#The-Three-Orbital-Parameters">The Three Orbital Parameters</a><a id="The-Three-Orbital-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#The-Three-Orbital-Parameters" title="Permalink"></a></h2><ol><li><p><strong>Eccentricity</strong> <code>e</code>: the shape of Earth&#39;s orbit. Over the past 50 Myr it has ranged between about 0 (circular) and 0.06, with dominant periods near 405 kyr and 110 kyr (the latter an amplitude-weighted mean of several closely spaced periods, commonly called &quot;the 100-kyr cycle&quot;). Current value: 0.0167, a relatively low point in the cycle.</p></li><li><p><strong>Obliquity</strong> <code>γ</code>: Earth&#39;s axial tilt relative to the normal to the orbital plane, varying between 22.1° and 24.5° with a mean period of 41 kyr. Current value: 23.44°, close to its long-term mean and currently declining. Obliquity sets the strength of the seasonal cycle and the equator-to-pole distribution of annual-mean insolation.</p></li><li><p><strong>Longitude of perihelion</strong> <code>ϖ</code>: the angular distance along the orbit from vernal equinox to perihelion, that is, where in the seasonal cycle Earth passes closest to the Sun. It advances through a full revolution with a mean period of 21 kyr, a compound of two motions: the retrograde axial precession of Earth&#39;s spin axis, which carries the equinoxes backward around the orbit (the classical <em>precession of the equinoxes</em>, ~26 kyr), and the slower prograde apsidal precession of the orbital ellipse itself (~112 kyr). Currently <code>ϖ ≈ 283°</code>, so perihelion falls near southern summer solstice.</p></li></ol><p>Precession only matters to the extent that the orbit is eccentric: on a circular orbit, <code>ϖ</code> has no effect at all. The climatically relevant combination is therefore the <em>precession index</em> <code>e sin(ϖ)</code>, in which the 19–24 kyr precession band is amplitude-modulated by the much slower eccentricity variations.</p><h2 id="Variations-in-the-orbital-parameters"><a class="docs-heading-anchor" href="#Variations-in-the-orbital-parameters">Variations in the orbital parameters</a><a id="Variations-in-the-orbital-parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Variations-in-the-orbital-parameters" title="Permalink"></a></h2><pre><code class="language-julia hljs">using Insolation
+using Plots
+
+# Load orbital parameter data (Laskar et al. 2004)
+od = OrbitalDataSplines()
+
+# Time range: ±500 kyr around J2000; negative times are in the past
+dt = collect(-500e3:100:500e3); # Julian years since J2000
+
+# Extract orbital parameters over time
+y = hcat(collect.(orbital_params.(od, dt))...);
+ϖ, γ, e = y[1, :], y[2, :], y[3, :];
+
+# Precession: plot sin(ϖ), which is periodic (ϖ itself is stored unwrapped)
+p1 = plot(dt ./ 1e3, sin.(ϖ), legend = false);
+ylabel!(&quot;sin(ϖ)&quot;);
+title!(&quot;Precession&quot;);
+
+# Obliquity (axial tilt)
+p2 = plot(dt ./ 1e3, rad2deg.(γ), legend = false);
+ylabel!(&quot;γ [degrees]&quot;);
+title!(&quot;Obliquity&quot;);
+
+# Eccentricity (orbital shape)
+p3 = plot(dt ./ 1e3, e, legend = false);
+ylabel!(&quot;e&quot;);
+xlabel!(&quot;Time relative to present [kyr]&quot;)
+title!(&quot;Eccentricity&quot;);
+
+plot(p1, p2, p3, layout = grid(3, 1), size = (600, 500), dpi = 250);
+savefig(&quot;orbital_params.png&quot;)</code></pre><p><img src="../orbital_params.png" alt/></p><ul><li><strong>Top</strong>: precession, shown as <code>sin(ϖ)</code>, cycles with a mean period of 21 kyr, with power spread over the 19–24 kyr precession band.</li><li><strong>Middle</strong>: obliquity oscillates between 22.1° and 24.5° with a mean period of 41 kyr.</li><li><strong>Bottom</strong>: eccentricity varies with periods near 100 kyr and 405 kyr. Note how the eccentricity envelope modulates how much the precession cycle can matter.</li></ul><h2 id="Calendar-Considerations:-Equinox-and-Perihelion-Dates"><a class="docs-heading-anchor" href="#Calendar-Considerations:-Equinox-and-Perihelion-Dates">Calendar Considerations: Equinox and Perihelion Dates</a><a id="Calendar-Considerations:-Equinox-and-Perihelion-Dates-1"></a><a class="docs-heading-anchor-permalink" href="#Calendar-Considerations:-Equinox-and-Perihelion-Dates" title="Permalink"></a></h2><p>Orbital position is naturally measured by the solar longitude <code>Ls</code>, the angle travelled along the orbit since vernal equinox, which is what fixes the astronomical seasons (<code>Ls = 0°</code> at vernal equinox, <code>90°</code> at northern summer solstice, and so on). Calendar dates are a different thing altogether, and the two drift apart. <code>Insolation.jl</code> advances the mean anomaly from its J2000 value at the rate of the anomalistic year, so a calendar date is tied to Earth&#39;s position relative to <em>perihelion</em>, while the seasons are tied to its position relative to the equinoxes — and perihelion and equinox move relative to each other. It is worth knowing how fast.</p><h3 id="Centennial-Timescales-(1800–2200-CE)"><a class="docs-heading-anchor" href="#Centennial-Timescales-(1800–2200-CE)">Centennial Timescales (1800–2200 CE)</a><a id="Centennial-Timescales-(1800–2200-CE)-1"></a><a class="docs-heading-anchor-permalink" href="#Centennial-Timescales-(1800–2200-CE)" title="Permalink"></a></h3><p>Over a few centuries the drift is small, and what remains is dominated by the four-year leap cycle.</p><pre><code class="language-julia hljs">using Insolation
+using Roots
+using Optim
+include(&quot;find_equinox_perihelion_dates.jl&quot;)
+
+years = 1800:2200;
+days_eq = zeros(length(years));
+days_per = zeros(length(years));
+od = OrbitalDataSplines()
+
+# Find vernal equinox and perihelion dates for each year
+for (i, year) in enumerate(years)
+    # Vernal equinox: when the northern and southern mid-latitudes receive equal insolation
+    f = (x -&gt; zdiff(x, year, od))
+    days_eq[i] = find_zeros(f, -30, 60)[1]
+
+    # Perihelion: when the planet-star distance is minimal
+    f = (x -&gt; edist(x, year, od))
+    res = optimize(f, -50, 50)
+    days_per[i] = Optim.minimizer(res)[1]
+end
+
+plot(years, days_eq, legend = false, dpi = 250, lw = 2)
+xlabel!(&quot;Year&quot;)
+ylabel!(&quot;Day in March&quot;)
+title!(&quot;Date of Vernal Equinox&quot;)
+savefig(&quot;equinox_dates.png&quot;)
+
+plot(years, days_per, legend = false, dpi = 250, lw = 2)
+xlabel!(&quot;Year&quot;)
+ylabel!(&quot;Day in January&quot;)
+title!(&quot;Date of Perihelion&quot;)
+savefig(&quot;perihelion_dates.png&quot;)</code></pre><p><img src="../equinox_dates.png" alt/> <img src="../perihelion_dates.png" alt/></p><p>Three features stand out in the equinox curve, and all three are calendar artifacts rather than orbital signals. The one-day sawtooth is the leap-year cycle: the equinox slips about a quarter day later for three years, then is pulled back by the February 29 insertion. Within each century the sawtooth drifts downward by about 0.8 days, because a four-year leap cycle averages 365.25 days while the tropical year (equinox to equinox) is 365.2422 days. The upward jumps at 1900 and 2100 — but not at 2000 — are the Gregorian century rule recovering that drift, three days every 400 years.</p><p>The Gregorian reform of 1582 CE added the century exception to the Julian calendar&#39;s leap year rule. This helped pin vernal equinox near March 21 (in this calculation it lies just past March 20) instead of letting it slide backward by three days per 400 years.</p><p>Perihelion, by contrast, drifts steadily <em>later</em>, from January 1 in 1800 to January 7 in</p><ol><li>Nothing is wrong with the calendar here: the Gregorian year is about 0.017 days</li></ol><p>shorter than the anomalistic year, so perihelion arrives a little later each year, and over four centuries that accumulates to the six days in the figure. Because the equinox stays put while perihelion advances, the interval from perihelion to vernal equinox shrinks — from 79 days in 1800 to 72 days in 2200, about 1.75 days per century. That is precession — the motion of perihelion relative to the equinox — made visible on a human timescale: 1.75 days per century out of a 365-day year is one revolution in roughly 21 kyr.</p><h3 id="Millennial-Timescales-(50,000-BCE-–-30,000-CE)"><a class="docs-heading-anchor" href="#Millennial-Timescales-(50,000-BCE-–-30,000-CE)">Millennial Timescales (50,000 BCE – 30,000 CE)</a><a id="Millennial-Timescales-(50,000-BCE-–-30,000-CE)-1"></a><a class="docs-heading-anchor-permalink" href="#Millennial-Timescales-(50,000-BCE-–-30,000-CE)" title="Permalink"></a></h3><p>Over tens of millennia the equinox wanders through the calendar by months. Two large and nearly opposing effects are at work. A Gregorian year of 365.2425 days is about 0.017 days shorter than the anomalistic year, so perihelion — and with it any point of the orbit at fixed phase relative to perihelion — arrives roughly 17 days <em>later</em> in the calendar per millennium. Meanwhile the equinox does not keep a fixed phase relative to perihelion: precession carries it through a full revolution of the orbit in about 21 kyr, moving it <em>earlier</em> relative to perihelion by roughly the same 17 days per millennium. The two nearly cancel today — that near-cancellation is what makes the tropical year, and hence the Gregorian calendar, work — but the precession rate is not constant, so the residual accumulates.</p><pre><code class="language-julia hljs">using Insolation
+using Roots
+include(&quot;find_equinox_perihelion_dates.jl&quot;)
+
+od = OrbitalDataSplines()
+years = -50e3:100:30e3
+days_eq = zeros(length(years))
+
+# Calculate the vernal equinox date over 80 kyr
+for (i, year) in enumerate(years)
+    f = (x -&gt; zdiff(x, year, od))
+    days_eq[i] = find_zeros(f, -100, 100)[1]
+end
+
+plot(years ./ 1e3, days_eq, legend = false, dpi = 250, lw = 2)
+xlabel!(&quot;Time relative to present [kyr]&quot;)
+ylabel!(&quot;Day in March&quot;)
+title!(&quot;Date of Vernal Equinox Over 80 kyr&quot;)
+savefig(&quot;equinox_dates_long.png&quot;)</code></pre><p><img src="../equinox_dates_long.png" alt/></p><p>The date is plotted as a day offset from March 1, so negative values run back into February, January, and December: 50 kyr ago vernal equinox fell around December 16 on this calendar. Note how flat the curve is within a few millennia of the present, and how steeply it runs at the ends.</p><div class="admonition is-warning" id="A-fixed-calendar-date-is-not-a-fixed-season-in-deep-time-70e2480f23f4deaa"><header class="admonition-header">A fixed calendar date is not a fixed season in deep time<a class="admonition-anchor" href="#A-fixed-calendar-date-is-not-a-fixed-season-in-deep-time-70e2480f23f4deaa" title="Permalink"></a></header><div class="admonition-body"><p>Because the equinoxes and solstices migrate through the calendar, comparing insolation on the <em>same calendar date</em> at two widely separated times compares two different points on the orbit. Twenty-one thousand years ago, for example, northern summer solstice fell in mid-June by this calendar — the example below prints the exact date — so a &quot;June 21&quot; comparison mixes an orbital-parameter change with a seasonal offset of a week or more. Anchor paleoclimate comparisons to a season instead: locate the target solar longitude, or use a calendar-independent diagnostic such as the annual maximum of daily-mean insolation used below. Paleoclimate model intercomparisons conventionally fix vernal equinox to March 21 for the same reason.</p></div></div><h2 id="Using-Milankovitch-Cycles-in-Calculations"><a class="docs-heading-anchor" href="#Using-Milankovitch-Cycles-in-Calculations">Using Milankovitch Cycles in Calculations</a><a id="Using-Milankovitch-Cycles-in-Calculations-1"></a><a class="docs-heading-anchor-permalink" href="#Using-Milankovitch-Cycles-in-Calculations" title="Permalink"></a></h2><p>To use time-varying orbital parameters, load the orbital data once and pass it along with <code>milankovitch = true</code>:</p><pre><code class="language-julia hljs">using Insolation
+using Dates
+using ClimaParams
+
+# Load orbital data (do this once; construction is expensive)
+od = OrbitalDataSplines()
+params = InsolationParameters(Float64)
+
+lat = 65.0  # degrees North
+
+# Calendar date and value of the annual maximum of daily-mean insolation.
+# Scanning the whole year makes this independent of calendar drift.
+function summer_peak(lat, year, params, od)
+    milankovitch = true
+    Jan1 = DateTime(year, 1, 1)
+    F = [daily_insolation(Jan1 + Day(d), lat, params, od, milankovitch).F for d in 0:364]
+    imax = argmax(F)
+    return Date(Jan1 + Day(imax - 1)), F[imax]
+end
+
+# Year -19000 in astronomical numbering is ~21 kyr before J2000 (Last Glacial Maximum)
+day_modern, F_modern = summer_peak(lat, 2000, params, od)
+day_lgm, F_lgm = summer_peak(lat, -19000, params, od)
+
+println(&quot;Modern: $(round(F_modern, digits = 1)) W/m² on $day_modern&quot;)
+println(&quot;LGM:    $(round(F_lgm, digits = 1)) W/m² on $day_lgm&quot;)
+println(&quot;Difference: $(round(F_lgm - F_modern, digits = 1)) W/m²&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Modern: 478.3 W/m² on 2000-06-21
+LGM:    470.0 W/m² on -19000-06-13
+Difference: -8.3 W/m²</code></pre><p>Two things are worth noting. The peak is about 8 W/m² weaker at the Last Glacial Maximum, and nearly all of that comes from the lower obliquity then (23.0° versus 23.4°); the contemporaneous changes in eccentricity and longitude of perihelion largely offset one another at this latitude. And the peak falls on a different calendar date, which is the calendar drift of the previous section made concrete.</p><p>The orbital parameters themselves can be queried directly, indexed in Julian years since J2000:</p><pre><code class="language-julia hljs">ϖ, γ, e = orbital_params(od, -21000.0)
+println(&quot;21 kyr ago: ϖ = $(round(rad2deg(mod(ϖ, 2π)), digits = 1))°, &quot;,
+        &quot;γ = $(round(rad2deg(γ), digits = 2))°, e = $(round(e, digits = 4))&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">21 kyr ago: ϖ = 295.2°, γ = 22.96°, e = 0.0188</code></pre><h2 id="Milankovitch&#39;s-Diagnostic:-Peak-Summer-Insolation-at-65N"><a class="docs-heading-anchor" href="#Milankovitch&#39;s-Diagnostic:-Peak-Summer-Insolation-at-65N">Milankovitch&#39;s Diagnostic: Peak Summer Insolation at 65°N</a><a id="Milankovitch&#39;s-Diagnostic:-Peak-Summer-Insolation-at-65N-1"></a><a class="docs-heading-anchor-permalink" href="#Milankovitch&#39;s-Diagnostic:-Peak-Summer-Insolation-at-65N" title="Permalink"></a></h2><p>Turning around an earlier argument of James Croll&#39;s, which held that glacials begin with long, cold winters, Milankovitch argued that they begin with <em>cool summers</em>: when high-latitude northern summers are too weak to melt the previous winter&#39;s snow, ice sheets grow. His own measure was the insolation at 65°N accumulated over the summer half of the year, which he called the &quot;caloric summer half-year&quot;; peak (or solstitial) summer insolation at 65°N is the modern shorthand for it. Milankovitch spent years computing this by hand. Here it is over the past 700 kyr:</p><pre><code class="language-julia hljs">using Insolation
+using Dates
+using ClimaParams
+using Plots
+
+od = OrbitalDataSplines()
+params = InsolationParameters(Float64)
+
+function peak_summer_insolation(lat, year, params, od)
+    milankovitch = true
+    Jan1 = DateTime(round(Int, year), 1, 1)
+    return maximum(
+        daily_insolation(Jan1 + Day(d), lat, params, od, milankovitch).F for d in 0:364
+    )
+end
+
+years = collect(-700e3:200:0) # every 200 yr for a smooth curve
+F_65N = [peak_summer_insolation(65.0, yr, params, od) for yr in years]
+
+plot(years ./ 1e3, F_65N, legend = false, lw = 2, dpi = 250)
+xlabel!(&quot;Time relative to present [kyr]&quot;)
+ylabel!(&quot;Peak summer insolation\nat 65°N [W/m²]&quot;)
+title!(&quot;Peak Summer Insolation at 65°N (past 700 kyr)&quot;)
+savefig(&quot;insol_65N_ice_ages.png&quot;)</code></pre><p><img src="../insol_65N_ice_ages.png" alt/></p><p>Over the past 700 kyr the peak ranges from about 431 to 553 W/m², a spread of roughly 120 W/m², or 25% of the mean — large enough to be climatically plausible as a trigger. The rapid oscillation is precession, at 19–24 kyr. Its amplitude is visibly modulated by eccentricity on 100- and 405-kyr timescales: the swings are widest near 216 kyr ago, when eccentricity peaked at 0.050, and narrowest near 373 kyr ago, when the orbit was nearly circular at 0.0041 and precession had almost nothing left to modulate. Obliquity adds a weaker 41-kyr signal on top, visible as the alternating heights of successive precession peaks.</p><div class="admonition is-info" id="Precession-redistributes-insolation;-it-does-not-add-any-e3ad41845f17beaa"><header class="admonition-header">Precession redistributes insolation; it does not add any<a class="admonition-anchor" href="#Precession-redistributes-insolation;-it-does-not-add-any-e3ad41845f17beaa" title="Permalink"></a></header><div class="admonition-body"><p>The precession signal above is a redistribution <em>within</em> the seasonal cycle, not a change in the energy a season receives. The solar flux falls off as <code>d⁻²</code> while Earth&#39;s orbital angular velocity also varies as <code>d⁻²</code> (Kepler&#39;s second law), so the two cancel exactly: the energy received over a given arc of the orbit is independent of where in the orbit that arc falls (Herschel&#39;s law, 1832). Precession therefore leaves both the annual-mean insolation and the total insolation of each astronomical season unchanged at every latitude — it only trades peak intensity against season length. This is one reason the strong precession signal in the figure above has no clear counterpart in global paleotemperature spectra, whereas the 41-kyr obliquity signal, which <em>does</em> alter annual-mean insolation by latitude, is unmistakable.</p></div></div><p>The cancellation can be checked directly by turning the orbit halfway around, so that perihelion moves from southern to northern summer, while holding eccentricity and obliquity fixed:</p><pre><code class="language-julia hljs">import Insolation.Parameters as IP
+
+ϖ0 = IP.lon_perihelion_epoch(params)
+params_flipped = IP.InsolationParameters(Float64, (; lon_perihelion_epoch = ϖ0 + π))
+
+# Average over 1461 days ≈ 4 anomalistic years, so the sum spans whole orbits
+annual_mean(p) =
+    sum(daily_insolation(DateTime(2000, 1, 1) + Day(d), 65.0, p).F for d in 0:1460) / 1461
+
+peak(p) = maximum(daily_insolation(DateTime(2000, 1, 1) + Day(d), 65.0, p).F for d in 0:364)
+
+println(&quot;65°N annual mean:  ϖ = $(round(annual_mean(params), digits = 2)) W/m², &quot;,
+        &quot;ϖ + 180° = $(round(annual_mean(params_flipped), digits = 2)) W/m²&quot;)
+println(&quot;65°N summer peak:  ϖ = $(round(peak(params), digits = 1)) W/m², &quot;,
+        &quot;ϖ + 180° = $(round(peak(params_flipped), digits = 1)) W/m²&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">65°N annual mean:  ϖ = 213.84 W/m², ϖ + 180° = 213.83 W/m²
+65°N summer peak:  ϖ = 478.3 W/m², ϖ + 180° = 510.5 W/m²</code></pre><p>Moving perihelion from southern to northern summer raises the 65°N summer peak by more than 30 W/m², while leaving the annual mean unchanged to within the sampling error of the discrete daily sum (0.01 out of 214 W/m²).</p><p>That such a large seasonal signal leaves no clear fingerprint in global paleotemperature records — while the weaker 41-kyr obliquity signal does — is one of several open questions about how orbital forcing is translated into climate. The 1976 analysis of ocean sediment cores by Hays, Imbrie, and Shackleton established that orbital variations pace the ice ages; the nonlinear feedbacks in the ice sheets and carbon cycle that amplify these insolation shifts — whose global, annual-mean component is only of order 0.1% — into full glacial cycles, and that produce the ~100-kyr sawtooth of the past million years, remain incompletely understood.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../InsolationExamples/">« Examples</a><a class="docs-footer-nextpage" href="../SolarGeometry/">Mathematical Background »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 4 August 2026 17:39">Tuesday 4 August 2026</span>. Using Julia version 1.10.11.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

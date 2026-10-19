@@ -1,0 +1,43 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sun circle in Julia blue -->
+  <circle cx="80" cy="80" r="30" fill="#4063D8" stroke="#4063D8" stroke-width="2"/>
+
+  <!-- Sun rays -->
+  <g transform="translate(80, 80)">
+    <g id="rays">
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(0)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(30)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(60)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(90)"/>
+      <!-- <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(120)"/> -->
+      <!-- <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(150)"/> -->
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(180)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(210)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(240)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(270)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(300)"/>
+      <rect x="-2" y="-50" width="4" height="10" fill="#4063D8" transform="rotate(330)"/>
+    </g>
+  </g>
+
+  <!-- Three radiation arrows in other Julia colors - positioned outside sun, pointing southeast -->
+  <g transform="translate(100, 100)">
+    <!-- Arrow 1: Green (#389826) -->
+    <g transform="rotate(135) translate(20, -60)">
+      <path d="M 0 40 L 0 10 L 10 10 L 0 0 L -10 10 L 0 10 Z" fill="#389826"/>
+      <line x1="0" y1="-10" x2="0" y2="40" stroke="#389826" stroke-width="4"/>
+    </g>
+    
+    <!-- Arrow 2: Purple (#9558B2) -->
+    <g transform="rotate(135) translate(0, -60)">
+      <path d="M 0 40 L 0 10 L 10 10 L 0 0 L -10 10 L 0 10 Z" fill="#9558B2"/>
+      <line x1="0" y1="-10" x2="0" y2="40" stroke="#9558B2" stroke-width="4"/>
+    </g>
+    
+    <!-- Arrow 3: Red (#CB3C33) -->
+    <g transform="rotate(135) translate(-20, -60)">
+      <path d="M 0 40 L 0 10 L 10 10 L 0 0 L -10 10 L 0 10 Z" fill="#CB3C33"/>
+      <line x1="0" y1="-10" x2="0" y2="40" stroke="#CB3C33" stroke-width="4"/>
+    </g>
+  </g>
+</svg>
